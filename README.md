@@ -54,6 +54,47 @@ public/struct/       whole-drug structures (WebP)
 public/parts/        chelator / linker / vector fragments (PNG)
 ```
 
+## Deploy elsewhere (self-hosting / institutional platform)
+
+This is a **pure static site** — no backend, no database connection at runtime. The
+build output in `dist/` can be served from any static host.
+
+```bash
+npm run build      # → dist/
+```
+
+### Sub-path deployment
+
+If the site will live under a sub-path (e.g. `https://data.example.edu.cn/nucmed/`),
+set `VITE_BASE` before building so all asset URLs are prefixed correctly:
+
+```powershell
+$env:VITE_BASE = "/nucmed/"      # PowerShell
+npm run build
+```
+
+```bash
+VITE_BASE=/nucmed/ npm run build  # bash
+```
+
+Default (variable unset) is `base = "/"`, which is correct for:
+- GitHub Pages **user/organization** sites (`user.github.io`)
+- Netlify / Vercel / any dedicated domain
+- local `npm run dev` / `npm run preview`
+
+### SPA fallback (must be configured on the host)
+
+`react-router` uses client-side routes (`/drug/322`). Every host needs a rewrite to
+`index.html`, otherwise a direct visit returns 404:
+
+| Host | Already provided |
+|---|---|
+| GitHub Pages | `dist/404.html` (emitted automatically by `npm run build`) |
+| Netlify / Cloudflare Pages | `public/_redirects` (`/*  /index.html  200`) |
+| Vercel | `vercel.json` (`rewrites`) |
+| nginx | `try_files $uri $uri/ /index.html;` |
+| Apache | `FallbackResource /index.html` |
+
 ## License
 
 - **Code**: MIT (see `LICENSE`)
