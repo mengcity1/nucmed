@@ -11,6 +11,11 @@ preview.log
 Thumbs.db
 *.tsbuildinfo
 
+# ── ★ 内部待办数据，不进库也不部署（2026-10-28） ──────
+# public/data/candidates.json = 3,779 个"看过但未入库"的候选 + tier 分级，
+# 属内部进度表，前端已不使用，不从 export_data.py 导出。
+public/data/candidates.json
+
 # ── ★ 注意：以下**必须进库**（Vercel 构建时要用，无法在云端重生成）
 #   public/data/       导出数据 13 MB
 #   public/struct/     整药结构图 37.6 MB / 2,229 张

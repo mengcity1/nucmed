@@ -270,17 +270,20 @@ def main() -> int:
             agg["by_prop"].items(), key=lambda kv: -kv[1]["n"]))
         sizes["props_agg.json"] = dump("props_agg.json", agg)
 
-        # 库外候选（原「🗂 库外候选」页）
-        cand_cols = [
-            "canon_key", "name", "nuclide", "tier", "target_zh",
-            "n_pmids", "n_trials", "namedness", "top_journal",
-        ]
-        cands = rows_to_dicts(
-            con,
-            "SELECT " + ",".join(cand_cols) + " FROM ext_candidate ORDER BY canon_key",
-            cand_cols,
-        )
-        sizes["candidates.json"] = dump("candidates.json", cands)
+        # ★ 2026-10-28：库外候选**不再导出**（原「🗂 库外候选」页已下线）
+        #   理由：① 三页架构里前端不加载它；② 它是内部待办清单（3,779 个未入库候选 +
+        #   tier 分级 + namedness），性质与「已完成的事实数据」不同，不适合随网站公开。
+        #   将来若要展示覆盖边界，在本地临时导出，不要默认写进 public/data。
+        # cand_cols = [
+        #     "canon_key", "name", "nuclide", "tier", "target_zh",
+        #     "n_pmids", "n_trials", "namedness", "top_journal",
+        # ]
+        # cands = rows_to_dicts(
+        #     con,
+        #     "SELECT " + ",".join(cand_cols) + " FROM ext_candidate ORDER BY canon_key",
+        #     cand_cols,
+        # )
+        # sizes["candidates.json"] = dump("candidates.json", cands)
 
         def dist(sql: str) -> list:
             return [{"k": r[0], "n": r[1]} for r in con.execute(sql).fetchall()]
