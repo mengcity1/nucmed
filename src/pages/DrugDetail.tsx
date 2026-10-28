@@ -301,6 +301,10 @@ export default function DrugDetail() {
     const ids = drugRefs ?? pmids;
     return ids.map((p) => refMeta?.[p] ?? { pmid: p, title: null, journal: null, year: null });
   }, [drugRefs, refMeta, pmids]);
+
+  /** 分两组：① 该药生物分布数值的出处 ② 其余相关文献（背景/方法/临床） */
+  const srcRefs = useMemo(() => refList.filter((r) => pmids.includes(r.pmid)), [refList, pmids]);
+  const otherRefs = useMemo(() => refList.filter((r) => !pmids.includes(r.pmid)), [refList, pmids]);
   const hits = useMemo(() => {
     const k = pick.trim().toLowerCase();
     return (drugs ?? [])
@@ -795,40 +799,63 @@ export default function DrugDetail() {
           <span className="text-[12.5px] text-ink-3">
             {drugRefs === null
               ? "加载中…"
-              : `共 ${fmt(refList.length)} 篇 · 其中 ${fmt(refList.filter((r) => pmids.includes(r.pmid)).length)} 篇是生物分布来源`}
+              : `共 ${fmt(refList.length)} 篇 = 分布来源 ${fmt(srcRefs.length)} + 其他 ${fmt(otherRefs.length)}`}
           </span>
         </div>
-        <div className="card mt-3 divide-y divide-[#f1f4f9]">
-          {refList.slice(0, 30).map((r) => {
-            const isSrc = pmids.includes(r.pmid);
-            return (
-              <div key={r.pmid} className="px-5 py-3">
-                <a
-                  href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[13px] font-medium text-brand hover:underline"
-                >
-                  {r.title || `PMID ${r.pmid}`}
-                </a>
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-3">
-                  <span className="num">{r.pmid}</span>
-                  <span>· {r.journal ?? "—"} {r.year ?? ""}</span>
-                  {isSrc && (
-                    <span className="rounded bg-[#dcfce7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#166534]">
-                      生物分布来源
+
+        {drugRefs !== null &&
+          [
+            { key: "src", title: "生物分布来源", tone: "src", items: srcRefs,
+              hint: "该药分布数值的出处 —— 能和「生物分布」Tab 里的 PMID 对上" },
+            { key: "other", title: "其他相关文献", tone: "other", items: otherRefs,
+              hint: "背景 / 方法 / 临床研究；未直接提供本站的分布数值" },
+          ]
+            .filter((g) => g.items.length > 0)
+            .map((g) => (
+              <div key={g.key} className="mt-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="flex items-center gap-2 text-[13.5px] font-semibold">
+                    <span
+                      className={
+                        g.tone === "src"
+                          ? "rounded bg-[#dcfce7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#166534]"
+                          : "rounded bg-[#eef2f8] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
+                      }
+                    >
+                      {g.tone === "src" ? "来源" : "背景"}
                     </span>
+                    {g.title} · {fmt(g.items.length)} 篇
+                  </h3>
+                  <span className="text-[11.5px] text-ink-3">{g.hint}</span>
+                </div>
+                <div className="card mt-2 divide-y divide-[#f1f4f9]">
+                  {g.items.slice(0, 30).map((r) => (
+                    <div key={r.pmid} className="px-5 py-3">
+                      <a
+                        href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[13px] font-medium text-brand hover:underline"
+                      >
+                        {r.title || `PMID ${r.pmid}`}
+                      </a>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-3">
+                        <span className="num">{r.pmid}</span>
+                        <span>· {r.journal ?? "—"} {r.year ?? ""}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {g.items.length > 30 && (
+                    <div className="px-5 py-3 text-[12px] text-ink-3">
+                      仅显示前 30 篇（共 {fmt(g.items.length)} 篇）—— 按 PMID 升序。
+                    </div>
                   )}
                 </div>
               </div>
-            );
-          })}
-          {drugRefs !== null && refList.length > 30 && (
-            <div className="px-5 py-3 text-[12px] text-ink-3">
-              仅显示前 30 篇（共 {fmt(refList.length)} 篇）—— 按 PMID 升序，可去 PubMed 检索该药补全。
-            </div>
-          )}
-          {drugRefs !== null && !refList.length && (
+            ))}
+
+        {drugRefs !== null && !refList.length && (
+          <div className="card mt-3">
             <EmptyState
               title="该药暂无关联文献"
               hint="库内既没有它的生物分布来源文献，也没有药物级参考文献关联。"
@@ -843,8 +870,8 @@ export default function DrugDetail() {
                 </button>
               )}
             </EmptyState>
-          )}
-        </div>
+          </div>
+        )}
       </section>
       )}
     </div>
