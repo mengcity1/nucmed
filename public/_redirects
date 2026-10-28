@@ -1,0 +1,4 @@
+# Netlify / Cloudflare Pages 的 SPA 回退规则
+# 作用：任何不存在的路径都返回 index.html（200），由 react-router 接管
+# 没有这一行，直接访问 /drug/322 会 404
+/*    /index.html    200

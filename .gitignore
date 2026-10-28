@@ -1,0 +1,18 @@
+# ── 依赖与构建产物（不进库） ─────────────────────────
+node_modules/
+dist/
+*.log
+dev.log
+preview.log
+
+# ── 本地/编辑器 ──────────────────────────────────
+.vite/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# ── ★ 注意：以下**必须进库**（Vercel 构建时要用，无法在云端重生成）
+#   public/data/       导出数据 13 MB
+#   public/struct/     整药结构图 37.6 MB / 2,229 张
+#   public/parts/      分段结构图 19.6 MB / 1,703 张
+#   这些由本地 Python/RDKit 生成，云端没有 RDKit 环境，删了网站就没图没数据。

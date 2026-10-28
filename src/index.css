@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: #1e5ba8;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-[#f6f8fc] text-ink font-sans text-[14px] leading-relaxed;
+    background-image: radial-gradient(900px 400px at 8% -8%, #e9f0fb 0%, rgba(233, 240, 251, 0) 70%),
+      radial-gradient(700px 320px at 100% 0%, #eef4fd 0%, rgba(238, 244, 253, 0) 65%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: #cfe1f7;
+  }
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto max-w-[1240px] px-6 md:px-8;
+  }
+  .card {
+    @apply rounded-md2 border border-line bg-white shadow-s1;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-s2 hover:border-[#d5e0f0];
+  }
+  .num {
+    @apply font-mono tabular-nums;
+  }
+  .label {
+    @apply text-[12.5px] font-medium text-ink-3;
+  }
+  .kpi-val {
+    @apply num mt-1.5 text-[32px] font-semibold leading-none tracking-tight text-ink;
+  }
+  .badge {
+    @apply inline-flex h-5 min-w-[22px] items-center justify-center rounded px-1.5 text-[11px] font-bold;
+  }
+  .badge-a {
+    @apply border border-[#c6e8e1] bg-[#e6f4f1] text-[#0a7d6f];
+  }
+  .badge-b {
+    @apply border border-[#dfe6f0] bg-[#eef2f8] text-[#516078];
+  }
+  .badge-c {
+    @apply border border-[#f6e3c8] bg-[#fdf3e7] text-[#a9620d];
+  }
+  .tab {
+    @apply relative flex items-center gap-1.5 rounded-[11px] px-4 py-2 text-[14px] font-medium text-ink-2
+      transition-all duration-150 hover:bg-[#eff3f9] hover:text-ink;
+  }
+  .tab-on {
+    @apply bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.55)] hover:bg-brand-deep hover:text-white;
+  }
+
+  /* 筛选标签（大尺寸 · 醒目选中态） */
+  .chip {
+    @apply inline-flex select-none items-center gap-1.5 rounded-[11px] border px-4 py-2 text-[13.5px]
+      font-medium transition-all duration-150;
+  }
+  .chip-off {
+    @apply border-line bg-white text-ink-2 shadow-s1 hover:-translate-y-px hover:border-[#b9d0e9]
+      hover:text-ink hover:shadow-s2;
+  }
+  .chip-on {
+    @apply border-brand bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.6)];
+  }
+
+  /* 区块标题 */
+  .sec-title {
+    @apply text-[15px] font-semibold tracking-tight text-ink;
+  }
+  .sec-sub {
+    @apply mt-1 text-[12.5px] text-ink-3;
+  }
+}
