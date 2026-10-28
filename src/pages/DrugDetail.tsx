@@ -236,14 +236,56 @@ export default function DrugDetail() {
   const did = id ? Number(id) : 0;
   const { data: drugs, error: drugsErr, loading: drugsLoading, reload: reloadDrugs } = useJSON<Drug[]>("drugs.json");
   const { data: pts } = useJSON<Point[]>("biodist.json");
-  const { data: refs } = useJSON<Ref[]>("refs.json");
   const { data: raw } = useJSON<Record<string, string>>("raw.json");
   const [pick, setPick] = useState("");
   const [openId, setOpenId] = useState<number | null>(null);
   const [zoom, setZoom] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("bio");
+  // ★ 结构图来源（884 浙大 / 575 示意图 / 11 肽段 2D / 759 本地 RDKit）：此前一律标成 radiopharm，属错标
+  const [structSrc, setStructSrc] = useState<string | null>(null);
+  // ★ 文献扩展：drug_refs（药→pmid）+ refs_all（题录）懒加载，避免首屏多拉 1 MB
+  const [drugRefs, setDrugRefs] = useState<string[] | null>(null);
+  const [refMeta, setRefMeta] = useState<Record<string, Ref> | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}struct/manifest.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string>) => alive && setStructSrc(m[String(did)] ?? null))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [did]);
+
+  useEffect(() => {
+    if (tab !== "refs" || drugRefs) return;
+    let alive = true;
+    Promise.all([
+      fetch(`${import.meta.env.BASE_URL}data/drug_refs.json`, { cache: "no-cache" }).then((r) => r.json()),
+      fetch(`${import.meta.env.BASE_URL}data/refs_all.json`, { cache: "no-cache" }).then((r) => r.json()),
+    ])
+      .then(([map, meta]) => {
+        if (!alive) return;
+        setDrugRefs((map as Record<string, string[]>)[String(did)] ?? []);
+        const idx: Record<string, Ref> = {};
+        for (const r of meta as Ref[]) idx[String(r.pmid)] = r;
+        setRefMeta(idx);
+      })
+      .catch(() => {
+        if (alive) {
+          setDrugRefs([]);
+          setRefMeta({});
+        }
+      });
+    return () => {
+      alive = false;
+    };
+  }, [tab, did, drugRefs]);
+
   // ★ 图片加载失败要「说出来」，不能静默 display:none（否则表现为「有标题、没图」）
   const [imgErr, setImgErr] = useState<Record<string, boolean>>({});
+
 
   const drug = useMemo(() => (drugs ?? []).find((d) => d.drug_id === did), [drugs, did]);
   const mine = useMemo(() => (pts ?? []).filter((p) => p.drug_id === did), [pts, did]);
@@ -254,7 +296,11 @@ export default function DrugDetail() {
     () => [...new Set(mine.map((p) => p.doc_pmid).filter(Boolean) as string[])],
     [mine]
   );
-  const myRefs = useMemo(() => (refs ?? []).filter((r) => pmids.includes(r.pmid)), [refs, pmids]);
+  /** 文献列表：优先药物级参考文献（drug_refs + refs_all）；未加载完时先按 biodist 来源占位 */
+  const refList = useMemo<Ref[]>(() => {
+    const ids = drugRefs ?? pmids;
+    return ids.map((p) => refMeta?.[p] ?? { pmid: p, title: null, journal: null, year: null });
+  }, [drugRefs, refMeta, pmids]);
   const hits = useMemo(() => {
     const k = pick.trim().toLowerCase();
     return (drugs ?? [])
@@ -393,7 +439,7 @@ export default function DrugDetail() {
     },
     { key: "dos", label: "剂量学", ok: (drug.n_dosim ?? 0) > 0, hint: `${fmt(drug.n_dosim ?? 0)} 条` },
     { key: "tbr", label: "靶本比", ok: (drug.has_tbr ?? 0) === 1, hint: "有记录" },
-    { key: "refs", label: "文献", ok: (drug.n_refs ?? myRefs.length) > 0, hint: `${fmt(drug.n_refs ?? myRefs.length)} 篇` },
+    { key: "refs", label: "文献", ok: (drug.n_refs ?? pmids.length) > 0, hint: `${fmt(drug.n_refs ?? pmids.length)} 篇来源` },
   ];
 
   return (
@@ -495,7 +541,11 @@ export default function DrugDetail() {
             <div className="mb-3 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-ink">完整结构图（点击放大）</span>
               <span className="text-[11.5px] text-ink-3">
-                radiopharm.idrblab.cn · 口径 ligand_only
+                {structSrc === "ligand" && "radiopharm.idrblab.cn · 外部来源（ligand_only）"}
+                {structSrc === "schematic" && "抗体/多肽示意图 · 本库绘制（非精确结构）"}
+                {structSrc === "peptide2d" && "肽段 2D 结构 · 本库整理"}
+                {structSrc === "rdkit" && "由库内 SMILES 经 RDKit 现画"}
+                {!structSrc && "来源未标注"}
               </span>
             </div>
             <div className="flex justify-center">
@@ -740,31 +790,48 @@ export default function DrugDetail() {
 
       {tab === "refs" && (
       <section className="mt-5">
-        <h2 className="text-[16px] font-semibold">相关文献</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-[16px] font-semibold">相关文献</h2>
+          <span className="text-[12.5px] text-ink-3">
+            {drugRefs === null
+              ? "加载中…"
+              : `共 ${fmt(refList.length)} 篇 · 其中 ${fmt(refList.filter((r) => pmids.includes(r.pmid)).length)} 篇是生物分布来源`}
+          </span>
+        </div>
         <div className="card mt-3 divide-y divide-[#f1f4f9]">
-          {myRefs.slice(0, 12).map((r) => (
-            <div key={r.pmid} className="px-5 py-3">
-              <a
-                href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[13px] font-medium text-brand hover:underline"
-              >
-                {r.title || `PMID ${r.pmid}`}
-              </a>
-              <div className="mt-0.5 text-[12px] text-ink-3">
-                <span className="num">{r.pmid}</span> · {r.journal ?? "—"} {r.year ?? ""}
+          {refList.slice(0, 30).map((r) => {
+            const isSrc = pmids.includes(r.pmid);
+            return (
+              <div key={r.pmid} className="px-5 py-3">
+                <a
+                  href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[13px] font-medium text-brand hover:underline"
+                >
+                  {r.title || `PMID ${r.pmid}`}
+                </a>
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-3">
+                  <span className="num">{r.pmid}</span>
+                  <span>· {r.journal ?? "—"} {r.year ?? ""}</span>
+                  {isSrc && (
+                    <span className="rounded bg-[#dcfce7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#166534]">
+                      生物分布来源
+                    </span>
+                  )}
+                </div>
               </div>
+            );
+          })}
+          {drugRefs !== null && refList.length > 30 && (
+            <div className="px-5 py-3 text-[12px] text-ink-3">
+              仅显示前 30 篇（共 {fmt(refList.length)} 篇）—— 按 PMID 升序，可去 PubMed 检索该药补全。
             </div>
-          ))}
-          {!myRefs.length && (
+          )}
+          {drugRefs !== null && !refList.length && (
             <EmptyState
-              title="暂无关联文献记录"
-              hint={
-                (drug.n_refs ?? 0) > 0
-                  ? `库内标记该药有 ${fmt(drug.n_refs ?? 0)} 篇文献，但生物分布记录里没有可对应的 PMID —— 文献明细未随本站数据导出。`
-                  : "该药的生物分布记录里没有 PMID，因此无法反查文献。"
-              }
+              title="该药暂无关联文献"
+              hint="库内既没有它的生物分布来源文献，也没有药物级参考文献关联。"
             >
               {(drug.n_points ?? 0) > 0 && (
                 <button

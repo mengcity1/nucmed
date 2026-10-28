@@ -254,6 +254,32 @@ def main() -> int:
                       key=lambda r: str(r["pmid"]))
         sizes["refs.json"] = dump("refs.json", refs)
 
+        # ★ pk271：「文献」Tab 原先只显示 biodist 来源（528 个 pmid ⇒ 每药基本 1 篇）。
+        #   库里 rel_drug_ref 有 3,005 药 / 16,621 链接 / 4,486 去重 pmid，这里单独导出两份：
+        #   drug_refs.json（药 → pmids，供前端懒加载）+ refs_all.json（这些 pmid 的题录）。
+        drug_refs: dict[str, list[str]] = {}
+        for did, pmid in con.execute(
+            "SELECT r.drug_id, f.pmid FROM rel_drug_ref r JOIN ref f ON f.id = r.ref_id "
+            "WHERE f.pmid IS NOT NULL AND TRIM(f.pmid) <> '' "
+            "GROUP BY r.drug_id, f.pmid ORDER BY r.drug_id, f.pmid"
+        ):
+            drug_refs.setdefault(str(did), []).append(str(pmid))
+        sizes["drug_refs.json"] = dump("drug_refs.json", drug_refs)
+
+        refs_all = rows_to_dicts(
+            con,
+            "SELECT pmid, title, journal, year, doi FROM ("
+            "  SELECT r.pmid, r.title, r.journal, r.year, r.doi,"
+            "         ROW_NUMBER() OVER (PARTITION BY r.pmid"
+            "           ORDER BY (r.title IS NOT NULL AND TRIM(r.title) <> '') DESC, r.id) AS rn"
+            "  FROM ref r WHERE r.pmid IS NOT NULL AND r.pmid IN ("
+            "    SELECT f.pmid FROM rel_drug_ref d JOIN ref f ON f.id = d.ref_id"
+            "    WHERE f.pmid IS NOT NULL AND TRIM(f.pmid) <> '')"
+            ") WHERE rn = 1 ORDER BY pmid",
+            ["pmid", "title", "journal", "year", "doi"],
+        )
+        sizes["refs_all.json"] = dump("refs_all.json", refs_all)
+
         # 文献性质（原「📑 文献性质 v0.2」页）—— 不含 raw_text 以控体积
         prop_cols = [
             "drug_id", "prop_code", "value_num", "unit", "organ",
