@@ -100,11 +100,14 @@ export type Meta = {
 
 const cache = new Map<string, unknown>();
 
-/** 从 public/data 加载（同一次会话内缓存，避免重复请求）。 */
+/** 从 public/data 加载（同一次会话内缓存，避免重复请求）。
+ *  ★ cache: "no-cache" —— 数据文件名不带 hash，GitHub Pages 默认 max-age=600，
+ *    部署后 10 分钟内浏览器还会拿旧 JSON（refs.json 从 280→528 时就撞过）。
+ *    no-cache = 每次都带 ETag 回源校验，未变则 304，几乎无开销。 */
 export function loadJSON<T>(name: string): Promise<T> {
   const hit = cache.get(name);
   if (hit) return Promise.resolve(hit as T);
-  return fetch(`${import.meta.env.BASE_URL}data/${name}`)
+  return fetch(`${import.meta.env.BASE_URL}data/${name}`, { cache: "no-cache" })
     .then((r) => {
       if (!r.ok) throw new Error(`${name} 加载失败：HTTP ${r.status}`);
       return r.json() as Promise<T>;

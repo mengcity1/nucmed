@@ -30,7 +30,7 @@ function useFigs() {
   useEffect(() => {
     let alive = true;
     setErr(null);
-    fetch(`${BASE}figs/manifest.json`)
+    fetch(`${BASE}figs/manifest.json`, { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`manifest.json 加载失败：HTTP ${r.status}`))))
       .then((v: Fig[]) => alive && setData(v))
       .catch((e: Error) => alive && setErr(e.message));
