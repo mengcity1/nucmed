@@ -1,0 +1,178 @@
+[
+ {
+  "drug_id": 1324,
+  "drug_name": "Lutetium Lu 177 dotatate",
+  "pmid": "41951775",
+  "pmcid": "PMC13062086",
+  "label": "Fig. 3",
+  "caption": "Ex vivo biodistributions and µSPECT/CT scans performed in AR42J tumor-bearing female CD1 nu/nu mice.A Ex vivo biodistribution data of [18F]Lu-rhTATE4 (n = 3, 300 pmol each) and competition study (47 pmol + 40 nmol Ga-DOTA-TATE, n = 1) in selected organs 1 h post injection (p.i.) (exact values Table ",
+  "license": "CC BY 4.0",
+  "attrib": "comparator",
+  "file": "1324_PMC13062086_44303_2026_155_Fig3_HTML.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "41510164",
+  "pmcid": "PMC12775650",
+  "label": "Figure 5",
+  "caption": "(A) Representative Sagittal [18F]FDG PET images of healthy mice compared to treatment groups (PBS, 7.4 MBq and 18.5 MBq of [131I]I-BCMA-Nb,) acquired pre- and post-treatment regimen. Quantitative analysis of [18F]FDG uptake in bone marrow of the (B) spine, (C)femur, (D) arm, and (E) skull across all",
+  "license": "Open access",
+  "attrib": "comparator",
+  "file": "307_PMC12775650_thnov16p2748g005.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29190900",
+  "pmcid": "PMC5696166",
+  "label": "Figure 3",
+  "caption": "Small animal PET imaging of 64Cu-PCTA-cetuximab in SNU-1066 HNSCC xenograft modelPET images were acquired at 2 h, 24 h and 48 h after injection of 64Cu-PCTA-cetuximab and represented as SUV. (a) 64Cu-PCTA-cetuximab was selectively localized in SNU-1066 tumor. After PET imaging, mice were immediately",
+  "license": "CC BY 4.0",
+  "attrib": "comparator",
+  "file": "307_PMC5696166_oncotarget-08-92090-g003.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29190900",
+  "pmcid": "PMC5696166",
+  "label": "Figure 4",
+  "caption": "Micro-SPECT/CT images of 177Lu-PCTA-cetuximab in SNU-1066 HNSCC xenograft model(a) At 7 days post-injection of 177Lu-PCTA-cetuximab (12.95 MBq/100 μg), SPECT/CT volume and coronal section images were acquired for 2 h with small animal SPECT/CT system (Bioscan). (b) In blocking experiment, SPECT/CT v",
+  "license": "CC BY 4.0",
+  "attrib": "comparator",
+  "file": "307_PMC5696166_oncotarget-08-92090-g004.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29392086",
+  "pmcid": "PMC5772849",
+  "label": "Figure 2",
+  "caption": "Biodistribution of 64Cu radioactivity in C57BL/6 mice orally administered with 64CuCl2 by PET/CT imaging(A) At 24h PO, prominent 64Cu radioactivity in the liver and gastrointestinal tracts were visualized on PET/CT images. Residual 64Cu radioactivity in oral cavity was also noted. (B) PET quantitati",
+  "license": "Open access",
+  "attrib": "comparator",
+  "file": "307_PMC5772849_ad-9-1-109-g2.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29392086",
+  "pmcid": "PMC5772849",
+  "label": "Figure 3",
+  "caption": "Whole brain regional 64Cu uptake at different ages assessed using longitudinal PET imaging(A) Whole brain 64Cu uptake (mean ± SD %ID/g) at 5, 13 and 26 months of age acquired at 2h and 24h post oral administration of the 64CuCl2 PET tracer. (B) Transaxial images showing regional 64Cu radioactivity (",
+  "license": "Open access",
+  "attrib": "comparator",
+  "file": "307_PMC5772849_ad-9-1-109-g3.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29392086",
+  "pmcid": "PMC5772849",
+  "label": "Figure 4",
+  "caption": "Biodistribution of 18F-FDG radioactivity (mean ± SD %ID/g) in C57BL/6 mice orally administered with 18F-FDG by PET/CT imaging(A) At 1h PO, prominent 18F-FDG radioactivity in the brain and gastrointestinal tracts was visualized on PET/CT images. Residual 18F-FDG was noted in oral cavity. (B) PET quan",
+  "license": "Open access",
+  "attrib": "target",
+  "file": "307_PMC5772849_ad-9-1-109-g4.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29507674",
+  "pmcid": "PMC5823645",
+  "label": "Figure 2",
+  "caption": "PET imaging and quantification with 64Cu-TE2A-9E7.4 and 64CuCl2 in tumor-bearing miceMaximum intensity projections of PET and CT imaging at 2 h post-injection (PI) (A) and at 24 h PI (B) of Mouse 2 showing uptakes in both subcutaneous tumors and of an iliac lymph node (Tumors are indicated by arrows",
+  "license": "CC BY 4.0",
+  "attrib": "comparator",
+  "file": "307_PMC5823645_oncotarget-09-9061-g002.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "29904818",
+  "pmcid": "PMC6003898",
+  "label": "Fig. 5",
+  "caption": "Example of magnetic resonance images and PET images obtained with 18F-FDG and with 68Ga-NODAGA-RGD in a rat brain with an engrafted glioblastoma tumor (white arrows)",
+  "license": "CC BY 4.0",
+  "attrib": "unclear",
+  "file": "307_PMC6003898_13550_2018_405_Fig5_HTML.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "31137758",
+  "pmcid": "PMC6567828",
+  "label": "Figure 2",
+  "caption": "Positron emission tomography (PET) imaging with 89Zr-DFO-9E7.4, 18F-FDG-PET and 89Zr-oxalate in tumor-bearing mice. Maximum intensity projections of PET and CT imaging at 24 h post-injection (PI) (A) of Mouse 1 showing uptake of a subcutaneous tumor (Tumors are indicated by red arrows). Maximum inte",
+  "license": "CC BY (MDPI)",
+  "attrib": "unclear",
+  "file": "307_PMC6567828_ijms-20-02564-g002.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "31137758",
+  "pmcid": "PMC6567828",
+  "label": "Figure 3",
+  "caption": "PET imaging with 89Zr-DFO-9E7.4 in the subcutaneous (SC) model. Maximum intensity projections of PET imaging at 24 h post-injection (PI) (A;D), 48 h PI (B;E) and 72 h PI (C;F) showing uptake of a subcutaneous tumor and of an inguinal lymph node (Tumors are indicated by red arrows) (Mouse 8). Green a",
+  "license": "CC BY (MDPI)",
+  "attrib": "comparator",
+  "file": "307_PMC6567828_ijms-20-02564-g003.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "31137758",
+  "pmcid": "PMC6567828",
+  "label": "Figure 5",
+  "caption": "PET imaging and Digital autoradiography acquisitions performed on femurs of Mice imaged with 89Zr-DFO-9E7.4 or 89Zr-oxalate. Maximum intensity projections of PET and CT imaging with 89Zr-DFO-9E7.4 at 24 h post-injection (PI) (A) of Mouse 14 showing uptake in the left femur. Maximum intensity project",
+  "license": "CC BY (MDPI)",
+  "attrib": "comparator",
+  "file": "307_PMC6567828_ijms-20-02564-g005.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "33273603",
+  "pmcid": "PMC7713063",
+  "label": "Figure 7",
+  "caption": "Maximum intensity projection (MIP) PET images at 1 h p.i. of two mice with either PSMA positive tumors (LNCaP, top) or PSMA negative tumors (PC3, bottom). Images show high kidney and bladder uptake and low/absent liver uptake, suggesting predominantly renal clearance.",
+  "license": "CC BY 4.0",
+  "attrib": "unclear",
+  "file": "307_PMC7713063_41598_2020_78273_Fig7_HTML.jpg"
+ },
+ {
+  "drug_id": 307,
+  "drug_name": "Fludeoxyglucose F-18",
+  "pmid": "32676914",
+  "pmcid": "PMC8709820",
+  "label": "Figure 4",
+  "caption": "Specificity of 68Ga-mCXCL12. (A) Unblocked slices with 68Ga-mCXCL12 accumulation in the infarcted heart in the anterior and antero-septal wall (bottom row). After blocking with CXCR4 antibody sections show no visible 68Ga-mCXCL12 uptake anymore (top row). (B) Significantly higher 68Ga-mCXCL12 myocar",
+  "license": "CC BY 4.0",
+  "attrib": "unclear",
+  "file": "307_PMC8709820_12350_2020_2262_Fig4_HTML.jpg"
+ },
+ {
+  "drug_id": 338,
+  "drug_name": "Piflufolastat F-18",
+  "pmid": "30737299",
+  "pmcid": "PMC6681697",
+  "label": "FIGURE 3",
+  "caption": "PET/CT images (maximum-intensity projections) of LNCaP tumor–bearing mice at 1 h after injection, with and without blocking by coinjection of unlabeled DCFPyL. Arrows locate tumors.",
+  "license": "CC BY 4.0",
+  "attrib": "unclear",
+  "file": "338_PMC6681697_1160fig3.jpg"
+ },
+ {
+  "drug_id": 338,
+  "drug_name": "Piflufolastat F-18",
+  "pmid": "30737299",
+  "pmcid": "PMC6681697",
+  "label": "FIGURE 6",
+  "caption": "PET/CT images (maximum-intensity projections in black on white to display background activity), comparing 18F-DCFPyL (A) with 18F-8 (B), showing similar image contrast with lower liver accumulation for compound 8. Maximum of scale corresponds to 10 %ID/g for both radiotracers.",
+  "license": "CC BY 4.0",
+  "attrib": "target",
+  "file": "338_PMC6681697_1160fig6.jpg"
+ }
+]

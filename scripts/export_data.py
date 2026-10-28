@@ -75,6 +75,14 @@ def main() -> int:
             "WHERE reason='comparative_context' AND resolved_at IS NULL))"
         )
 
+        # ★ pk270：发布口径下的 doc_pmid 集合（refs 导出复用同一口径，避免又长出第二份）
+        PUB_PMID = (
+            "SELECT p.doc_pmid FROM biodist_point p "
+            "WHERE p.doc_pmid IS NOT NULL AND TRIM(p.doc_pmid) <> '' "
+            "AND p.id NOT IN (SELECT row_id FROM backfill_queue "
+            "WHERE reason='comparative_context' AND resolved_at IS NULL)"
+        )
+
         pts = rows_to_dicts(
             con,
             "SELECT "
@@ -223,14 +231,27 @@ def main() -> int:
             })
         sizes["dosimetry.json"] = dump("dosimetry.json", dos_out)
 
+        # ★ pk270 修：refs 原从 lit_doc 导，只覆盖 280/528 个 doi/pmid ⇒ 394 个药的「文献」Tab 是空的。
+        #   改以 ref 表为主（527/528，523 条有标题），lit_doc 只作兜底。口径仍只读、不改任何数值。
         refs = rows_to_dicts(
             con,
-            "SELECT pmid, title, journal, year, doi FROM lit_doc "
-            "WHERE pmid IS NOT NULL AND pmid IN "
-            "(SELECT doc_pmid FROM biodist_point WHERE doc_pmid IS NOT NULL) "
-            "GROUP BY pmid ORDER BY pmid",
+            "SELECT pmid, title, journal, year, doi FROM ("
+            "  SELECT r.pmid, r.title, r.journal, r.year, r.doi,"
+            "         ROW_NUMBER() OVER (PARTITION BY r.pmid"
+            "           ORDER BY (r.title IS NOT NULL AND TRIM(r.title) <> '') DESC, r.id) AS rn"
+            f"  FROM ref r WHERE r.pmid IS NOT NULL AND r.pmid IN ({PUB_PMID})"
+            ") WHERE rn = 1 ORDER BY pmid",
             ["pmid", "title", "journal", "year", "doi"],
         )
+        have = {str(r["pmid"]) for r in refs}
+        extra = rows_to_dicts(
+            con,
+            "SELECT pmid, title, journal, year, doi FROM lit_doc "
+            f"WHERE pmid IS NOT NULL AND pmid IN ({PUB_PMID}) ORDER BY pmid",
+            ["pmid", "title", "journal", "year", "doi"],
+        )
+        refs = sorted(refs + [r for r in extra if str(r["pmid"]) not in have],
+                      key=lambda r: str(r["pmid"]))
         sizes["refs.json"] = dump("refs.json", refs)
 
         # 文献性质（原「📑 文献性质 v0.2」页）—— 不含 raw_text 以控体积

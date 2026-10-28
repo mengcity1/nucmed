@@ -7,11 +7,13 @@ import Overview from "./pages/Home";
 //   静态引入会让总览首屏也拉这个包。改为路由级 lazy 后 echarts 只在进入画像时才下载。
 const DrugDetail = lazy(() => import("./pages/DrugDetail"));
 import About from "./pages/About";
+import Atlas from "./pages/Atlas";
 
-/** 全站只保留 3 页（pk261 v2 · 2026-10-28 owner 拍板：8 页 → 3 页） */
+/** 全站 4 页（3 页 + 2026-10-28 新增「文献影像图集」） */
 const TABS: { to: string; label: string; icon: IconName; end: boolean }[] = [
   { to: "/", label: "核药总览", icon: "grid", end: true },
   { to: "/drug", label: "单药画像", icon: "flask", end: false },
+  { to: "/atlas", label: "影像图集", icon: "layers", end: false },
   { to: "/about", label: "关于", icon: "info", end: false },
 ];
 
@@ -126,6 +128,7 @@ export default function App() {
             <Route path="/" element={<Overview />} />
             <Route path="/drug" element={<DrugDetail />} />
             <Route path="/drug/:id" element={<DrugDetail />} />
+            <Route path="/atlas" element={<Atlas />} />
             {/* 兼容旧链接 /drugs/:id */}
             <Route path="/drugs/:id" element={<DrugDetail />} />
             <Route path="/about" element={<About />} />
