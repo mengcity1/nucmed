@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
+import { ErrorState } from "../components/States";
 
 const PAGE = 30;
 
@@ -68,7 +69,7 @@ function Metric({ label, value, hint }: { label: string; value: string; hint?: s
 }
 
 export default function Home() {
-  const { data: drugs, error } = useJSON<Drug[]>("drugs.json");
+  const { data: drugs, error, reload } = useJSON<Drug[]>("drugs.json");
   const { data: st } = useJSON<Stats>("stats.json");
 
   const [sp, setSp] = useSearchParams();
@@ -177,14 +178,16 @@ export default function Home() {
       <p className="mt-1.5 text-[13px] text-ink-3">按类型 / 核素 / 靶点 / 适应症筛选 · 点标签即生效</p>
 
       {error && (
-        <div className="mt-4 rounded-md2 border border-[#f6c9c9] bg-[#fdf2f2] p-4 text-[13px] text-bad">{error}</div>
+        <div className="mt-4">
+          <ErrorState message={`药物目录（drugs.json）加载失败：${error}`} onRetry={reload} />
+        </div>
       )}
 
       {/* 常用查询（一行胶囊 · 不占版面） */}
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <span className="text-[12px] text-ink-3">常用：</span>
         <Chip on={onlyPts} onClick={() => setOnlyPts((v) => !v)}>
-          有生物分布数据（861）
+          有生物分布数据（{st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…"}）
         </Chip>
         <Chip on={hideBad} onClick={() => setHideBad((v) => !v)}>
           隐藏疑似非药名（175）
@@ -253,13 +256,13 @@ export default function Home() {
             <GroupLabel icon="target" count={allTargets.length}>靶点</GroupLabel>
             <select
               multiple
-              size={3}
+              size={4}
               value={targets}
               onChange={(e) => {
                 setTargets([...e.target.selectedOptions].map((o) => o.value));
                 setPage(0);
               }}
-              className="w-full rounded-lg border border-line bg-white px-2 py-1 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+              className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
             >
               {allTargets.map((t) => (
                 <option key={t} value={t}>
@@ -273,13 +276,13 @@ export default function Home() {
             <GroupLabel icon="heart" count={allDiseases.length}>适应症</GroupLabel>
             <select
               multiple
-              size={3}
+              size={4}
               value={diseases}
               onChange={(e) => {
                 setDiseases([...e.target.selectedOptions].map((o) => o.value));
                 setPage(0);
               }}
-              className="w-full rounded-lg border border-line bg-white px-2 py-1 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+              className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
             >
               {allDiseases.map((t) => (
                 <option key={t} value={t}>
@@ -350,69 +353,81 @@ export default function Home() {
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
-                <th className="px-3 py-2.5 text-center font-semibold">单药画像</th>
-                <th className="px-4 py-2.5 text-left font-semibold">核药</th>
-                <th className="px-3 py-2.5 text-left font-semibold">类型</th>
-                <th className="px-3 py-2.5 text-left font-semibold">核素</th>
-                <th className="px-3 py-2.5 text-left font-semibold">靶点</th>
-                <th className="px-3 py-2.5 text-left font-semibold">适应症</th>
-                <th className="px-3 py-2.5 text-left font-semibold">阶段</th>
-                <th className="px-3 py-2.5 text-center font-semibold">分布</th>
-                <th className="px-3 py-2.5 text-center font-semibold">结构</th>
+                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">单药画像</th>
+                <th className="px-2 py-2.5 text-left font-semibold sm:px-4">核药</th>
+                <th className="px-2 py-2.5 text-left font-semibold sm:px-3">类型</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">核素</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">靶点</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">适应症</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">阶段</th>
+                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">分布</th>
+                <th className="hidden px-3 py-2.5 text-center font-semibold sm:table-cell">结构</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((d) => (
                 <tr key={d.drug_id} className="border-b border-[#f1f4f9] transition hover:bg-[#f9fbfe]">
-                  <td className="px-3 py-2.5 text-center">
+                  <td className="px-2 py-2.5 text-center sm:px-3">
                     <Link
-                      to={`/drugs/${d.drug_id}`}
+                      to={`/drug/${d.drug_id}`}
                       className="inline-block whitespace-nowrap rounded-lg border border-line bg-white px-2.5 py-1 text-[12px] font-medium text-brand transition hover:border-brand hover:bg-brand-soft"
                     >
                       查看 →
                     </Link>
                   </td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-2 py-2.5 sm:px-4">
                     <Link
-                      to={`/drugs/${d.drug_id}`}
+                      to={`/drug/${d.drug_id}`}
                       className="font-medium text-ink transition hover:text-brand hover:underline"
                     >
                       {d.name_en}
                     </Link>
                     {d.name_zh && <div className="text-[11.5px] text-ink-3">{d.name_zh}</div>}
+                    <div className="text-[11px] text-ink-3 sm:hidden">
+                      {d.radionuclides_zh || "—"} · {d.stage}
+                    </div>
                   </td>
-                  <td className="px-3 py-2.5 text-ink-2">
+                  <td className="px-2 py-2.5 text-ink-2 sm:px-3">
                     {(d.drug_type || "未分类").replace("-based RP", "")}
                   </td>
-                  <td className="px-3 py-2.5 text-ink-2">{d.radionuclides_zh || "—"}</td>
-                  <td className="max-w-[190px] truncate px-3 py-2.5 text-ink-2" title={d.targets_zh || ""}>
+                  <td className="hidden px-3 py-2.5 text-ink-2 sm:table-cell">{d.radionuclides_zh || "—"}</td>
+                  <td
+                    className="hidden max-w-[190px] truncate px-3 py-2.5 text-ink-2 lg:table-cell"
+                    title={d.targets_zh || ""}
+                  >
                     {d.targets_zh || "—"}
                   </td>
-                  <td className="max-w-[190px] truncate px-3 py-2.5 text-ink-2" title={d.diseases_zh || ""}>
+                  <td
+                    className="hidden max-w-[190px] truncate px-3 py-2.5 text-ink-2 lg:table-cell"
+                    title={d.diseases_zh || ""}
+                  >
                     {d.diseases_zh || "—"}
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="hidden px-3 py-2.5 sm:table-cell">
                     <span
                       className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium ${STAGE_TONE[d.stage]}`}
                     >
                       {d.stage}
                     </span>
                   </td>
-                  <td className="num px-3 py-2.5 text-center text-[12.5px]">
+                  <td className="num px-2 py-2.5 text-center text-[12.5px] sm:px-3">
                     {d.n_points ? (
                       <span className="font-semibold text-ink">{d.n_points}</span>
                     ) : (
-                      <span className="text-ink-3">—</span>
+                      <span className="text-ink-3" title="暂无生物分布记录">
+                        —
+                      </span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-center text-[13px]">
+                  <td className="hidden px-3 py-2.5 text-center text-[13px] sm:table-cell">
                     {d.has_struct ? <span className="text-ok">✓</span> : <span className="text-ink-3">—</span>}
                   </td>
                 </tr>
               ))}
 
-              {/* 加载骨架：数据未到时用灰条占位，避免白屏 */}
+              {/* 加载骨架：数据未到时用灰条占位，避免白屏（出错时交给 ErrorState，不再闪骨架） */}
               {!drugs &&
+                !error &&
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={`sk-${i}`} className="border-b border-[#f1f4f9]">
                     <td className="px-3 py-2.5">

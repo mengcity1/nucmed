@@ -63,22 +63,43 @@ def main() -> int:
     try:
         sizes = {}
 
+        # ★ 2026-10-28 pk263：排除「多药比较句」污染行
+        #   backfill_queue 里 reason='comparative_context' 的 484 行（全部 C 级、全部 site_text），
+        #   抽检 12 条发现约 60% 把「对照组/另一种药」的数值安到了目标药头上
+        #   （例：[89Zr]Zr-DFO-5B1 的 spleen 1.6 实际属于 N297A5B1）。
+        #   这 484 行已在库内，此处只在**导出层**过滤：DB 不动、raw 保留，可随时复核后恢复。
+        #   影响：3,875 → 3,391 行；A 级 2,602 完全不变；A 级占比 67.2% → 76.7%。
+        PTS = (
+            "(SELECT p.* FROM biodist_point p WHERE p.id NOT IN ("
+            "SELECT row_id FROM backfill_queue "
+            "WHERE reason='comparative_context' AND resolved_at IS NULL))"
+        )
+
         pts = rows_to_dicts(
             con,
             "SELECT "
             + ",".join("p." + c for c in POINT_COLS)
-            + ",d.name_en FROM biodist_point p LEFT JOIN drug d ON d.id = p.drug_id ORDER BY p.id",
+            + f",d.name_en FROM {PTS} p LEFT JOIN drug d ON d.id = p.drug_id ORDER BY p.id",
             POINT_COLS + ["drug_en"],
         )
-        sizes["biodist.json"] = dump("biodist.json", pts)
 
+        # ★ pk263：raw_text 为空的 527 行里，40 行有 table_id ⇒ 用 biodist_table.raw_caption 兜底
+        #   （表级说明文字，不是单元级原句，但对追溯已经够用；仍为空的 487 条只能靠 PMID）
         raw = {}
         for pid, txt in con.execute(
-            "SELECT id, raw_text FROM biodist_point "
-            "WHERE raw_text IS NOT NULL AND TRIM(raw_text) <> '' ORDER BY id"
+            f"SELECT p.id, COALESCE(NULLIF(TRIM(p.raw_text),''), t.raw_caption) "
+            f"FROM {PTS} p LEFT JOIN biodist_table t ON t.id = p.table_id "
+            "WHERE COALESCE(NULLIF(TRIM(p.raw_text),''), t.raw_caption) IS NOT NULL "
+            "ORDER BY p.id"
         ):
             raw[str(pid)] = txt
         sizes["raw.json"] = dump("raw.json", raw)
+
+        # ★ pk263：给每行标 has_raw，前端据此显示「原文片段」或「仅文献级追溯（PMID）」
+        #   487 条无原文（14.4%），它们仍有 doc_pmid，可追到文献但不是原句。
+        for p in pts:
+            p["has_raw"] = 1 if str(p["id"]) in raw else 0
+        sizes["biodist.json"] = dump("biodist.json", pts)
 
         # 药物列表取自 v_drug_overview（原 app.py 总览页用的就是这个视图）
         struct_dir = ROOT / "docs" / "assets" / "structures"
@@ -103,8 +124,9 @@ def main() -> int:
             "SELECT " + ",".join(drug_cols) + " FROM v_drug_overview ORDER BY drug_id",
             drug_cols,
         )
+        # ★ pk263：n_points 必须与 biodist.json 一致（否则会出现「药显示有 N 条、点进去为空」）
         pt_count = dict(
-            con.execute("SELECT drug_id, COUNT(*) FROM biodist_point GROUP BY drug_id").fetchall()
+            con.execute(f"SELECT drug_id, COUNT(*) FROM {PTS} GROUP BY drug_id").fetchall()
         )
         # ★ 2026-10-28 pk261：单药画像要按 tab 显示「有无数据」⇒ 需要各层条数
         dos_count = dict(
@@ -115,15 +137,15 @@ def main() -> int:
         #   前端「性质与证据」tab 改为**全库聚合视角**（用 props_agg.json），不按药过滤。
         ref_count = {}
         for did, n in con.execute(
-            "SELECT drug_id, COUNT(DISTINCT doc_pmid) FROM biodist_point "
+            f"SELECT drug_id, COUNT(DISTINCT doc_pmid) FROM {PTS} "
             "WHERE doc_pmid IS NOT NULL AND TRIM(doc_pmid) <> '' GROUP BY drug_id"
         ):
             ref_count[did] = n
         # 靶本比：同药同时间点同时有 tumor 与 blood ⇒ 可算
         tbr_drugs = {
             r[0] for r in con.execute(
-                "SELECT drug_id FROM biodist_point WHERE organ_norm='tumor' "
-                "INTERSECT SELECT drug_id FROM biodist_point WHERE organ_norm='blood'"
+                f"SELECT drug_id FROM {PTS} WHERE organ_norm='tumor' "
+                f"INTERSECT SELECT drug_id FROM {PTS} WHERE organ_norm='blood'"
             )
         }
 
@@ -288,32 +310,40 @@ def main() -> int:
         def dist(sql: str) -> list:
             return [{"k": r[0], "n": r[1]} for r in con.execute(sql).fetchall()]
 
-        total = con.execute("SELECT COUNT(*) FROM biodist_point").fetchone()[0]
+        # ★ pk263：统计口径与 biodist.json 一致（都排除 comparative_context 污染行）
+        total = con.execute(f"SELECT COUNT(*) FROM {PTS}").fetchone()[0]
         l1 = con.execute(
-            "SELECT COUNT(*) FROM biodist_point WHERE doc_pmid IS NOT NULL AND TRIM(doc_pmid)<>''"
+            f"SELECT COUNT(*) FROM {PTS} WHERE doc_pmid IS NOT NULL AND TRIM(doc_pmid)<>''"
         ).fetchone()[0]
         l2 = con.execute(
-            "SELECT COUNT(*) FROM biodist_point WHERE doc_pmid IN "
+            f"SELECT COUNT(*) FROM {PTS} WHERE doc_pmid IN "
             "(SELECT pmid FROM lit_doc WHERE pmid IS NOT NULL)"
         ).fetchone()[0]
         l3 = con.execute(
-            "SELECT COUNT(*) FROM biodist_point WHERE doc_pmid IN "
+            f"SELECT COUNT(*) FROM {PTS} WHERE doc_pmid IN "
             "(SELECT pmid FROM lit_doc WHERE pmid IS NOT NULL AND oa_status='open')"
         ).fetchone()[0]
 
         stats = {
             "total": total,            "drugs": con.execute("SELECT COUNT(*) FROM drug").fetchone()[0],
-            "organs": con.execute("SELECT COUNT(DISTINCT organ_norm) FROM biodist_point").fetchone()[0],
+            "organs": con.execute(f"SELECT COUNT(DISTINCT organ_norm) FROM {PTS}").fetchone()[0],
             "tables": con.execute("SELECT COUNT(*) FROM biodist_table").fetchone()[0],
             "tiers": {"l1_has_pmid": l1, "l2_in_lit": l2, "l3_oa": l3},
-            "by_grade": dist("SELECT COALESCE(evidence_grade,'(null)'),COUNT(*) FROM biodist_point GROUP BY 1 ORDER BY 2 DESC"),
-            "by_source": dist("SELECT source_kind,COUNT(*) FROM biodist_point GROUP BY 1 ORDER BY 2 DESC"),
-            "by_organ": dist("SELECT organ_norm,COUNT(*) FROM biodist_point GROUP BY 1 ORDER BY 2 DESC"),
-            "by_isotope": dist("SELECT COALESCE(isotope,'(null)'),COUNT(*) FROM biodist_point GROUP BY 1 ORDER BY 2 DESC"),
-            "by_species": dist("SELECT COALESCE(species,'(null)'),COUNT(*) FROM biodist_point GROUP BY 1 ORDER BY 2 DESC"),
+            "by_grade": dist(f"SELECT COALESCE(evidence_grade,'(null)'),COUNT(*) FROM {PTS} GROUP BY 1 ORDER BY 2 DESC"),
+            "by_source": dist(f"SELECT source_kind,COUNT(*) FROM {PTS} GROUP BY 1 ORDER BY 2 DESC"),
+            "by_organ": dist(f"SELECT organ_norm,COUNT(*) FROM {PTS} GROUP BY 1 ORDER BY 2 DESC"),
+            "by_isotope": dist(f"SELECT COALESCE(isotope,'(null)'),COUNT(*) FROM {PTS} GROUP BY 1 ORDER BY 2 DESC"),
+            "by_species": dist(f"SELECT COALESCE(species,'(null)'),COUNT(*) FROM {PTS} GROUP BY 1 ORDER BY 2 DESC"),
             "by_status": dist("SELECT COALESCE(status,'(未标注)'),COUNT(*) FROM v_drug_overview GROUP BY 1 ORDER BY 2 DESC"),
             "by_drug_type": dist("SELECT COALESCE(drug_type,'(未分类)'),COUNT(*) FROM v_drug_overview GROUP BY 1 ORDER BY 2 DESC"),
         }
+        # ★ pk263：原始总量（未过滤）留档，供审计与论文方法学部分引用
+        stats["raw_total_unfiltered"] = con.execute(
+            "SELECT COUNT(*) FROM biodist_point").fetchone()[0]
+        stats["excluded_comparative_context"] = con.execute(
+            "SELECT COUNT(*) FROM backfill_queue "
+            "WHERE reason='comparative_context' AND resolved_at IS NULL"
+        ).fetchone()[0]
         # ★ 2026-10-28 pk261：首页 KPI 必须用「有数据的药」，不能用 drug 表全量
         #   （drug 表 5,159 行，但只有 861 个药有分布、35 个有剂量学；
         #    直接显示 5,159 会让人以为五千个药都有数据 —— 审稿人一眼就会问）
@@ -325,7 +355,7 @@ def main() -> int:
         stats["coverage"] = {
             "drugs_total": con.execute("SELECT COUNT(*) FROM drug").fetchone()[0],
             "drugs_with_biodist": con.execute(
-                "SELECT COUNT(DISTINCT drug_id) FROM biodist_point"
+                f"SELECT COUNT(DISTINCT drug_id) FROM {PTS}"
             ).fetchone()[0],
             "drugs_with_dosim": con.execute(
                 "SELECT COUNT(DISTINCT drug_id) FROM dosimetry"

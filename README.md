@@ -10,11 +10,18 @@ from pre-exported JSON under `public/data/`.
 
 | Layer | Count | Source |
 |---|---|---|
-| Biodistribution points | 3,875 | PubMed / PMC full text & tables |
-| Drugs with biodistribution data | 861 (of 5,159 catalogued) | — |
-| Organ classes | 32 | — |
-| Dosimetry records | 403 (35 drugs, 21 organs) | FDA approved drug labels |
+| Biodistribution points | 3,391 | PubMed / PMC full text & tables |
+| Drugs with biodistribution data | 808 (of 5,159 catalogued) | — |
+| Organ classes | 30 | — |
+| Dosimetry records | 401 (34 drugs, 22 organs) | FDA approved drug labels |
 | Structure images | 2,229 whole-drug + 1,703 fragments | radiopharm.idrblab.cn / RDKit |
+
+> **Data quality note.** 484 additional biodistribution rows exist in the database but are
+> excluded from this release because their source sentences compare multiple tracers
+> (e.g. *"…lower uptake in the spleen (1.6 %ID/g) compared to its glycosylated cousin"*),
+> and automated extraction cannot reliably tell which value belongs to which compound.
+> They are retained for manual review and do not affect any grade-A record.
+> Raw unfiltered count: 3,875.
 
 Every biodistribution point keeps its **raw text snippet** and **PMID**, so each
 number can be traced back to the sentence or table cell it came from.

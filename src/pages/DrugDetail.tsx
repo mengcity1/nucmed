@@ -1,15 +1,52 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Point } from "../lib/data";
 import { Chart, PALETTE, AXIS } from "../components/Chart";
+import DosimetryPanel from "../components/DosimetryPanel";
+import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
 
 type Ref = { pmid: string; title: string | null; journal: string | null; year: number | null };
+
+/** 单药画像的 4 个 Tab（pk262 B1） */
+type TabKey = "bio" | "dos" | "tbr" | "refs";
+const TAB_ORDER: TabKey[] = ["bio", "dos", "tbr", "refs"];
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
       <div className="text-[11.5px] font-medium text-ink-3">{label}</div>
       <div className="mt-0.5 text-[13.5px] text-ink">{children}</div>
+    </div>
+  );
+}
+
+/** 详情页加载骨架：与真实版面同形（标题 + 信息卡 + 面板），避免加载完成时跳动。 */
+function DetailSkeleton() {
+  return (
+    <div className="pb-4" aria-busy="true">
+      <div className="h-3.5 w-24 animate-pulse rounded bg-[#eef2f8]" />
+      <div className="mt-4 h-7 w-64 animate-pulse rounded bg-[#e9eef6]" />
+      <div className="card mt-5 p-6">
+        <div className="grid gap-5 md:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i}>
+              <div className="h-3 w-12 animate-pulse rounded bg-[#eef2f8]" />
+              <div className="mt-2 h-4 w-24 animate-pulse rounded bg-[#e9eef6]" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card mt-5 p-6">
+        <div className="h-4 w-20 animate-pulse rounded bg-[#e9eef6]" />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-20 animate-pulse rounded-[10px] bg-[#f2f5fa]" />
+          ))}
+        </div>
+      </div>
+      <div className="card mt-5 p-6">
+        <TableSkeleton rows={5} cols={4} />
+      </div>
     </div>
   );
 }
@@ -87,22 +124,132 @@ function DrugCurve({ pts }: { pts: Point[] }) {
   );
 }
 
+/** 靶本比 Tab：`drugs.json` 的 `has_tbr=1` 只说明「库内该药有 TBR 记录」，
+ *  TBR 明细不在 `public/data/` 导出层（导出脚本受红线保护，本轮不改）。
+ *  这里**不自行重算比值**（分子/分母/时点口径各篇论文不同，前端重算会造出第二份口径），
+ *  只把能看见的「分子」摊开 —— 该药的肿瘤摄取点，分母去「生物分布」Tab 对照。 */
+function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onGoBio: () => void }) {
+  const tumor = useMemo(() => pts.filter((p) => p.is_tumor === 1), [pts]);
+
+  const goBio = (
+    <button
+      type="button"
+      onClick={onGoBio}
+      className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:-translate-y-px hover:border-[#b9d0e9] hover:shadow-s2"
+    >
+      去「生物分布」看正常器官对照 →
+    </button>
+  );
+
+  /* 库内没有 TBR 记录：不摆空表、不补算，给一句「为什么空」+ 一条能走的路 */
+  if (!hasTbr) {
+    return (
+      <div className="card p-5 sm:p-6">
+        <EmptyState
+          title="该药暂无靶本比记录"
+          hint="库内只记录「该药是否存在 TBR 记录」，明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出 —— 这里不猜、也不自行重算比值。"
+        >
+          {goBio}
+        </EmptyState>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-5 sm:p-6">
+      <div className="rounded-[10px] border border-[#f6e3c8] bg-[#fdf3e7] px-3.5 py-3 text-[12.5px] leading-relaxed text-[#8a5310]">
+        <b>库内标记该药有靶本比记录</b>，但 TBR 明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出，
+        本轮不改导出脚本，因此这里<b>不展示重算出的比值</b>
+        {tumor.length > 0 ? "，只列原始肿瘤摄取点" : ""}；分母（正常器官 / 血池）在「生物分布」Tab。
+      </div>
+
+      {tumor.length > 0 ? (
+        <>
+          <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-[13px] font-medium text-ink">肿瘤摄取点（TBR 的分子）</span>
+            <span className="text-[11.5px] text-ink-3">
+              共 <b className="num text-ink-2">{fmt(tumor.length)}</b> 条 · 口径以原文为准
+            </span>
+          </div>
+          <div className="mt-2 overflow-x-auto rounded-[10px] border border-line">
+            <table className="w-full border-collapse text-[13px]">
+              <thead>
+                <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
+                  <th className="px-4 py-2 text-left font-semibold">器官 / 模型</th>
+                  <th className="px-4 py-2 text-left font-semibold">时点 (h)</th>
+                  <th className="px-4 py-2 text-right font-semibold">值</th>
+                  <th className="px-4 py-2 text-left font-semibold">单位</th>
+                  <th className="px-4 py-2 text-left font-semibold">证据</th>
+                  <th className="px-4 py-2 text-left font-semibold">PMID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tumor.slice(0, 40).map((p) => (
+                  <tr key={p.id} className="border-b border-[#f1f4f9] last:border-0">
+                    <td className="px-4 py-2 font-medium text-ink">{p.organ_norm}</td>
+                    <td className="num px-4 py-2">{p.time_h ?? "—"}</td>
+                    <td className="num px-4 py-2 text-right font-medium">{p.value_num}</td>
+                    <td className="px-4 py-2">{p.value_unit}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`badge ${
+                          p.evidence_grade === "A" ? "badge-a" : p.evidence_grade === "C" ? "badge-c" : "badge-b"
+                        }`}
+                      >
+                        {p.evidence_grade ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2">
+                      {p.doc_pmid ? (
+                        <a
+                          href={`https://pubmed.ncbi.nlm.nih.gov/${p.doc_pmid}/`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="num text-brand underline decoration-dashed underline-offset-2"
+                        >
+                          {p.doc_pmid}
+                        </a>
+                      ) : (
+                        <span className="text-ink-3">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <div className="mt-4 rounded-lg border border-dashed border-[#e8edf5] px-4 py-6 text-center text-[12.5px] text-ink-3">
+          库内有 TBR 记录，但该药的生物分布点里没有标记为 tumor 的摄取点 —— 分子端未导出
+        </div>
+      )}
+
+      <div className="mt-4">{goBio}</div>
+    </div>
+  );
+}
+
 export default function DrugDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const did = id ? Number(id) : 0;
-  const { data: drugs } = useJSON<Drug[]>("drugs.json");
+  const { data: drugs, error: drugsErr, loading: drugsLoading, reload: reloadDrugs } = useJSON<Drug[]>("drugs.json");
   const { data: pts } = useJSON<Point[]>("biodist.json");
   const { data: refs } = useJSON<Ref[]>("refs.json");
   const { data: raw } = useJSON<Record<string, string>>("raw.json");
   const [pick, setPick] = useState("");
   const [openId, setOpenId] = useState<number | null>(null);
   const [zoom, setZoom] = useState<string | null>(null);
+  const [tab, setTab] = useState<TabKey>("bio");
   // ★ 图片加载失败要「说出来」，不能静默 display:none（否则表现为「有标题、没图」）
   const [imgErr, setImgErr] = useState<Record<string, boolean>>({});
 
   const drug = useMemo(() => (drugs ?? []).find((d) => d.drug_id === did), [drugs, did]);
   const mine = useMemo(() => (pts ?? []).filter((p) => p.drug_id === did), [pts, did]);
+  /** `has_raw = 0` ⇒ 只有 PMID、没有原文片段（487/3,391，pk263）。
+   *  这类行不展开、不留空白框，直接在表格里标明「仅文献级追溯」。 */
+  const noRawCount = useMemo(() => mine.filter((p) => p.has_raw === 0).length, [mine]);
   const pmids = useMemo(
     () => [...new Set(mine.map((p) => p.doc_pmid).filter(Boolean) as string[])],
     [mine]
@@ -115,43 +262,85 @@ export default function DrugDetail() {
       .slice(0, 24);
   }, [drugs, pick]);
 
+  /* 切药时把 Tab 落到「有数据的第一个」，否则停在上一个药的 Tab 上会看到空面板 */
+  useEffect(() => {
+    if (!drug) return;
+    const ok: Record<TabKey, boolean> = {
+      bio: (drug.n_points ?? mine.length) > 0,
+      dos: (drug.n_dosim ?? 0) > 0,
+      tbr: (drug.has_tbr ?? 0) === 1,
+      refs: (drug.n_refs ?? 0) > 0,
+    };
+    setTab((cur) => (ok[cur] ? cur : TAB_ORDER.find((k) => ok[k]) ?? "bio"));
+  }, [drug, mine.length]);
+
   /* 无 id ⇒ 选择器（导航「单药画像」直接进来时） */
   if (!did) {
     return (
       <div className="pb-4">
         <h1 className="text-[26px] font-bold tracking-tight">🔬 单药画像</h1>
-        <p className="mt-1.5 text-[13px] text-ink-3">
+        <p className="mt-1.5 text-[13px] text-ink-3 text-balance">
           搜索并选择一个核药，查看它的结构、生物分布与来源文献
         </p>
         <div className="card mt-5 p-6">
           <input
             value={pick}
             onChange={(e) => setPick(e.target.value)}
-            placeholder="输入药名（中英文均可），如 PSMA / DOTATATE…"
+            placeholder="输入药名（中英文），如 PSMA…"
             className="h-10 w-full rounded-[10px] border border-line bg-white px-3.5 text-[13.5px] outline-none focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
           />
-          <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {hits.map((d) => (
-              <Link
-                key={d.drug_id}
-                to={`/drugs/${d.drug_id}`}
-                className="flex items-center justify-between rounded-[10px] border border-line bg-white px-3.5 py-2.5 text-[13px] transition hover:-translate-y-px hover:border-[#b9d0e9] hover:shadow-s2"
+          {drugsErr && (
+            <div className="mt-4">
+              <ErrorState message={`药物目录（drugs.json）加载失败：${drugsErr}`} onRetry={reloadDrugs} />
+            </div>
+          )}
+
+          {/* 加载：与结果网格同形的卡片骨架 */}
+          {drugsLoading && (
+            <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} className="h-[42px] animate-pulse rounded-[10px] bg-[#f0f3f9]" />
+              ))}
+            </div>
+          )}
+
+          {/* 空：关键词 0 命中 —— 说清「查了什么 + 还有多少药 + 一键清空」 */}
+          {!drugsErr && !drugsLoading && !hits.length && (
+            <EmptyState
+              title="没有匹配的核药"
+              hint={`关键词「${pick.trim()}」在库内 ${fmt(drugs?.length ?? 0)} 个核药里没有命中。可以试英文名 / 通用名，或只输入片段（如 PSMA、DOTA）。`}
+            >
+              <button
+                type="button"
+                onClick={() => setPick("")}
+                className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
               >
-                <span className="truncate font-medium text-ink">{d.name_en}</span>
-                <span className="ml-2 shrink-0 text-[11.5px] text-ink-3">
-                  {d.has_struct ? "✓ 结构" : ""}
-                </span>
-              </Link>
-            ))}
-            {!hits.length && (
-              <div className="col-span-full py-8 text-center text-[13px] text-ink-3">
-                {drugs ? "没有匹配的核药" : "加载中…"}
-              </div>
-            )}
-          </div>
-          {drugs && (
+                清空关键词
+              </button>
+            </EmptyState>
+          )}
+
+          {!drugsErr && !drugsLoading && hits.length > 0 && (
+            <div className="mt-4 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+              {hits.map((d) => (
+                <Link
+                  key={d.drug_id}
+                  to={`/drug/${d.drug_id}`}
+                  title={d.name_en}
+                  className="flex min-w-0 items-center justify-between rounded-[10px] border border-line bg-white px-3.5 py-2.5 text-[13px] transition hover:-translate-y-px hover:border-[#b9d0e9] hover:shadow-s2"
+                >
+                  <span className="min-w-0 flex-1 truncate font-medium text-ink">{d.name_en}</span>
+                  <span className="ml-2 shrink-0 text-[11.5px] text-ink-3">
+                    {d.has_struct ? "✓ 结构" : ""}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {drugs && !drugsErr && (
             <div className="mt-3 text-[12px] text-ink-3">
-              共 {drugs.length.toLocaleString("en-US")} 个核药 · 仅显示前 24 个匹配项
+              共 {fmt(drugs.length)} 个核药 · 仅显示前 24 个匹配项
             </div>
           )}
         </div>
@@ -159,9 +348,53 @@ export default function DrugDetail() {
     );
   }
 
+  /* 详情页三态（pk262 B5）：加载骨架 / 目录加载失败可重试 / 编号不存在给出口 */
   if (!drug) {
-    return <div className="py-20 text-center text-[13px] text-ink-3">加载中…（或该药不存在）</div>;
+    if (drugsErr) {
+      return (
+        <div className="pb-4">
+          <ErrorState message={`药物目录（drugs.json）加载失败：${drugsErr}`} onRetry={reloadDrugs} />
+        </div>
+      );
+    }
+    if (drugsLoading) return <DetailSkeleton />;
+    return (
+      <div className="pb-4">
+        <div className="card mt-5">
+          <EmptyState
+            title={`没有 #${did} 这个核药`}
+            hint="链接里的编号在库内不存在（可能是旧链接或被合并的编号）。可以回总览重新筛选，或去「单药画像」按名字选。"
+          >
+            <Link
+              to="/"
+              className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:shadow-s2"
+            >
+              ← 回总览
+            </Link>
+            <Link
+              to="/drug"
+              className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
+            >
+              去「单药画像」选择 →
+            </Link>
+          </EmptyState>
+        </div>
+      </div>
+    );
   }
+
+  /* Tab 可见性由 drugs.json 的导出字段决定；不可见仍显示（灰态 + 该药暂无），不直接隐藏 */
+  const tabs: { key: TabKey; label: string; ok: boolean; hint: string }[] = [
+    {
+      key: "bio",
+      label: "生物分布",
+      ok: (drug.n_points ?? mine.length) > 0,
+      hint: `${fmt(drug.n_points ?? mine.length)} 条`,
+    },
+    { key: "dos", label: "剂量学", ok: (drug.n_dosim ?? 0) > 0, hint: `${fmt(drug.n_dosim ?? 0)} 条` },
+    { key: "tbr", label: "靶本比", ok: (drug.has_tbr ?? 0) === 1, hint: "有记录" },
+    { key: "refs", label: "文献", ok: (drug.n_refs ?? myRefs.length) > 0, hint: `${fmt(drug.n_refs ?? myRefs.length)} 篇` },
+  ];
 
   return (
     <div className="pb-4">
@@ -174,7 +407,7 @@ export default function DrugDetail() {
       </button>
 
       <div className="mt-3 flex flex-wrap items-baseline gap-3">
-        <h1 className="text-[26px] font-bold tracking-tight">{drug.name_en}</h1>
+        <h1 className="text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
         <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
           # {drug.drug_id}
         </span>
@@ -292,6 +525,41 @@ export default function DrugDetail() {
         )}
       </section>
 
+      {/* 4 个 Tab（B1）：可见性来自 drugs.json 导出字段；灰态 Tab 不隐藏、仍可点，
+          点进去是「该药暂无 + 覆盖说明」，避免用户以为功能被砍掉 */}
+      <div className="-mx-1 mt-5 px-1 pb-1">
+        <div
+          role="tablist"
+          aria-label="单药画像分区"
+          className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-[#f7f9fd] p-1 sm:inline-flex sm:shrink-0"
+        >
+          {tabs.map((t) => {
+            const on = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setTab(t.key)}
+                className={`tab min-w-0 justify-center whitespace-nowrap px-2.5 text-[12.5px] sm:px-4 sm:text-[13px] ${on ? "tab-on" : ""} ${
+                  !t.ok && !on ? "text-ink-3 hover:bg-white" : ""
+                }`}
+              >
+                {t.label}
+                <span
+                  className={`num text-[11.5px] ${
+                    on ? "text-white/75" : t.ok ? "text-ink-3" : "text-[#a98a5c]"
+                  }`}
+                >
+                  {t.ok ? t.hint : "该药暂无"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {zoom && (
         <div
           onClick={() => setZoom(null)}
@@ -308,11 +576,20 @@ export default function DrugDetail() {
         </div>
       )}
 
+      {tab === "bio" && (
       <section className="mt-5">
         <div className="flex items-baseline justify-between">
           <h2 className="text-[16px] font-semibold">生物分布记录</h2>
           <span className="text-[12.5px] text-ink-3">
-            共 <b className="num text-ink-2">{fmt(mine.length)}</b> 条 · 点任意行查看原文
+            共 <b className="num text-ink-2">{fmt(mine.length)}</b> 条
+            {noRawCount > 0 ? (
+              <>
+                {" · "}可展开原文 <b className="num text-ink-2">{fmt(mine.length - noRawCount)}</b> 条 · 仅文献级追溯{" "}
+                <b className="num text-ink-2">{fmt(noRawCount)}</b> 条
+              </>
+            ) : (
+              <> · 点任意行查看原文</>
+            )}
           </span>
         </div>
 
@@ -330,24 +607,32 @@ export default function DrugDetail() {
                   <th className="px-4 py-2.5 text-left font-semibold">时点 (h)</th>
                   <th className="px-4 py-2.5 text-right font-semibold">值</th>
                   <th className="px-4 py-2.5 text-left font-semibold">单位</th>
-                  <th className="px-4 py-2.5 text-left font-semibold">证据</th>
-                  <th className="px-4 py-2.5 text-left font-semibold">PMID / 原文</th>
+                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">证据</th>
+                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">PMID / 原文</th>
                 </tr>
               </thead>
               <tbody>
                 {mine.slice(0, 40).map((p) => (
                   <Fragment key={p.id}>
                     <tr
-                      onClick={() => setOpenId(openId === p.id ? null : p.id)}
-                      className={`cursor-pointer border-b border-[#f1f4f9] transition hover:bg-[#f9fbfe] ${
-                        openId === p.id ? "bg-[#f9fbfe]" : ""
+                      onClick={() => setOpenId(p.has_raw === 0 ? null : openId === p.id ? null : p.id)}
+                      title={p.has_raw === 0 ? "该行无原文片段，仅有 PMID 可追溯" : undefined}
+                      className={`border-b border-[#f1f4f9] transition ${
+                        p.has_raw === 0
+                          ? "cursor-default"
+                          : `cursor-pointer hover:bg-[#f9fbfe] ${openId === p.id ? "bg-[#f9fbfe]" : ""}`
                       }`}
                     >
-                      <td className="px-4 py-2 font-medium text-ink">{p.organ_norm}</td>
+                      <td className="px-4 py-2 font-medium text-ink">
+                        {p.organ_norm}
+                        {p.has_raw === 0 && (
+                          <span className="ml-1.5 text-[10.5px] font-normal text-ink-3 sm:hidden">仅文献</span>
+                        )}
+                      </td>
                       <td className="num px-4 py-2">{p.time_h ?? "—"}</td>
                       <td className="num px-4 py-2 text-right font-medium">{p.value_num}</td>
                       <td className="px-4 py-2">{p.value_unit}</td>
-                      <td className="px-4 py-2">
+                      <td className="hidden px-4 py-2 sm:table-cell">
                         <span
                           className={`badge ${
                             p.evidence_grade === "A" ? "badge-a" : p.evidence_grade === "C" ? "badge-c" : "badge-b"
@@ -356,23 +641,33 @@ export default function DrugDetail() {
                           {p.evidence_grade ?? "—"}
                         </span>
                       </td>
-                      <td className="px-4 py-2">
-                        {p.doc_pmid ? (
-                          <a
-                            href={`https://pubmed.ncbi.nlm.nih.gov/${p.doc_pmid}/`}
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="num text-brand underline decoration-dashed underline-offset-2"
-                          >
-                            {p.doc_pmid}
-                          </a>
-                        ) : (
-                          <span className="text-ink-3">—</span>
-                        )}
+                      <td className="hidden px-4 py-2 sm:table-cell">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {p.doc_pmid ? (
+                            <a
+                              href={`https://pubmed.ncbi.nlm.nih.gov/${p.doc_pmid}/`}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="num text-brand underline decoration-dashed underline-offset-2"
+                            >
+                              {p.doc_pmid}
+                            </a>
+                          ) : (
+                            <span className="text-ink-3">—</span>
+                          )}
+                          {p.has_raw === 0 && (
+                            <span
+                              className="rounded border border-dashed border-[#cbd5e1] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
+                              title="该行没有原文片段，只能追到 PMID 指向的文献"
+                            >
+                              仅文献级追溯
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
-                    {openId === p.id && (
+                    {openId === p.id && p.has_raw !== 0 && (
                       <tr className="border-b border-[#f1f4f9]">
                         <td colSpan={6} className="bg-[#fafbfe] px-4 py-3">
                           <div className="text-[12px] leading-relaxed text-ink-2">
@@ -413,7 +708,37 @@ export default function DrugDetail() {
           </div>
         </div>
       </section>
+      )}
 
+      {tab === "dos" && (
+        <section className="mt-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-[16px] font-semibold">剂量学</h2>
+            <span className="text-[12.5px] text-ink-3">
+              {(drug.n_dosim ?? 0) > 0 ? "同一器官多口径并列，不跨单位合并" : "该药暂无剂量学记录"}
+            </span>
+          </div>
+          <div className="mt-3">
+            <DosimetryPanel drugId={drug.drug_id} />
+          </div>
+        </section>
+      )}
+
+      {tab === "tbr" && (
+        <section className="mt-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-[16px] font-semibold">靶本比</h2>
+            <span className="text-[12.5px] text-ink-3">
+              {(drug.has_tbr ?? 0) === 1 ? "明细未随本站导出 · 以原文为准" : "库内无 TBR 记录"}
+            </span>
+          </div>
+          <div className="mt-3">
+            <TbrPanel pts={mine} hasTbr={(drug.has_tbr ?? 0) === 1} onGoBio={() => setTab("bio")} />
+          </div>
+        </section>
+      )}
+
+      {tab === "refs" && (
       <section className="mt-5">
         <h2 className="text-[16px] font-semibold">相关文献</h2>
         <div className="card mt-3 divide-y divide-[#f1f4f9]">
@@ -433,10 +758,28 @@ export default function DrugDetail() {
             </div>
           ))}
           {!myRefs.length && (
-            <div className="px-5 py-8 text-center text-[13px] text-ink-3">暂无关联文献记录</div>
+            <EmptyState
+              title="暂无关联文献记录"
+              hint={
+                (drug.n_refs ?? 0) > 0
+                  ? `库内标记该药有 ${fmt(drug.n_refs ?? 0)} 篇文献，但生物分布记录里没有可对应的 PMID —— 文献明细未随本站数据导出。`
+                  : "该药的生物分布记录里没有 PMID，因此无法反查文献。"
+              }
+            >
+              {(drug.n_points ?? 0) > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setTab("bio")}
+                  className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:shadow-s2"
+                >
+                  去「生物分布」看原始记录 →
+                </button>
+              )}
+            </EmptyState>
           )}
         </div>
       </section>
+      )}
     </div>
   );
 }

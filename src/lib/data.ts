@@ -17,6 +17,8 @@ export type Point = {
   subject_key: string | null;
   species: string | null;
   drug_en?: string | null;
+  /** 1 = 有原文片段；0 = 只有 PMID 可追溯（487 条，pk263 新增） */
+  has_raw?: number;
 };
 
 export type Drug = {
@@ -34,6 +36,12 @@ export type Drug = {
   has_struct: number;
   n_points?: number;
   name_ok?: number;
+  /** 剂量学行数（dosimetry.json 中 did == drug_id 的行数） */
+  n_dosim?: number;
+  /** 是否有靶本比（库存量标记，明细不在 public/data 导出层） */
+  has_tbr?: number;
+  /** 参考文献条数 */
+  n_refs?: number;
 };
 
 /** 器官吸收剂量行（public/data/dosimetry.json，1 行 = 1 器官 × 1 单位口径）。
@@ -68,6 +76,10 @@ export type Stats = {
   by_species: Dist[];
   /** 剂量学层（pk258 从 FDA 标签补入）· 可选，老 stats.json 没有 */
   dosimetry?: { total: number; drugs: number; organs: number };
+  /** 语境过滤前的原始行数（pk263 新增；= 未剔除多药比较句时的 total） */
+  raw_total_unfiltered?: number;
+  /** 被标记为 comparative_context 的行数（pk263 新增；用于 About 页审计说明） */
+  excluded_comparative_context?: number;
   /** 覆盖率 · 用「有数据的药」而不是 drug 表全量，避免误导 */
   coverage?: {
     drugs_total: number;

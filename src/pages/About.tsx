@@ -1,4 +1,4 @@
-import { useJSON, fmt, type Meta } from "../lib/data";
+import { useJSON, fmt, type Meta, type Stats } from "../lib/data";
 
 const LIC = "CC BY-NC 4.0";
 // ★ 2026-10-28：原为 github.com/<TODO-OWNER> 占位（会显示成一个不存在的地址）。
@@ -7,15 +7,16 @@ const REPO = "https://gitee.com/mengcity1/nucmed";
 
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[150px_1fr] gap-3 border-b border-[#f1f4f9] py-2.5 last:border-0">
+    <div className="grid grid-cols-1 gap-1 border-b border-[#f1f4f9] py-2.5 last:border-0 sm:grid-cols-[150px_1fr] sm:gap-3">
       <div className="text-[12.5px] text-ink-3">{k}</div>
-      <div className="break-all text-[13px] text-ink">{v}</div>
+      <div className="break-words text-[13px] text-ink">{v}</div>
     </div>
   );
 }
 
 export default function About() {
   const { data: m } = useJSON<Meta>("meta.json");
+  const { data: st } = useJSON<Stats>("stats.json");
   const base = import.meta.env.BASE_URL;
 
   return (
@@ -31,13 +32,21 @@ export default function About() {
           {m ? (
             <>
               <Row k="数据版本" v={<span className="font-mono">{m.version}</span>} />
-              <Row k="库指纹 sha256" v={<span className="font-mono">{m.db_sha16}…（前 16 位）</span>} />
-              <Row k="库体积" v={<span className="font-mono">{fmt(m.db_bytes)} B</span>} />
+              <Row k="库指纹 sha256" v={<span className="font-mono">{m.db_sha16}<span className="text-ink-3">（前 16 位）</span></span>} />
+              <Row k="库体积" v={<span className="font-mono">{(m.db_bytes / 1048576).toFixed(1)} MB<span className="text-ink-3">（{fmt(m.db_bytes)} B）</span></span>} />
               <Row k="导出时间" v={<span className="font-mono">{m.generated_at}</span>} />
               <Row
                 k="规模"
                 v={`${fmt(m.counts.biodist)} 条分布记录 · ${fmt(m.counts.drugs)} 个核药 · ${fmt(m.counts.tables)} 张表 · ${fmt(m.counts.refs)} 篇文献`}
               />
+              {st?.raw_total_unfiltered ? (
+                <Row
+                  k="语境校验"
+                  v={`${fmt(st.total)} / ${fmt(st.raw_total_unfiltered)} 条通过多药比较句校验（剔除 ${fmt(
+                    st.raw_total_unfiltered - st.total
+                  )} 条 C 级记录）`}
+                />
+              ) : null}
               <Row k="许可" v={<b>{LIC}</b>} />
             </>
           ) : (
@@ -48,8 +57,8 @@ export default function About() {
 
       <section className="card mt-5 p-6">
         <h2 className="text-[16px] font-semibold">数据可用性</h2>
-        <p className="mt-1 text-[12.5px] text-ink-3">
-          前端所用的全部数据均可直接下载（JSON · UTF-8）——不需要账号，不需要申请
+        <p className="mt-1 text-[12.5px] text-balance text-ink-3">
+          前端所用的全部数据均可直接下载（JSON · <span className="whitespace-nowrap">UTF-8</span>）——不需要账号，不需要申请
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {m &&
@@ -69,13 +78,13 @@ export default function About() {
               ))}
         </div>
         <p className="mt-3 text-[12px] leading-relaxed text-ink-3">
-          完整 SQLite 库（385 MB）与复现脚本：见下方仓库占位。论文正式发表后将补充 Zenodo DOI。
+          完整 SQLite 库（{m ? (m.db_bytes / 1048576).toFixed(1) : "…"} MB）与复现脚本：见下方仓库占位。论文正式发表后将补充 Zenodo DOI。
         </p>
       </section>
 
       <section className="card mt-5 p-6">
         <h2 className="text-[16px] font-semibold">引用</h2>
-        <pre className="mt-3 overflow-x-auto rounded-lg bg-[#fafbfe] p-4 text-[12px] leading-relaxed text-ink-2">
+        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-[#fafbfe] p-4 text-[12px] leading-relaxed text-ink-2">
 {`@article{nucmeddb2026,
   title   = {NucMed DB: a traceable radiopharmaceutical
              biodistribution resource with a reproducible benchmark},
@@ -94,7 +103,8 @@ export default function About() {
         <h2 className="text-[16px] font-semibold">数据来源与口径</h2>
         <ul className="mt-3 grid gap-2 text-[13px] leading-relaxed text-ink-2">
           <li>
-            · <b className="text-ink">摄取记录</b>：PubMed / PMC 全文与表格抽取，每条保留原始文本片段与 PMID 指针。
+            · <b className="text-ink">摄取记录</b>：PubMed / PMC 全文与表格抽取，保留原始文本片段与 PMID 指针；
+            少数无原文片段的记录在详情页明确标注<b className="text-ink">「仅文献级追溯」</b>，只给 PMID，不用空白框冒充原文。
           </li>
           <li>
             · <b className="text-ink">结构数据</b>：配体结构来自 radiopharm.idrblab.cn（口径 <code className="font-mono">ligand_only</code>）；
