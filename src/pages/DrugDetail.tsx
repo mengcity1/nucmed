@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useJSON, fmt, type Drug, type Point } from "../lib/data";
+import { useJSON, fmt, refLink, type Drug, type Point } from "../lib/data";
 import { Chart, PALETTE, AXIS } from "../components/Chart";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
@@ -200,18 +200,21 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
                       </span>
                     </td>
                     <td className="px-4 py-2">
-                      {p.doc_pmid ? (
-                        <a
-                          href={`https://pubmed.ncbi.nlm.nih.gov/${p.doc_pmid}/`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="num text-brand underline decoration-dashed underline-offset-2"
-                        >
-                          {p.doc_pmid}
-                        </a>
-                      ) : (
-                        <span className="text-ink-3">—</span>
-                      )}
+                      {(() => {
+                        const L = refLink(p.doc_pmid);
+                        return L.href ? (
+                          <a
+                            href={L.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="num text-brand underline decoration-dashed underline-offset-2"
+                          >
+                            {p.doc_pmid}
+                          </a>
+                        ) : (
+                          <span className="text-ink-3">—</span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))}
@@ -710,19 +713,22 @@ export default function DrugDetail() {
                       </td>
                       <td className="hidden px-4 py-2 sm:table-cell">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {p.doc_pmid ? (
-                            <a
-                              href={`https://pubmed.ncbi.nlm.nih.gov/${p.doc_pmid}/`}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="num text-brand underline decoration-dashed underline-offset-2"
-                            >
-                              {p.doc_pmid}
-                            </a>
-                          ) : (
-                            <span className="text-ink-3">—</span>
-                          )}
+                          {(() => {
+                            const L = refLink(p.doc_pmid);
+                            return L.href ? (
+                              <a
+                                href={L.href}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="num text-brand underline decoration-dashed underline-offset-2"
+                              >
+                                {p.doc_pmid}
+                              </a>
+                            ) : (
+                              <span className="text-ink-3">—</span>
+                            );
+                          })()}
                           {p.has_raw === 0 && (
                             <span
                               className="rounded border border-dashed border-[#cbd5e1] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
@@ -842,22 +848,37 @@ export default function DrugDetail() {
                   <span className="text-[11.5px] text-ink-3">{g.hint}</span>
                 </div>
                 <div className="card mt-2 divide-y divide-[#f1f4f9]">
-                  {g.items.slice(0, 30).map((r) => (
-                    <div key={r.pmid} className="px-5 py-3">
-                      <a
-                        href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[13px] font-medium text-brand hover:underline"
-                      >
-                        {r.title || `PMID ${r.pmid}`}
-                      </a>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-3">
-                        <span className="num">{r.pmid}</span>
-                        <span>· {r.journal ?? "—"} {r.year ?? ""}</span>
+                  {g.items.slice(0, 30).map((r) => {
+                    const L = refLink(r.pmid);
+                    return (
+                      <div key={r.pmid} className="px-5 py-3">
+                        {L.href ? (
+                          <a
+                            href={L.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[13px] font-medium text-brand hover:underline"
+                          >
+                            {r.title || L.text}
+                          </a>
+                        ) : (
+                          <span className="text-[13px] font-medium text-ink-2">{r.title || L.text}</span>
+                        )}
+                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-3">
+                          <span
+                            className={`num ${
+                              L.kind === "nct" || L.kind === "url"
+                                ? "rounded bg-[#eef2f8] px-1.5 py-0.5 text-[10.5px] text-ink-2"
+                                : ""
+                            }`}
+                          >
+                            {L.text}
+                          </span>
+                          <span>· {r.journal ?? "—"} {r.year ?? ""}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {g.items.length > 30 && (
                     <div className="px-5 py-3 text-[12px] text-ink-3">
                       仅显示前 30 篇（共 {fmt(g.items.length)} 篇）—— 按 PMID 升序。

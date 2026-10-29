@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
+import { refLink } from "../lib/data";
 
 /** 文献影像图（public/figs/manifest.json，非 public/data ⇒ 不被导出器覆盖） */
 type Fig = {
@@ -196,22 +197,31 @@ export default function Atlas() {
                     {f.caption}
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-3">
-                    <a
-                      href={`https://pubmed.ncbi.nlm.nih.gov/${f.pmid}/`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="num text-brand underline decoration-dashed underline-offset-2"
-                    >
-                      PMID {f.pmid}
-                    </a>
-                    <a
-                      href={`https://pmc.ncbi.nlm.nih.gov/articles/${f.pmcid}/`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="num text-brand underline decoration-dashed underline-offset-2"
-                    >
-                      {f.pmcid}
-                    </a>
+                    {(() => {
+                      const L = refLink(f.pmid);
+                      return L.href ? (
+                        <a
+                          href={L.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="num text-brand underline decoration-dashed underline-offset-2"
+                        >
+                          {L.text}
+                        </a>
+                      ) : (
+                        <span className="num">{L.text}</span>
+                      );
+                    })()}
+                    {f.pmcid && (
+                      <a
+                        href={`https://pmc.ncbi.nlm.nih.gov/articles/${f.pmcid}/`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="num text-brand underline decoration-dashed underline-offset-2"
+                      >
+                        {f.pmcid}
+                      </a>
+                    )}
                     <span>· {f.license}</span>
                   </div>
                 </figcaption>

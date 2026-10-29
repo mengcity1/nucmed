@@ -138,4 +138,22 @@ export function useJSON<T>(name: string) {
 }
 
 export const pct = (n: number, d: number) => (d > 0 ? (n / d) * 100 : 0);
+
+/** 文献标识 → 正确的外链。
+ *  库里 `ref.pmid` 混了三种东西：纯数字(PubMed)、NCT(ClinicalTrials.gov)、URL(厂商/FDA 页面)，
+ *  一律拼 pubmed.ncbi.nlm.nih.gov/ 会跳到 404。这里按形态分流。 */
+export type RefLink = { href: string | null; text: string; kind: "pmid" | "nct" | "url" | "doi" | "pmcid" | "other" };
+
+export function refLink(id: string | null | undefined, raw?: string | null): RefLink {
+  const s = (id ?? "").trim();
+  const title = (raw ?? "").trim();
+  if (!s) return { href: null, text: title || "—", kind: "other" };
+  if (/^\d{1,9}$/.test(s)) return { href: `https://pubmed.ncbi.nlm.nih.gov/${s}/`, text: `PMID ${s}`, kind: "pmid" };
+  if (/^NCT\d+$/i.test(s)) return { href: `https://clinicaltrials.gov/study/${s.toUpperCase()}`, text: s.toUpperCase(), kind: "nct" };
+  if (/^PMC\d+$/i.test(s)) return { href: `https://pmc.ncbi.nlm.nih.gov/articles/${s.toUpperCase()}/`, text: s.toUpperCase(), kind: "pmcid" };
+  if (/^https?:\/\//i.test(s)) return { href: s, text: title || "原文链接", kind: "url" };
+  if (/^10\.\d{4,9}\//.test(s)) return { href: `https://doi.org/${s}`, text: `DOI ${s}`, kind: "doi" };
+  return { href: null, text: s, kind: "other" };
+}
+
 export const fmt = (n: number) => n.toLocaleString("en-US");
