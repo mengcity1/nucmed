@@ -110,8 +110,7 @@ export default function Home() {
   const [page, setPage] = useState(() => Number(sp.get("p") ?? 0) || 0);
   const [onlyPts, setOnlyPts] = useState(() => sp.get("pts") === "1");
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
-  // ★ 筛选区：核素可展开全部 + 三个维度各有搜索框
-  const [nucAll, setNucAll] = useState(false);
+  // ★ 筛选区：核素按当前筛选频次全量排序；三个维度各有搜索框
   const [qNuc, setQNuc] = useState("");
   const [qTgt, setQTgt] = useState("");
   const [qDis, setQDis] = useState("");
@@ -180,7 +179,7 @@ export default function Home() {
     return [...missing, ...all];
   }, [nucFreq, qNuc, nucs]);
 
-  const shownNucs = qNuc.trim() || nucAll ? nucOrdered : nucOrdered.slice(0, 12);
+  const shownNucs = nucOrdered;
 
   const view = useMemo(() => {
     let v = drugs ?? [];
@@ -317,13 +316,9 @@ export default function Home() {
               ))}
             </div>
             {!qNuc.trim() && nucOrdered.length > 12 && (
-              <button
-                type="button"
-                onClick={() => setNucAll((v) => !v)}
-                className="mt-2 text-[12px] text-brand hover:underline"
-              >
-                {nucAll ? "收起（只看 Top 12）" : `展开全部 ${nucOrdered.length} 个核素 →`}
-              </button>
+              <div className="mt-1.5 text-[11.5px] text-ink-3">
+                共 {nucOrdered.length} 个核素，已按当前筛选的命中数降序排列
+              </div>
             )}
           </div>
 
