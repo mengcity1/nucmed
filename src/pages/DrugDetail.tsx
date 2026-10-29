@@ -559,7 +559,9 @@ export default function DrugDetail() {
         {drug.has_struct === 1 && (
           <div className="mt-5 border-t border-line pt-4">
             <div className="mb-3 flex items-baseline justify-between">
-              <span className="text-[13px] font-medium text-ink">完整结构图（点击放大）</span>
+              <span className="text-[13px] font-medium text-ink">
+                {structSrc === "schematic" ? "分子组成示意（非精确结构）" : "完整结构图（点击放大）"}
+              </span>
               <span className="text-[11.5px] text-ink-3">
                 {structSrc === "ligand" && "radiopharm.idrblab.cn · 外部来源（ligand_only）"}
                 {structSrc === "schematic" && "抗体/多肽示意图 · 本库绘制（非精确结构）"}
