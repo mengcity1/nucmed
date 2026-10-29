@@ -23,6 +23,24 @@ const STAGE_TONE: Record<string, string> = {
   未标注: "bg-[#eef2f8] text-[#516078] border-[#dfe6f0]",
 };
 
+/** 元素中文 → 符号（让搜索框同时支持「镥」和「Lu」） */
+const ELEM_ALIAS: Record<string, string> = {
+  镓: "ga", 氟: "f", 锝: "tc", 锆: "zr", 镥: "lu", 铜: "cu", 铟: "in", 碳: "c",
+  碘: "i", 锕: "ac", 钇: "y", 钐: "sm", 铼: "re", 铋: "bi", 铅: "pb", 钪: "sc",
+  溴: "br", 砷: "as", 砹: "at", 氧: "o", 氮: "n", 磷: "p", 金: "au", 钍: "th",
+  钛: "ti", 钬: "ho", 镭: "ra", 铯: "cs", 铷: "rb", 锶: "sr", 铊: "tl", 铱: "ir",
+  钌: "ru", 钯: "pd", 银: "ag", 碲: "te", 氙: "xe", 铍: "be", 钴: "co", 铁: "fe",
+  锌: "zn", 硒: "se", 铬: "cr", 钼: "mo", 钨: "w", 铂: "pt", 汞: "hg", 铒: "er",
+  铥: "tm", 镱: "yb", 镝: "dy", 钆: "gd", 钕: "nd", 镨: "pr", 铈: "ce", 镧: "la",
+};
+
+/** 核素搜索键：「镥-177」→「镥-177 lu-177」 */
+function nucKey(n: string): string {
+  const [zh, num] = n.split("-");
+  const sym = ELEM_ALIAS[zh] ?? "";
+  return `${n} ${sym ? `${sym}-${num ?? ""}` : ""}`.toLowerCase();
+}
+
 /** 按「、」拆分并去重。 */
 function splitUniq(values: (string | null)[]): string[] {
   const set = new Set<string>();
@@ -92,6 +110,11 @@ export default function Home() {
   const [page, setPage] = useState(() => Number(sp.get("p") ?? 0) || 0);
   const [onlyPts, setOnlyPts] = useState(() => sp.get("pts") === "1");
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
+  // ★ 筛选区：核素可展开全部 + 三个维度各有搜索框
+  const [nucAll, setNucAll] = useState(false);
+  const [qNuc, setQNuc] = useState("");
+  const [qTgt, setQTgt] = useState("");
+  const [qDis, setQDis] = useState("");
   useEffect(() => {
     setPage(0);
   }, [kw]);
@@ -119,9 +142,45 @@ export default function Home() {
     () => [...new Set((drugs ?? []).map((d) => d.drug_type || "未分类"))].sort(),
     [drugs]
   );
-  const allNucs = useMemo(() => splitUniq((drugs ?? []).map((d) => d.radionuclides_zh)), [drugs]);
   const allTargets = useMemo(() => splitUniq((drugs ?? []).map((d) => d.targets_zh)), [drugs]);
   const allDiseases = useMemo(() => splitUniq((drugs ?? []).map((d) => d.diseases_zh)), [drugs]);
+
+  /** ★ facet：除「核素」外的所有筛选条件 → 用于计算核素的动态 Top（选别的维度时，核素 Top 跟着变） */
+  const facetBase = useMemo(() => {
+    let v = drugs ?? [];
+    const k = kw.trim().toLowerCase();
+    if (k) v = v.filter((d) => (d.name_en || "").toLowerCase().includes(k) || (d.name_zh || "").includes(k));
+    if (types.length) v = v.filter((d) => types.includes(d.drug_type || "未分类"));
+    if (onlyPts) v = v.filter((d) => (d.n_points ?? 0) > 0);
+    if (hideBad) v = v.filter((d) => d.name_ok !== 0);
+    const hit = (field: string | null, sel: string[]) => sel.some((x) => (field || "").includes(x));
+    if (targets.length) v = v.filter((d) => hit(d.targets_zh, targets));
+    if (diseases.length) v = v.filter((d) => hit(d.diseases_zh, diseases));
+    return v;
+  }, [drugs, kw, types, onlyPts, hideBad, targets, diseases]);
+
+  /** 核素频次（在当前 facet 结果里） */
+  const nucFreq = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of facetBase) {
+      for (const x of String(d.radionuclides_zh || "").split("、")) {
+        const s = x.trim();
+        if (s) m.set(s, (m.get(s) ?? 0) + 1);
+      }
+    }
+    return m;
+  }, [facetBase]);
+
+  /** 排序后的核素：频次降序；已选中的永远留在最前；搜索框有输入则全量过滤 */
+  const nucOrdered = useMemo(() => {
+    const q = qNuc.trim().toLowerCase();
+    const all = [...nucFreq.keys()].filter((n) => (q ? nucKey(n).includes(q) : true));
+    all.sort((a, b) => (nucFreq.get(b) ?? 0) - (nucFreq.get(a) ?? 0) || a.localeCompare(b));
+    const missing = nucs.filter((n) => !all.includes(n));
+    return [...missing, ...all];
+  }, [nucFreq, qNuc, nucs]);
+
+  const shownNucs = qNuc.trim() || nucAll ? nucOrdered : nucOrdered.slice(0, 12);
 
   const view = useMemo(() => {
     let v = drugs ?? [];
@@ -233,11 +292,17 @@ export default function Home() {
           </div>
 
           <div>
-            <GroupLabel icon="atom" count={allNucs.length}>
-              核素 <span className="font-normal text-ink-3/60">· Top 12</span>
+            <GroupLabel icon="atom" count={nucFreq.size}>
+              核素 <span className="font-normal text-ink-3/60">· 按当前筛选动态排序</span>
             </GroupLabel>
+            <input
+              value={qNuc}
+              onChange={(e) => setQNuc(e.target.value)}
+              placeholder={`搜索核素（中文或符号，如 镥 / Lu）· 共 ${nucOrdered.length} 个`}
+              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+            />
             <div className="flex flex-wrap gap-2">
-              {allNucs.slice(0, 12).map((n) => (
+              {shownNucs.map((n) => (
                 <Chip
                   key={n}
                   on={nucs.includes(n)}
@@ -247,13 +312,29 @@ export default function Home() {
                   }}
                 >
                   {n}
+                  <span className="ml-1 text-[10.5px] opacity-60">{nucFreq.get(n) ?? 0}</span>
                 </Chip>
               ))}
             </div>
+            {!qNuc.trim() && nucOrdered.length > 12 && (
+              <button
+                type="button"
+                onClick={() => setNucAll((v) => !v)}
+                className="mt-2 text-[12px] text-brand hover:underline"
+              >
+                {nucAll ? "收起（只看 Top 12）" : `展开全部 ${nucOrdered.length} 个核素 →`}
+              </button>
+            )}
           </div>
 
           <div>
             <GroupLabel icon="target" count={allTargets.length}>靶点</GroupLabel>
+            <input
+              value={qTgt}
+              onChange={(e) => setQTgt(e.target.value)}
+              placeholder={`搜索靶点（共 ${allTargets.length} 个）`}
+              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+            />
             <select
               multiple
               size={4}
@@ -264,7 +345,7 @@ export default function Home() {
               }}
               className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
             >
-              {allTargets.map((t) => (
+              {[...new Set([...targets, ...(qTgt.trim() ? allTargets.filter((t) => t.toLowerCase().includes(qTgt.trim().toLowerCase())) : allTargets)])].map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -274,6 +355,12 @@ export default function Home() {
 
           <div>
             <GroupLabel icon="heart" count={allDiseases.length}>适应症</GroupLabel>
+            <input
+              value={qDis}
+              onChange={(e) => setQDis(e.target.value)}
+              placeholder={`搜索适应症（共 ${allDiseases.length} 个）`}
+              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+            />
             <select
               multiple
               size={4}
@@ -284,7 +371,7 @@ export default function Home() {
               }}
               className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
             >
-              {allDiseases.map((t) => (
+              {[...new Set([...diseases, ...(qDis.trim() ? allDiseases.filter((t) => t.toLowerCase().includes(qDis.trim().toLowerCase())) : allDiseases)])].map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
