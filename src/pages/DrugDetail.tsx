@@ -243,7 +243,7 @@ export default function DrugDetail() {
   const [tab, setTab] = useState<TabKey>("bio");
   // ★ 结构图来源（884 浙大 / 575 示意图 / 11 肽段 2D / 759 本地 RDKit）：此前一律标成 radiopharm，属错标
   const [structSrc, setStructSrc] = useState<string | null>(null);
-  // ★ 文献扩展：drug_refs（药→pmid）+ refs_all（题录）懒加载，避免首屏多拉 1 MB
+  // ★ 文献 Tab 数字：挂载即取 drug_refs（104 KB，小）；题录 refs_all（979 KB）仍懒加载
   const [drugRefs, setDrugRefs] = useState<string[] | null>(null);
   const [refMeta, setRefMeta] = useState<Record<string, Ref> | null>(null);
 
@@ -258,30 +258,36 @@ export default function DrugDetail() {
     };
   }, [did]);
 
+  /* 药 → pmids：进页面就取，供 Tab 显示真实文献数（不再显示「该药暂无」） */
   useEffect(() => {
-    if (tab !== "refs" || drugRefs) return;
     let alive = true;
-    Promise.all([
-      fetch(`${import.meta.env.BASE_URL}data/drug_refs.json`, { cache: "no-cache" }).then((r) => r.json()),
-      fetch(`${import.meta.env.BASE_URL}data/refs_all.json`, { cache: "no-cache" }).then((r) => r.json()),
-    ])
-      .then(([map, meta]) => {
-        if (!alive) return;
-        setDrugRefs((map as Record<string, string[]>)[String(did)] ?? []);
-        const idx: Record<string, Ref> = {};
-        for (const r of meta as Ref[]) idx[String(r.pmid)] = r;
-        setRefMeta(idx);
-      })
-      .catch(() => {
-        if (alive) {
-          setDrugRefs([]);
-          setRefMeta({});
-        }
-      });
+    setDrugRefs(null);
+    fetch(`${import.meta.env.BASE_URL}data/drug_refs.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string[]>) => alive && setDrugRefs(m[String(did)] ?? []))
+      .catch(() => alive && setDrugRefs([]));
     return () => {
       alive = false;
     };
-  }, [tab, did, drugRefs]);
+  }, [did]);
+
+  /* 题录（979 KB）：只在切到「文献」Tab 时拉 */
+  useEffect(() => {
+    if (tab !== "refs" || refMeta) return;
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}data/refs_all.json`, { cache: "no-cache" })
+      .then((r) => r.json())
+      .then((meta: Ref[]) => {
+        if (!alive) return;
+        const idx: Record<string, Ref> = {};
+        for (const r of meta) idx[String(r.pmid)] = r;
+        setRefMeta(idx);
+      })
+      .catch(() => alive && setRefMeta({}));
+    return () => {
+      alive = false;
+    };
+  }, [tab, refMeta]);
 
   // ★ 图片加载失败要「说出来」，不能静默 display:none（否则表现为「有标题、没图」）
   const [imgErr, setImgErr] = useState<Record<string, boolean>>({});
@@ -443,7 +449,14 @@ export default function DrugDetail() {
     },
     { key: "dos", label: "剂量学", ok: (drug.n_dosim ?? 0) > 0, hint: `${fmt(drug.n_dosim ?? 0)} 条` },
     { key: "tbr", label: "靶本比", ok: (drug.has_tbr ?? 0) === 1, hint: "有记录" },
-    { key: "refs", label: "文献", ok: (drug.n_refs ?? pmids.length) > 0, hint: `${fmt(drug.n_refs ?? pmids.length)} 篇来源` },
+    {
+      key: "refs",
+      label: "文献",
+      // ★ 用「药物级参考文献」的真实条数（drug_refs），而不是 biodist 来源数；
+      //   无文献时不显示「该药暂无」（用户要求），只显示「文献」两个字。
+      ok: (drugRefs?.length ?? drug.n_refs ?? 0) > 0,
+      hint: drugRefs && drugRefs.length ? `${fmt(drugRefs.length)} 篇` : "",
+    },
   ];
 
   return (
@@ -606,7 +619,7 @@ export default function DrugDetail() {
                     on ? "text-white/75" : t.ok ? "text-ink-3" : "text-[#a98a5c]"
                   }`}
                 >
-                  {t.ok ? t.hint : "该药暂无"}
+                  {t.key === "refs" ? t.hint : t.ok ? t.hint : "该药暂无"}
                 </span>
               </button>
             );
