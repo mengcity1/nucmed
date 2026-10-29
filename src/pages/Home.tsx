@@ -110,7 +110,8 @@ export default function Home() {
   const [page, setPage] = useState(() => Number(sp.get("p") ?? 0) || 0);
   const [onlyPts, setOnlyPts] = useState(() => sp.get("pts") === "1");
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
-  // ★ 筛选区：核素按当前筛选频次全量排序；三个维度各有搜索框
+  // ★ 筛选区：核素默认 Top12 + 可展开栏；三个维度各有搜索框
+  const [nucAll, setNucAll] = useState(false);
   const [qNuc, setQNuc] = useState("");
   const [qTgt, setQTgt] = useState("");
   const [qDis, setQDis] = useState("");
@@ -179,7 +180,7 @@ export default function Home() {
     return [...missing, ...all];
   }, [nucFreq, qNuc, nucs]);
 
-  const shownNucs = nucOrdered;
+  const shownNucs = nucAll || qNuc.trim() ? nucOrdered : nucOrdered.slice(0, 12);
 
   const view = useMemo(() => {
     let v = drugs ?? [];
@@ -300,29 +301,46 @@ export default function Home() {
               placeholder={`搜索核素（中文或符号，如 镥 / Lu）· 共 ${nucOrdered.length} 个`}
               className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
             />
-            <div className="flex flex-wrap gap-2">
-              {shownNucs.map((n) => (
-                <Chip
-                  key={n}
-                  on={nucs.includes(n)}
-                  onClick={() => {
-                    setNucs((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
-                    setPage(0);
-                  }}
-                >
-                  {n}
-                  <span className="ml-1 text-[10.5px] opacity-60">{nucFreq.get(n) ?? 0}</span>
-                </Chip>
-              ))}
+            <div
+              className={
+                nucAll && !qNuc.trim()
+                  ? "max-h-[210px] overflow-y-auto rounded-lg border border-line bg-white p-2"
+                  : ""
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {shownNucs.map((n) => (
+                  <Chip
+                    key={n}
+                    on={nucs.includes(n)}
+                    onClick={() => {
+                      setNucs((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
+                      setPage(0);
+                    }}
+                  >
+                    {n}
+                    <span className="ml-1 text-[10.5px] opacity-60">{nucFreq.get(n) ?? 0}</span>
+                  </Chip>
+                ))}
+              </div>
             </div>
             {!qNuc.trim() && nucOrdered.length > 12 && (
-              <div className="mt-1.5 text-[11.5px] text-ink-3">
-                共 {nucOrdered.length} 个核素，已按当前筛选的命中数降序排列
-              </div>
+              <button
+                type="button"
+                onClick={() => setNucAll((v) => !v)}
+                className="mt-2 flex w-full items-center justify-between rounded-lg border border-line bg-[#f7f9fd] px-2.5 py-1.5 text-[12px] text-ink-2 transition hover:border-[#b9d0e9] hover:bg-white"
+              >
+                <span>
+                  {nucAll
+                    ? `收起（只看前 12 个）`
+                    : `展开全部 ${nucOrdered.length} 个核素`}
+                </span>
+                <span className="text-ink-3">{nucAll ? "▲" : "▼"}</span>
+              </button>
             )}
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <GroupLabel icon="target" count={allTargets.length}>靶点</GroupLabel>
             <input
               value={qTgt}
@@ -332,7 +350,7 @@ export default function Home() {
             />
             <select
               multiple
-              size={4}
+              size={9}
               value={targets}
               onChange={(e) => {
                 setTargets([...e.target.selectedOptions].map((o) => o.value));
@@ -348,7 +366,7 @@ export default function Home() {
             </select>
           </div>
 
-          <div>
+          <div className="md:col-span-2">
             <GroupLabel icon="heart" count={allDiseases.length}>适应症</GroupLabel>
             <input
               value={qDis}
@@ -358,7 +376,7 @@ export default function Home() {
             />
             <select
               multiple
-              size={4}
+              size={9}
               value={diseases}
               onChange={(e) => {
                 setDiseases([...e.target.selectedOptions].map((o) => o.value));
