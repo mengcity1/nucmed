@@ -8,7 +8,20 @@ import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
 type Ref = { pmid: string; title: string | null; journal: string | null; year: number | null };
 
 /** 单药画像的 4 个 Tab（pk262 B1） */
-type TabKey = "bio" | "dos" | "tbr" | "refs";
+type TabKey = "bio" | "dos" | "tbr" | "refs" | "img";
+
+/** 文献影像图（pk295 U1：来源 `public/figs/manifest.json`，每条带 drug_id） */
+type Fig = {
+  drug_id: number;
+  drug_name: string;
+  pmid: string;
+  pmcid: string;
+  label: string;
+  caption: string;
+  license: string;
+  attrib: "target" | "unclear" | "comparator";
+  file: string;
+};
 const TAB_ORDER: TabKey[] = ["bio", "dos", "tbr", "refs"];
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -249,6 +262,19 @@ export default function DrugDetail() {
   // ★ 文献 Tab 数字：挂载即取 drug_refs（104 KB，小）；题录 refs_all（979 KB）仍懒加载
   const [drugRefs, setDrugRefs] = useState<string[] | null>(null);
   const [refMeta, setRefMeta] = useState<Record<string, Ref> | null>(null);
+  // ★ 文献影像（pk295 U1）：`figs/manifest.json` 每条带 drug_id ⇒ 单药可直接筛
+  const [figs, setFigs] = useState<Fig[] | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}figs/manifest.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((m: Fig[]) => alive && setFigs((m || []).filter((f) => f.drug_id === did)))
+      .catch(() => alive && setFigs([]));
+    return () => {
+      alive = false;
+    };
+  }, [did]);
 
   useEffect(() => {
     let alive = true;
@@ -329,9 +355,10 @@ export default function DrugDetail() {
       dos: (drug.n_dosim ?? 0) > 0,
       tbr: (drug.has_tbr ?? 0) === 1,
       refs: (drug.n_refs ?? 0) > 0,
+      img: (figs?.length ?? 0) > 0,
     };
     setTab((cur) => (ok[cur] ? cur : TAB_ORDER.find((k) => ok[k]) ?? "bio"));
-  }, [drug, mine.length]);
+  }, [drug, mine.length, figs?.length]);
 
   /* 无 id ⇒ 选择器（导航「单药画像」直接进来时） */
   if (!did) {
@@ -459,6 +486,13 @@ export default function DrugDetail() {
       //   无文献时不显示「该药暂无」（用户要求），只显示「文献」两个字。
       ok: (drugRefs?.length ?? drug.n_refs ?? 0) > 0,
       hint: drugRefs && drugRefs.length ? `${fmt(drugRefs.length)} 篇` : "",
+    },
+    {
+      key: "img",
+      label: "文献影像",
+      // pk295 U1：figs/manifest.json 里该药的图（含 target/unclear/comparator 三类，渲染时分区）
+      ok: (figs?.length ?? 0) > 0,
+      hint: figs && figs.length ? `${fmt(figs.length)} 张` : "",
     },
   ];
 
@@ -909,6 +943,69 @@ export default function DrugDetail() {
           </div>
         )}
       </section>
+      )}
+
+      {tab === "img" && (
+        <section className="mt-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-[16px] font-semibold">文献影像</h2>
+            <span className="text-[12.5px] text-ink-3">
+              {figs === null
+                ? "加载中…"
+                : figs.length
+                ? `共 ${fmt(figs.length)} 张 · PET / PET-CT 原图（引自原文 Figure）`
+                : "该药暂无收录影像图"}
+            </span>
+          </div>
+          {figs && figs.length > 0 && (
+            <>
+              {[
+                { k: "target" as Fig["attrib"], t: "图注点名本药", cls: "bg-[#dcfce7] text-[#166534]" },
+                { k: "unclear" as Fig["attrib"], t: "图注未点名（需回原文核对）", cls: "bg-[#fef3c7] text-[#92400e]" },
+                { k: "comparator" as Fig["attrib"], t: "图注是别的药", cls: "bg-[#fee2e2] text-[#991b1b]" },
+              ].map((g) => {
+                const rows = figs.filter((f) => f.attrib === g.k);
+                if (!rows.length) return null;
+                return (
+                  <div key={g.k} className="mt-4">
+                    <div className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11.5px] font-medium ${g.cls}`}>
+                      {g.t} · {rows.length} 张
+                    </div>
+                    <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {rows.map((f) => (
+                        <figure key={f.file} className="card m-0 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setZoom(`${import.meta.env.BASE_URL}figs/${f.file}`)}
+                            className="block w-full cursor-zoom-in"
+                            title="点击放大"
+                          >
+                            <img
+                              src={`${import.meta.env.BASE_URL}figs/${f.file}`}
+                              alt={f.label}
+                              loading="lazy"
+                              className="h-44 w-full object-cover"
+                              onError={() => setImgErr((s) => ({ ...s, [f.file]: true }))}
+                            />
+                          </button>
+                          <figcaption className="p-3 text-[12px] leading-snug text-ink-2">
+                            <div className="max-h-10 overflow-hidden">{f.caption || f.label}</div>
+                            <div className="mt-1.5 text-[11.5px] text-ink-3">
+                              PMID {f.pmid} · {f.license}
+                            </div>
+                          </figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="mt-3 text-[11.5px] text-ink-3">
+                图引自原文 Figure（非本库生成、非重绘）；点击可放大；许可随图标注，使用前请回原文核对。
+              </div>
+            </>
+          )}
+        </section>
       )}
     </div>
   );
