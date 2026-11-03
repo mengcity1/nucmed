@@ -1,20 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
-import { fmt, refLink } from "../lib/data";
-
-/** 文献影像图（public/figs/manifest.json，非 public/data ⇒ 不被导出器覆盖） */
-type Fig = {
-  drug_id: number;
-  drug_name: string;
-  pmid: string;
-  pmcid: string;
-  label: string;
-  caption: string;
-  license: string;
-  attrib: "target" | "unclear" | "comparator";
-  file: string;
-};
+import { fmt, loadFigManifest, refLink, type Fig } from "../lib/data";
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -24,6 +11,7 @@ const ATTRIB: Record<Fig["attrib"], { t: string; cls: string; why: string }> = {
   comparator: { t: "图注是别的药", cls: "bg-[#fee2e2] text-[#991b1b]", why: "图注里出现的是另一种示踪剂" },
 };
 
+/** manifest 走 `lib/data` 的单例缓存 ⇒ 图集页与单药页共用同一次下载/解析 */
 function useFigs() {
   const [data, setData] = useState<Fig[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -31,9 +19,8 @@ function useFigs() {
   useEffect(() => {
     let alive = true;
     setErr(null);
-    fetch(`${BASE}figs/manifest.json`, { cache: "no-cache" })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`manifest.json 加载失败：HTTP ${r.status}`))))
-      .then((v: Fig[]) => alive && setData(v))
+    loadFigManifest(n > 0)
+      .then((v) => alive && setData(v))
       .catch((e: Error) => alive && setErr(e.message));
     return () => {
       alive = false;
@@ -44,8 +31,6 @@ function useFigs() {
 
 /** 每次「加载更多」渲染的张数。图池已 2,011 张，全量渲染会一次造几万 DOM 节点 ⇒ 渐进渲染。 */
 const PAGE = 60;
-/** 药名 chip 默认显示上限（510 个药全铺会占掉整屏；可搜索 / 展开全部）。 */
-const CHIP_HEAD = 18;
 
 const isAttrib = (v: string): v is Fig["attrib"] => v === "target" || v === "unclear" || v === "comparator";
 
@@ -69,8 +54,9 @@ export default function Atlas() {
   };
   const [zoom, setZoom] = useState<Fig | null>(null);
   const [limit, setLimit] = useState(PAGE);
+  /** 药名检索：输入即给建议（前 8 个匹配药），选中后写进 URL 的 ?drug=（510 个药不再逐个铺 chip） */
   const [drugQ, setDrugQ] = useState("");
-  const [allChips, setAllChips] = useState(false);
+  const [sugOpen, setSugOpen] = useState(false);
 
   const drugs = useMemo(() => {
     const m = new Map<number, { name: string; n: number }>();
@@ -101,18 +87,22 @@ export default function Atlas() {
 
   const shown = useMemo(() => list.slice(0, limit), [list, limit]);
 
-  /** 药名 chip：默认只显示图最多的前 CHIP_HEAD 个，可搜索 / 展开全部 */
-  const chips = useMemo(() => {
-    const k = drugQ.trim().toLowerCase();
-    const hit = k ? drugs.filter(([, d]) => d.name.toLowerCase().includes(k)) : drugs;
-    return k || allChips ? hit : hit.slice(0, CHIP_HEAD);
-  }, [drugs, drugQ, allChips]);
+  /** 当前选中的药（来自 URL `?drug=`），用于搜索框回显与「清除」 */
+  const selected = useMemo(() => (drug ? drugs.find(([id]) => id === drug) : undefined), [drug, drugs]);
 
-  /** 选中的药若被折叠/被搜索挡住，单独补一个 chip（避免「选中态看不见」） */
-  const selChip = useMemo(
-    () => (drug !== 0 && !chips.some(([id]) => id === drug) ? drugs.find(([id]) => id === drug) : undefined),
-    [drug, chips, drugs],
-  );
+  /** 检索建议：输入非空时给前 8 个匹配药（按图数排序，故热门药在前） */
+  const suggest = useMemo(() => {
+    const k = drugQ.trim().toLowerCase();
+    if (!k) return [];
+    return drugs.filter(([, d]) => d.name.toLowerCase().includes(k)).slice(0, 8);
+  }, [drugs, drugQ]);
+
+  /** 选中建议项：写进 URL，并把输入框回显为该药名 */
+  const pickDrug = (id: number, name: string) => {
+    setFilter({ drug: id });
+    setDrugQ(name);
+    setSugOpen(false);
+  };
 
   /** 归属按钮上的计数：让「全部 2,011」与「图注点名本药 1,728」一眼可比 */
   const counts = useMemo(() => {
@@ -160,55 +150,71 @@ export default function Atlas() {
         ))}
       </div>
 
-      {/* 药名筛选：510 个药默认只铺前 18 个（按图数排序），可搜索 / 展开全部 */}
+      {/* 药名：不再逐个铺 chip（510 个药），改成输入即建议；选中即写 URL ?drug=，并可跳单药画像 */}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <span className="text-[12px] text-ink-3">药物：</span>
-        <button
-          type="button"
-          onClick={() => setFilter({ drug: 0 })}
-          className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
-            drug === 0 ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-          }`}
-        >
-          全部药物 {data ? fmt(data.length) : "…"}
-        </button>
-        {chips.map(([id, d]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setFilter({ drug: id })}
-            className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
-              drug === id ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-            }`}
-          >
-            {d.name} · {d.n}
-          </button>
-        ))}
-        {selChip && (
-          <button
-            type="button"
-            onClick={() => setFilter({ drug: selChip[0] })}
-            className="rounded-full border border-brand bg-brand-soft px-3 py-1 text-[12.5px] text-brand-deep"
-          >
-            {selChip[1].name} · {selChip[1].n}
-          </button>
+        <div className="relative">
+          <input
+            value={drugQ}
+            onChange={(e) => {
+              setDrugQ(e.target.value);
+              setSugOpen(true);
+              if (!e.target.value.trim()) setFilter({ drug: 0 });
+            }}
+            onFocus={() => setSugOpen(true)}
+            onBlur={() => setSugOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSugOpen(false);
+              if (e.key === "Enter" && suggest[0]) pickDrug(suggest[0][0], suggest[0][1].name);
+            }}
+            placeholder="输入药名检索…"
+            aria-label="按药名检索影像图"
+            className="h-9 w-[220px] rounded-full border border-line bg-white px-3.5 pr-8 text-[12.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
+          />
+          {drugQ && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setDrugQ("");
+                setSugOpen(false);
+                setFilter({ drug: 0 });
+              }}
+              aria-label="清除药名筛选"
+              className="absolute right-2 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full text-[11px] text-ink-3 transition hover:bg-[#eef2f8] hover:text-ink"
+            >
+              ✕
+            </button>
+          )}
+          {sugOpen && suggest.length > 0 && (
+            <ul className="absolute left-0 top-10 z-40 max-h-[280px] w-[260px] overflow-auto rounded-[10px] border border-line bg-white py-1 shadow-s2">
+              {suggest.map(([id, d]) => (
+                <li key={id}>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => pickDrug(id, d.name)}
+                    className={`flex w-full items-center justify-between gap-2 px-3 py-1.5 text-left text-[12.5px] transition hover:bg-brand-soft ${
+                      drug === id ? "text-brand-deep" : "text-ink-2"
+                    }`}
+                  >
+                    <span className="truncate">{d.name}</span>
+                    <span className="num shrink-0 text-[11px] text-ink-3">{d.n} 张</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {selected && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand bg-brand-soft px-3 py-1 text-[12.5px] text-brand-deep">
+            {selected[1].name} · {selected[1].n} 张
+            <Link to={`/drug/${selected[0]}`} className="underline decoration-dashed underline-offset-2">
+              单药画像 ↗
+            </Link>
+          </span>
         )}
-        <input
-          value={drugQ}
-          onChange={(e) => setDrugQ(e.target.value)}
-          placeholder="搜索药名…"
-          aria-label="按药名筛选"
-          className="h-8 w-[140px] rounded-full border border-line bg-white px-3 text-[12.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
-        />
-        {drugs.length > CHIP_HEAD && (
-          <button
-            type="button"
-            onClick={() => setAllChips((v) => !v)}
-            className="rounded-full border border-dashed border-[#b9d0e9] bg-white px-3 py-1 text-[12.5px] text-brand-deep transition hover:bg-brand-soft"
-          >
-            {allChips ? "收起" : `展开全部 ${fmt(drugs.length)}`}
-          </button>
-        )}
+        <span className="text-[11.5px] text-ink-3">{data ? `共 ${fmt(drugs.length)} 个药有影像` : "…"}</span>
       </div>
 
       {err && <div className="mt-5"><ErrorState message={err} onRetry={reload} /></div>}

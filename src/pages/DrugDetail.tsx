@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useJSON, fmt, refLink, type Drug, type Point } from "../lib/data";
+import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { Chart, PALETTE, AXIS } from "../components/Chart";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
@@ -10,18 +10,7 @@ type Ref = { pmid: string; title: string | null; journal: string | null; year: n
 /** 单药画像的 4 个 Tab（pk262 B1） */
 type TabKey = "bio" | "dos" | "tbr" | "refs" | "img";
 
-/** 文献影像图（pk295 U1：来源 `public/figs/manifest.json`，每条带 drug_id） */
-type Fig = {
-  drug_id: number;
-  drug_name: string;
-  pmid: string;
-  pmcid: string;
-  label: string;
-  caption: string;
-  license: string;
-  attrib: "target" | "unclear" | "comparator";
-  file: string;
-};
+/** 文献影像图（pk295 U1）：类型与加载都来自 `lib/data`（与图集页共用一次下载/解析） */
 const TAB_ORDER: TabKey[] = ["bio", "dos", "tbr", "refs"];
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -267,9 +256,8 @@ export default function DrugDetail() {
 
   useEffect(() => {
     let alive = true;
-    fetch(`${import.meta.env.BASE_URL}figs/manifest.json`, { cache: "no-cache" })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((m: Fig[]) => alive && setFigs((m || []).filter((f) => f.drug_id === did)))
+    loadFigManifest()
+      .then((m) => alive && setFigs(m.filter((f) => f.drug_id === did)))
       .catch(() => alive && setFigs([]));
     return () => {
       alive = false;

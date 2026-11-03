@@ -157,3 +157,48 @@ export function refLink(id: string | null | undefined, raw?: string | null): Ref
 }
 
 export const fmt = (n: number) => n.toLocaleString("en-US");
+
+/** 文献影像图（`public/figs/manifest.json`，每条带 drug_id）。
+ *  ★ 类型与加载都只在这里定义一处：图集页与单药画像都从这里取，避免两份口径。 */
+export type Fig = {
+  drug_id: number;
+  drug_name: string;
+  pmid: string;
+  pmcid: string;
+  label: string;
+  caption: string;
+  license: string;
+  attrib: "target" | "unclear" | "comparator";
+  file: string;
+};
+
+/** manifest 缓存（1.17 MB / 2,011 条，2026-11-03 实测）。
+ *  未缓存时：图集页进来拉一次、单药页每换一个药又拉一次 ⇒ 同一次会话里重复下载 + 重复解析。
+ *  这里做成模块级单例：同一次会话只下载/解析一次；`force` 供「重试」按钮绕过缓存。 */
+let figCache: Fig[] | null = null;
+let figInflight: Promise<Fig[]> | null = null;
+
+export function loadFigManifest(force = false): Promise<Fig[]> {
+  if (force) {
+    figCache = null;
+    figInflight = null;
+  }
+  if (figCache) return Promise.resolve(figCache);
+  if (figInflight) return figInflight;
+  figInflight = fetch(`${import.meta.env.BASE_URL}figs/manifest.json`, { cache: "no-cache" })
+    .then((r) => {
+      if (!r.ok) throw new Error(`manifest.json 加载失败：HTTP ${r.status}`);
+      return r.json() as Promise<Fig[]>;
+    })
+    .then((v) => {
+      figCache = Array.isArray(v) ? v : [];
+      figInflight = null;
+      return figCache;
+    })
+    .catch((e: Error) => {
+      figInflight = null;
+      throw e;
+    });
+  return figInflight;
+}
+
