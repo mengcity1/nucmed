@@ -31,7 +31,7 @@ const LEGACY = [
 ];
 
 function Nav() {
-  const [sp] = useSearchParams();
+  const [sp, setSp] = useSearchParams();
   const nav = useNavigate();
   const q = sp.get("q") ?? "";
   const tr = useT();
@@ -104,15 +104,39 @@ function Nav() {
             </NavLink>
           ))}
         </nav>
-        <button
-          type="button"
-          onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-          aria-label={lang === "zh" ? "Switch to English" : "切换到中文"}
-          title={lang === "zh" ? "Switch to English" : "切换到中文"}
-          className="ml-1 shrink-0 rounded-[10px] border border-line bg-white px-2.5 py-1.5 text-[12px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink"
+        <div
+          role="group"
+          aria-label="Language"
+          className="ml-1 flex shrink-0 items-center rounded-[10px] border border-line bg-[#f5f8fc] p-0.5"
         >
-          {lang === "zh" ? "EN" : "中文"}
-        </button>
+          {([
+            { v: "zh" as Lang, label: "ZH" },
+            { v: "en" as Lang, label: "EN" },
+          ]).map((o) => {
+            const on = lang === o.v;
+            return (
+              <button
+                key={o.v}
+                type="button"
+                onClick={() => {
+                  setLang(o.v);
+                  const p = new URLSearchParams(sp);
+                  if (o.v === "en") p.set("lang", "en");
+                  else p.delete("lang");
+                  setSp(p, { replace: true });
+                }}
+                aria-pressed={on}
+                aria-label={o.v === "zh" ? "Chinese" : "English"}
+                title={o.v === "zh" ? "Chinese" : "English"}
+                className={`rounded-[8px] px-2 py-1 text-[11.5px] font-medium transition ${
+                  on ? "bg-white text-brand-deep shadow-s1" : "text-ink-3 hover:text-ink"
+                }`}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* 小屏展开式搜索：整行铺满，Esc 或 ✕ 收起 */}
