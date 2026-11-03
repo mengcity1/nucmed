@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
-import { refLink } from "../lib/data";
+import { fmt, refLink } from "../lib/data";
 
 /** 文献影像图（public/figs/manifest.json，非 public/data ⇒ 不被导出器覆盖） */
 type Fig = {
@@ -42,11 +42,35 @@ function useFigs() {
   return { data, err, loading: !data && !err, reload: () => setN((x) => x + 1) };
 }
 
+/** 每次「加载更多」渲染的张数。图池已 2,011 张，全量渲染会一次造几万 DOM 节点 ⇒ 渐进渲染。 */
+const PAGE = 60;
+/** 药名 chip 默认显示上限（510 个药全铺会占掉整屏；可搜索 / 展开全部）。 */
+const CHIP_HEAD = 18;
+
+const isAttrib = (v: string): v is Fig["attrib"] => v === "target" || v === "unclear" || v === "comparator";
+
 export default function Atlas() {
   const { data, err, loading, reload } = useFigs();
-  const [drug, setDrug] = useState<number | 0>(0);
-  const [attrib, setAttrib] = useState<Fig["attrib"] | "all">("all");
+  /** 筛选写进 URL（?drug=&attrib=）⇒ 可分享、刷新保持、前进后退可用。
+   *  与顶部搜索共用同一个 URLSearchParams ⇒ 只动自己的键，不碰 q。 */
+  const [sp, setSp] = useSearchParams();
+  const drug = Number(sp.get("drug") ?? 0) || 0;
+  const rawAttrib = sp.get("attrib") ?? "all";
+  const attrib: Fig["attrib"] | "all" = isAttrib(rawAttrib) ? rawAttrib : "all";
+  const setFilter = (next: { drug?: number; attrib?: Fig["attrib"] | "all" }) => {
+    const p = new URLSearchParams(sp);
+    const d = next.drug ?? drug;
+    const a = next.attrib ?? attrib;
+    if (d) p.set("drug", String(d));
+    else p.delete("drug");
+    if (a === "all") p.delete("attrib");
+    else p.set("attrib", a);
+    setSp(p, { replace: true });
+  };
   const [zoom, setZoom] = useState<Fig | null>(null);
+  const [limit, setLimit] = useState(PAGE);
+  const [drugQ, setDrugQ] = useState("");
+  const [allChips, setAllChips] = useState(false);
 
   const drugs = useMemo(() => {
     const m = new Map<number, { name: string; n: number }>();
@@ -63,6 +87,42 @@ export default function Atlas() {
       .filter((f) => (drug === 0 || f.drug_id === drug) && (attrib === "all" || f.attrib === attrib))
       .sort((a, b) => rank[a.attrib] - rank[b.attrib] || a.drug_id - b.drug_id);
   }, [data, drug, attrib]);
+
+  /** 筛选条件变化 ⇒ 回到第一页（否则会在新结果里停在很深的 offset） */
+  useEffect(() => setLimit(PAGE), [drug, attrib, data]);
+
+  /** 弹层：Esc 关闭（键盘可达） */
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setZoom(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom]);
+
+  const shown = useMemo(() => list.slice(0, limit), [list, limit]);
+
+  /** 药名 chip：默认只显示图最多的前 CHIP_HEAD 个，可搜索 / 展开全部 */
+  const chips = useMemo(() => {
+    const k = drugQ.trim().toLowerCase();
+    const hit = k ? drugs.filter(([, d]) => d.name.toLowerCase().includes(k)) : drugs;
+    return k || allChips ? hit : hit.slice(0, CHIP_HEAD);
+  }, [drugs, drugQ, allChips]);
+
+  /** 选中的药若被折叠/被搜索挡住，单独补一个 chip（避免「选中态看不见」） */
+  const selChip = useMemo(
+    () => (drug !== 0 && !chips.some(([id]) => id === drug) ? drugs.find(([id]) => id === drug) : undefined),
+    [drug, chips, drugs],
+  );
+
+  /** 归属按钮上的计数：让「全部 2,011」与「图注点名本药 1,728」一眼可比 */
+  const counts = useMemo(() => {
+    const c: Record<Fig["attrib"] | "all", number> = { all: 0, target: 0, unclear: 0, comparator: 0 };
+    for (const f of data ?? []) {
+      c.all += 1;
+      c[f.attrib] += 1;
+    }
+    return c;
+  }, [data]);
 
   return (
     <div className="pb-4">
@@ -81,21 +141,42 @@ export default function Atlas() {
         ——这类图**不代表本药**，只是同一篇文献里的对照面板，保留是为了可追溯。
       </div>
 
+      {/* 归属筛选（带计数 · 语义上先于药名） */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-[12px] text-ink-3">归属：</span>
+        {(["all", "target", "unclear", "comparator"] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => setFilter({ attrib: k })}
+            title={k === "all" ? "不过滤归属（全部张数）" : ATTRIB[k].why}
+            className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
+              attrib === k ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
+            }`}
+          >
+            {k === "all" ? "全部" : ATTRIB[k].t}
+            <span className="num ml-1 text-[11px] opacity-70">{data ? fmt(counts[k]) : "…"}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* 药名筛选：510 个药默认只铺前 18 个（按图数排序），可搜索 / 展开全部 */}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <span className="text-[12px] text-ink-3">药物：</span>
         <button
           type="button"
-          onClick={() => setDrug(0)}
+          onClick={() => setFilter({ drug: 0 })}
           className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
             drug === 0 ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
           }`}
         >
-          全部药物 {data ? data.length : "…"}
+          全部药物 {data ? fmt(data.length) : "…"}
         </button>
-        {drugs.map(([id, d]) => (
+        {chips.map(([id, d]) => (
           <button
             key={id}
             type="button"
-            onClick={() => setDrug(id)}
+            onClick={() => setFilter({ drug: id })}
             className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
               drug === id ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
             }`}
@@ -103,19 +184,31 @@ export default function Atlas() {
             {d.name} · {d.n}
           </button>
         ))}
-        <span className="mx-1 h-4 w-px bg-line" />
-        {(["all", "target", "unclear", "comparator"] as const).map((k) => (
+        {selChip && (
           <button
-            key={k}
             type="button"
-            onClick={() => setAttrib(k)}
-            className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
-              attrib === k ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-            }`}
+            onClick={() => setFilter({ drug: selChip[0] })}
+            className="rounded-full border border-brand bg-brand-soft px-3 py-1 text-[12.5px] text-brand-deep"
           >
-            {k === "all" ? "全部归属" : ATTRIB[k].t}
+            {selChip[1].name} · {selChip[1].n}
           </button>
-        ))}
+        )}
+        <input
+          value={drugQ}
+          onChange={(e) => setDrugQ(e.target.value)}
+          placeholder="搜索药名…"
+          aria-label="按药名筛选"
+          className="h-8 w-[140px] rounded-full border border-line bg-white px-3 text-[12.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
+        />
+        {drugs.length > CHIP_HEAD && (
+          <button
+            type="button"
+            onClick={() => setAllChips((v) => !v)}
+            className="rounded-full border border-dashed border-[#b9d0e9] bg-white px-3 py-1 text-[12.5px] text-brand-deep transition hover:bg-brand-soft"
+          >
+            {allChips ? "收起" : `展开全部 ${fmt(drugs.length)}`}
+          </button>
+        )}
       </div>
 
       {err && <div className="mt-5"><ErrorState message={err} onRetry={reload} /></div>}
@@ -140,10 +233,7 @@ export default function Atlas() {
           >
             <button
               type="button"
-              onClick={() => {
-                setDrug(0);
-                setAttrib("all");
-              }}
+              onClick={() => setFilter({ drug: 0, attrib: "all" })}
               className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
             >
               清除筛选
@@ -161,7 +251,7 @@ export default function Atlas() {
       {!loading && !err && list.length > 0 && (
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((f) => (
+            {shown.map((f) => (
               <figure key={f.file} className="card m-0 overflow-hidden">
                 <button
                   type="button"
@@ -173,6 +263,7 @@ export default function Atlas() {
                     src={`${BASE}figs/${f.file}`}
                     alt={`${f.drug_name} · ${f.label}`}
                     loading="lazy"
+                    decoding="async"
                     className="h-[190px] w-full object-contain"
                   />
                 </button>
@@ -229,20 +320,51 @@ export default function Atlas() {
             ))}
           </div>
 
-          <p className="mt-4 text-[11.5px] leading-relaxed text-ink-3">
-            共 <b className="num text-ink-2">{list.length}</b> 张 · 图像版权归原作者，
-            按原文许可（多数为 CC BY 4.0）转载并保留出处；本库仅作陈列，未做任何像素改动。
-          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[11.5px] leading-relaxed text-ink-3">
+              当前筛选 <b className="num text-ink-2">{fmt(list.length)}</b> 张 · 已显示{" "}
+              <b className="num text-ink-2">{fmt(shown.length)}</b> 张 · 图像版权归原作者，
+              按原文许可（多数为 CC BY 4.0）转载并保留出处；本库仅作陈列，未做任何像素改动。
+            </p>
+            {shown.length < list.length && (
+              <button
+                type="button"
+                onClick={() => setLimit((v) => v + PAGE)}
+                className="shrink-0 rounded-lg border border-brand bg-brand-soft px-4 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
+              >
+                加载更多（剩 {fmt(list.length - shown.length)} 张）
+              </button>
+            )}
+          </div>
         </>
       )}
 
       {zoom && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${zoom.drug_name} · ${zoom.label} 大图`}
           onClick={() => setZoom(null)}
           className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
         >
-          <div className="max-h-[92vh] max-w-[96vw] overflow-auto rounded-xl bg-white p-3">
-            <img src={`${BASE}figs/${zoom.file}`} alt={zoom.label} className="max-h-[78vh] max-w-full" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[92vh] max-w-[96vw] overflow-auto rounded-xl bg-white p-3"
+          >
+            <button
+              type="button"
+              onClick={() => setZoom(null)}
+              aria-label="关闭大图（Esc）"
+              className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full border border-line bg-white/95 text-[14px] text-ink-2 shadow-s2 transition hover:text-ink"
+            >
+              ✕
+            </button>
+            <img
+              src={`${BASE}figs/${zoom.file}`}
+              alt={zoom.label}
+              decoding="async"
+              className="max-h-[78vh] max-w-full"
+            />
             <div className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-ink-2">
               <b>{zoom.drug_name}</b> · {zoom.label} · PMID {zoom.pmid} · {zoom.pmcid} · {zoom.license}
               <div className="mt-1 text-ink-3">{zoom.caption}</div>
