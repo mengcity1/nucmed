@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fmt, useJSON, type DoseRow } from "../lib/data";
+import { STR, useLang, useT, type Lang } from "../lib/i18n";
 import { EmptyState, ErrorState, TableSkeleton } from "./States";
 
 /* ------------------------------------------------------------------
@@ -24,13 +25,13 @@ const TO_MGY: Record<string, number> = {
 
 const UNIT_ORDER = ["mGy/MBq", "μGy/MBq", "Gy/MBq", "mSv/MBq", "rad/mCi", "mrad/mCi"];
 
-const UNIT_HINT: Record<string, string> = {
-  "mGy/MBq": "器官吸收剂量",
-  "μGy/MBq": "器官吸收剂量（1 μGy/MBq = 0.001 mGy/MBq）",
-  "Gy/MBq": "器官吸收剂量（原文即以 Gy/MBq 计，量级偏高，已在审计清单）",
-  "mSv/MBq": "全身有效剂量，不是器官吸收剂量 —— 不参与排序",
-  "rad/mCi": "旧单位（1 rad/mCi = 0.2703 mGy/MBq）",
-  "mrad/mCi": "旧单位（1 mrad/mCi = 0.2703 μGy/MBq）",
+const UNIT_HINT: Record<string, { zh: string; en: string }> = {
+  "mGy/MBq": { zh: "器官吸收剂量", en: "organ absorbed dose" },
+  "μGy/MBq": { zh: "器官吸收剂量（1 μGy/MBq = 0.001 mGy/MBq）", en: "organ absorbed dose (1 μGy/MBq = 0.001 mGy/MBq)" },
+  "Gy/MBq": { zh: "器官吸收剂量（原文即以 Gy/MBq 计，量级偏高，已在审计清单）", en: "organ absorbed dose (reported in Gy/MBq; high magnitude, flagged in the audit list)" },
+  "mSv/MBq": { zh: "全身有效剂量，不是器官吸收剂量 —— 不参与排序", en: "whole-body effective dose, not organ absorbed dose — not sorted" },
+  "rad/mCi": { zh: "旧单位（1 rad/mCi = 0.2703 mGy/MBq）", en: "legacy unit (1 rad/mCi = 0.2703 mGy/MBq)" },
+  "mrad/mCi": { zh: "旧单位（1 mrad/mCi = 0.2703 μGy/MBq）", en: "legacy unit (1 mrad/mCi = 0.2703 μGy/MBq)" },
 };
 
 const norm = (r: DoseRow): number | null => {
@@ -43,7 +44,8 @@ const showNum = (n: number | null) =>
 
 /** organ 是库内归一化英文键（小写），显示时首字母大写；null 单列，避免被静默丢掉。 */
 const NONE = "__none__";
-const organLabel = (o: string | null) => (o ? o.charAt(0).toUpperCase() + o.slice(1) : "未标注器官");
+const organLabel = (o: string | null, lang: Lang) =>
+  o ? o.charAt(0).toUpperCase() + o.slice(1) : STR["dose.organUnknown"][lang];
 const organKey = (o: string | null) => o ?? NONE;
 
 type Agg = {
@@ -92,6 +94,8 @@ function Badge({ grade }: { grade: string }) {
 
 /** 单药视图：横向条形图（按归一化剂量降序）+ 组内原文可展开。 */
 function DrugView({ rows }: { rows: DoseRow[] }) {
+  const tr = useT();
+  const { lang } = useLang();
   const [open, setOpen] = useState<string | null>(null);
 
   const aggs = useMemo(
@@ -118,10 +122,10 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
   return (
     <div className="card p-5 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
-        <h3 className="text-[15px] font-semibold text-ink">器官吸收剂量</h3>
+        <h3 className="text-[15px] font-semibold text-ink">{tr("dose.title")}</h3>
         <span className="text-[11.5px] leading-relaxed text-ink-3">
-          {bars.length > 0 ? "按 mGy/MBq 降序" : "原文口径"} · 共 {fmt(rows.length)} 条 /{" "}
-          {fmt(aggs.length)} 个器官
+          {bars.length > 0 ? tr("dose.sortedBy") : tr("dose.rawScale")} ·{" "}
+          {tr("dose.countLine", { a: fmt(rows.length), b: fmt(aggs.length) })}
         </span>
       </div>
 
@@ -131,22 +135,22 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
         }`}
       >
         <div>
-          <div className="text-ink-3">核素</div>
+          <div className="text-ink-3">{tr("dose.isotope")}</div>
           <div className="mt-0.5 font-medium text-ink">{isotopes}</div>
         </div>
         <div>
-          <div className="text-ink-3">物种</div>
+          <div className="text-ink-3">{tr("dose.species")}</div>
           <div className="mt-0.5 font-medium text-ink">{species}</div>
         </div>
         {top && (
           <div>
-            <div className="text-ink-3">最高器官</div>
-            <div className="mt-0.5 font-medium text-ink">{organLabel(top.organ)}</div>
+            <div className="text-ink-3">{tr("dose.topOrgan")}</div>
+            <div className="mt-0.5 font-medium text-ink">{organLabel(top.organ, lang)}</div>
           </div>
         )}
         {top && (
           <div>
-            <div className="text-ink-3">最高值</div>
+            <div className="text-ink-3">{tr("dose.topValue")}</div>
             <div className="num mt-0.5 font-medium text-ink">{`${showNum(top.mgy)} mGy/MBq`}</div>
           </div>
         )}
@@ -168,10 +172,10 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="truncate text-[13px] font-medium text-ink">
-                      {organLabel(a.organ)}
+                      {organLabel(a.organ, lang)}
                       {a.rows.length > 1 && (
                         <span className="ml-1.5 rounded bg-[#eef2f8] px-1.5 py-[1px] text-[10.5px] font-normal text-ink-3">
-                          {a.rows.length} 条
+                          {tr("dose.rowsN", { n: a.rows.length })}
                         </span>
                       )}
                     </span>
@@ -188,7 +192,9 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                   </div>
                   {a.primary.u !== "mGy/MBq" && (
                     <div className="mt-0.5 text-[11px] text-ink-3">
-                      原文 {a.primary.v} {a.primary.u} · {UNIT_HINT[a.primary.u] ?? "未登记口径"}
+                      {tr("dose.rawLabel")}
+                      {a.primary.v} {a.primary.u} ·{" "}
+                      {UNIT_HINT[a.primary.u]?.[lang] ?? tr("dose.unitUnregistered")}
                     </div>
                   )}
                 </button>
@@ -210,7 +216,8 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                         </span>
                         {r.raw && (
                           <div className="mt-0.5 break-words text-[11px] leading-relaxed text-ink-3">
-                            原文：{r.raw}
+                            {tr("dose.rawLabel")}
+                            {r.raw}
                           </div>
                         )}
                       </div>
@@ -227,24 +234,23 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
 
       {bars.length === 0 && (
         <div className="mt-4 rounded-lg border border-dashed border-[#e8edf5] px-4 py-5 text-center text-[12.5px] leading-relaxed text-ink-3">
-          该药的 {fmt(rows.length)} 条记录全部是「{units.join(" / ")}」口径，
-          不与器官吸收剂量同轴比较 —— 下列按原文列出
+          {tr("dose.mixedUnit", { n: fmt(rows.length), u: units.join(" / ") })}
         </div>
       )}
 
       {noBar.length > 0 && (
         <div className="mt-4 rounded-[10px] border border-[#f6e3c8] bg-[#fdf8f1] px-3.5 py-3">
           <div className="text-[12px] font-medium text-[#a9620d]">
-            不可归一口径（不参与排序）· {noBar.length} 个器官 / {missing} 条
+            {tr("dose.unmappable", { a: noBar.length, b: missing })}
           </div>
           <div className="mt-1 space-y-1">
             {noBar.map((a) => (
               <div key={a.key} className="text-[12px] text-ink-2">
-                <span className="font-medium">{organLabel(a.organ)}</span>
+                <span className="font-medium">{organLabel(a.organ, lang)}</span>
                 <span className="num ml-2">
                   {a.primary.v} {a.primary.u}
                 </span>
-                <span className="ml-2 text-ink-3">{UNIT_HINT[a.primary.u] ?? ""}</span>
+                <span className="ml-2 text-ink-3">{UNIT_HINT[a.primary.u]?.[lang] ?? ""}</span>
               </div>
             ))}
           </div>
@@ -252,12 +258,16 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
       )}
 
       <div className="mt-4 border-t border-line pt-3 text-[11px] leading-relaxed text-ink-3">
-        口径：仅取 FDA 获批说明书「剂量与给药」表（
-        <span className="font-mono">dosage_and_administration_table</span>
-        ），每条保留 set_id 与原始单元格文本；μGy/Gy 与旧单位先归一到 mGy/MBq 再排序。模型：
+        {tr("dose.note", { src: "dosage_and_administration_table" })} {tr("dose.models")}
         <span className="font-mono">{models}</span>
-        {units.length > 1 && <> · 单位口径：{units.join(" / ")}</>}
-        <> · 点击任意器官可展开逐条原文。</>
+        {units.length > 1 && (
+          <>
+            {" · "}
+            {tr("dose.unitScope")}
+            {units.join(" / ")}
+          </>
+        )}
+        <> · {tr("dose.clickToExpand")}</>
       </div>
     </div>
   );
@@ -276,6 +286,8 @@ type Group = {
 
 /** 全库视图：按药聚合，保留检索（药名 / id）—— 剂量学层的全库入口。 */
 function LibraryView({ rows }: { rows: DoseRow[] }) {
+  const tr = useT();
+  const { lang } = useLang();
   const [q, setQ] = useState("");
 
   const groups = useMemo<Group[]>(() => {
@@ -313,30 +325,30 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
     <div className="card overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
         <div>
-          <h2 className="text-[15px] font-semibold text-ink">剂量学全库</h2>
+          <h2 className="text-[15px] font-semibold text-ink">{tr("dose.library")}</h2>
           <p className="mt-0.5 text-[12px] text-ink-3">
-            {fmt(groups.length)} 个药 / {fmt(rows.length)} 条器官剂量记录 · 来自 FDA 获批说明书
+            {tr("dose.libraryLine", { a: fmt(groups.length), b: fmt(rows.length) })}
           </p>
         </div>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="药名 / drug_id…"
+          placeholder={tr("dose.searchPh")}
           className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-3 focus:border-[#8fb8e8] sm:w-[240px]"
         />
       </div>
 
       {list.length === 0 ? (
         <EmptyState
-          title="没有匹配的药物"
-          hint={`当前 ${fmt(groups.length)} 个药全部不含「${q}」。可改用 drug_id 或英文名片段。`}
+          title={tr("dose.noMatch")}
+          hint={tr("dose.noMatchHint", { n: fmt(groups.length), q })}
         >
           <button
             type="button"
             onClick={() => setQ("")}
             className="rounded-lg border border-line bg-white px-3 py-1.5 text-[12.5px] text-ink-2 transition hover:bg-[#f7f9fd]"
           >
-            清空搜索
+            {tr("dose.clear")}
           </button>
         </EmptyState>
       ) : (
@@ -344,15 +356,15 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
           <table className="w-full min-w-[720px] border-collapse text-[12.5px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11px] uppercase tracking-wide text-ink-3">
-                <th className="px-4 py-2 text-left font-medium">药物</th>
-                <th className="px-3 py-2 text-left font-medium">核素</th>
-                <th className="px-3 py-2 text-right font-medium">器官</th>
-                <th className="px-3 py-2 text-right font-medium">记录</th>
-                <th className="px-3 py-2 text-left font-medium">最高器官</th>
-                <th className="px-3 py-2 text-right font-medium">最高剂量</th>
-                <th className="px-3 py-2 text-left font-medium">口径</th>
-                <th className="px-3 py-2 text-center font-medium">证据</th>
-                <th className="px-4 py-2 text-right font-medium">画像</th>
+                <th className="px-4 py-2 text-left font-medium">{tr("dose.thDrug")}</th>
+                <th className="px-3 py-2 text-left font-medium">{tr("dose.thIsotope")}</th>
+                <th className="px-3 py-2 text-right font-medium">{tr("dose.thOrgans")}</th>
+                <th className="px-3 py-2 text-right font-medium">{tr("dose.thRows")}</th>
+                <th className="px-3 py-2 text-left font-medium">{tr("dose.thTopOrgan")}</th>
+                <th className="px-3 py-2 text-right font-medium">{tr("dose.thTopValue")}</th>
+                <th className="px-3 py-2 text-left font-medium">{tr("dose.thUnit")}</th>
+                <th className="px-3 py-2 text-center font-medium">{tr("dose.thEvidence")}</th>
+                <th className="px-4 py-2 text-right font-medium">{tr("dose.thProfile")}</th>
               </tr>
             </thead>
             <tbody>
@@ -365,7 +377,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
                   <td className="px-3 py-2 text-ink-2">{g.iso || "—"}</td>
                   <td className="num px-3 py-2 text-right text-ink-2">{g.organs}</td>
                   <td className="num px-3 py-2 text-right text-ink-3">{g.rows.length}</td>
-                  <td className="px-3 py-2 text-ink-2">{g.top ? organLabel(g.top.organ) : "—"}</td>
+                  <td className="px-3 py-2 text-ink-2">{g.top ? organLabel(g.top.organ, lang) : "—"}</td>
                   <td className="num px-3 py-2 text-right font-semibold text-ink">
                     {g.top && g.top.mgy !== null ? showNum(g.top.mgy) : "—"}
                   </td>
@@ -382,7 +394,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
                       to={`/drug/${g.did}`}
                       className="text-[12px] font-medium text-brand hover:underline"
                     >
-                      详情 →
+                      {tr("dose.detail")}
                     </Link>
                   </td>
                 </tr>
@@ -396,6 +408,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
 }
 
 export default function DosimetryPanel({ drugId }: { drugId?: number }) {
+  const tr = useT();
   const { data, error, loading, reload } = useJSON<DoseRow[]>("dosimetry.json");
   const rows = data ?? [];
 
@@ -407,19 +420,16 @@ export default function DosimetryPanel({ drugId }: { drugId?: number }) {
   if (loading) return <TableSkeleton rows={6} cols={4} />;
   if (error)
     return (
-      <ErrorState message={`剂量学数据（dosimetry.json）加载失败：${error}`} onRetry={reload} />
+      <ErrorState message={tr("dose.errLoad") + error} onRetry={reload} />
     );
 
   if (drugId !== undefined) {
     if (mine.length === 0)
       return (
-        <EmptyState
-          title="该药暂无剂量学数据"
-          hint="库内剂量学层只覆盖能从 FDA 获批说明书「剂量与给药」表机器提取的器官剂量；其余药物为空白，不代表不存在剂量学资料。"
-        >
+        <EmptyState title={tr("dose.emptyTitle")} hint={tr("dose.emptyHint")}>
           {/* 不给 /dosimetry 链接：该路由在 App.tsx 的 LEGACY 里 redirect 回首页，点了会白跑一趟 */}
           <span className="num text-[12px] text-ink-3">
-            全库 {fmt(rows.length)} 条 · 覆盖 {fmt(new Set(rows.map((r) => r.did)).size)} 个药
+            {tr("dose.libLine", { a: fmt(rows.length), b: fmt(new Set(rows.map((r) => r.did)).size) })}
           </span>
         </EmptyState>
       );
@@ -428,10 +438,7 @@ export default function DosimetryPanel({ drugId }: { drugId?: number }) {
 
   if (rows.length === 0)
     return (
-      <EmptyState
-        title="剂量学层为空"
-        hint="public/data/dosimetry.json 已加载，但没有记录 —— 可能是导出脚本未包含剂量学层。"
-      />
+      <EmptyState title={tr("dose.layerEmptyTitle")} hint={tr("dose.layerEmptyHint")} />
     );
 
   return <LibraryView rows={rows} />;
