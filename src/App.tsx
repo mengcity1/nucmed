@@ -57,9 +57,9 @@ function Nav() {
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
             ⚛
           </span>
-          <span className="hidden leading-none sm:block">
-            <b className="block text-[15px] font-semibold tracking-wide">{tr("brand.name")}</b>
-            <span className="mt-0.5 block text-[11px] font-medium tracking-[.6px] text-ink-3">
+          <span className="hidden min-w-0 leading-none sm:block">
+            <b className="block truncate text-[15px] font-semibold tracking-wide">{tr("brand.name")}</b>
+            <span className="mt-0.5 block max-w-[200px] truncate text-[11px] font-medium tracking-[.6px] text-ink-3">
               {tr("brand.sub")}
             </span>
           </span>

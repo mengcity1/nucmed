@@ -12,7 +12,7 @@ export const STR = {
   "common.errorTitle": { zh: "数据加载失败", en: "Could not load data" },
   "common.emptyTitle": { zh: "没有匹配的记录", en: "No matching records" },
   "brand.name": { zh: "核药数据库", en: "NucMed DB" },
-  "brand.sub": { zh: "NUCMED DB", en: "RADIOPHARMACEUTICALS" },
+  "brand.sub": { zh: "可追溯的核药资源", en: "TRACEABLE RADIOPHARMACEUTICALS" },
   "nav.overview": { zh: "核药总览", en: "Overview" },
   "nav.drug": { zh: "单药画像", en: "Drug profile" },
   "nav.atlas": { zh: "影像图集", en: "Imaging atlas" },
