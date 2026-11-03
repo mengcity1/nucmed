@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
+import ImageViewer from "../components/ImageViewer";
 import { fmt, loadFigManifest, refLink, type Fig } from "../lib/data";
 
 const BASE = import.meta.env.BASE_URL;
@@ -346,37 +347,32 @@ export default function Atlas() {
       )}
 
       {zoom && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${zoom.drug_name} · ${zoom.label} 大图`}
-          onClick={() => setZoom(null)}
-          className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-h-[92vh] max-w-[96vw] overflow-auto rounded-xl bg-white p-3"
-          >
-            <button
-              type="button"
-              onClick={() => setZoom(null)}
-              aria-label="关闭大图（Esc）"
-              className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full border border-line bg-white/95 text-[14px] text-ink-2 shadow-s2 transition hover:text-ink"
-            >
-              ✕
-            </button>
-            <img
-              src={`${BASE}figs/${zoom.file}`}
-              alt={zoom.label}
-              decoding="async"
-              className="max-h-[78vh] max-w-full"
-            />
-            <div className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-ink-2">
-              <b>{zoom.drug_name}</b> · {zoom.label} · PMID {zoom.pmid} · {zoom.pmcid} · {zoom.license}
-              <div className="mt-1 text-ink-3">{zoom.caption}</div>
-            </div>
-          </div>
-        </div>
+        <ImageViewer
+          src={`${BASE}figs/${zoom.file}`}
+          alt={`${zoom.drug_name} · ${zoom.label}`}
+          onClose={() => setZoom(null)}
+          footer={
+            <span>
+              {zoom.caption ? `${zoom.caption.slice(0, 120)}${zoom.caption.length > 120 ? "…" : ""} · ` : ""}
+              PMID {zoom.pmid}
+              {zoom.pmcid && (
+                <>
+                  {" · "}
+                  <a
+                    className="underline decoration-dashed underline-offset-2 hover:text-white"
+                    href={`https://pmc.ncbi.nlm.nih.gov/articles/${zoom.pmcid}/`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    PMC 原图页 ↗
+                  </a>
+                </>
+              )}
+              {" · "}
+              {zoom.license}
+            </span>
+          }
+        />
       )}
     </div>
   );

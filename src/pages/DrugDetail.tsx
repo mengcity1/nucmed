@@ -4,6 +4,7 @@ import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point
 import { Chart, PALETTE, AXIS } from "../components/Chart";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
+import ImageViewer from "../components/ImageViewer";
 
 type Ref = { pmid: string; title: string | null; journal: string | null; year: number | null };
 
@@ -383,7 +384,7 @@ export default function DrugDetail() {
   const { data: raw } = useJSON<Record<string, string>>("raw.json");
   const [pick, setPick] = useState("");
   const [openId, setOpenId] = useState<number | null>(null);
-  const [zoom, setZoom] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<{ src: string; alt?: string; pmc?: string } | null>(null);
   const [tab, setTab] = useState<TabKey>("bio");
   // ★ 结构图来源（884 浙大 / 575 示意图 / 11 肽段 2D / 759 本地 RDKit）：此前一律标成 radiopharm，属错标
   const [structSrc, setStructSrc] = useState<string | null>(null);
@@ -716,7 +717,12 @@ export default function DrugDetail() {
                   src={`${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`}
                   alt={`${p.k} 结构`}
                   loading="lazy"
-                  onClick={() => setZoom(`${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`)}
+                  onClick={() =>
+                    setZoom({
+                      src: `${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`,
+                      alt: `${drug.name_en} · ${p.k} 结构（RDKit 现画）`,
+                    })
+                  }
                   className="mt-2 w-full cursor-zoom-in rounded border border-[#eef2f8] bg-white transition hover:opacity-90"
                   onError={() => setImgErr((s) => ({ ...s, [`part:${p.part}`]: true }))}
                 />
@@ -748,7 +754,12 @@ export default function DrugDetail() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => setZoom(`${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`)}
+                  onClick={() =>
+                    setZoom({
+                      src: `${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`,
+                      alt: `${drug.name_en} · 完整结构图`,
+                    })
+                  }
                   className="cursor-zoom-in rounded-lg transition hover:opacity-90"
                   title="点击放大"
                 >
@@ -802,19 +813,23 @@ export default function DrugDetail() {
       </div>
 
       {zoom && (
-        <div
-          onClick={() => setZoom(null)}
-          className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/75 p-6 backdrop-blur-sm"
-        >
-          <img
-            src={zoom}
-            alt="放大预览"
-            className="max-h-[90vh] max-w-[90vw] rounded-xl bg-white p-6 shadow-2xl"
-          />
-          <span className="pointer-events-none absolute right-6 top-5 rounded-lg bg-white/90 px-3 py-1.5 text-[13px] font-medium text-ink">
-            点击任意处关闭 ✕
-          </span>
-        </div>
+        <ImageViewer
+          src={zoom.src}
+          alt={zoom.alt}
+          onClose={() => setZoom(null)}
+          footer={
+            zoom.pmc ? (
+              <a
+                className="underline decoration-dashed underline-offset-2 hover:text-white"
+                href={`https://pmc.ncbi.nlm.nih.gov/articles/${zoom.pmc}/`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                PMC 原图页 ↗
+              </a>
+            ) : undefined
+          }
+        />
       )}
 
       {tab === "bio" && (
@@ -1111,7 +1126,13 @@ export default function DrugDetail() {
                         <figure key={f.file} className="card m-0 overflow-hidden">
                           <button
                             type="button"
-                            onClick={() => setZoom(`${import.meta.env.BASE_URL}figs/${f.file}`)}
+                            onClick={() =>
+                              setZoom({
+                                src: `${import.meta.env.BASE_URL}figs/${f.file}`,
+                                alt: `${f.drug_name} · ${f.label}`,
+                                pmc: f.pmcid,
+                              })
+                            }
                             className="block w-full cursor-zoom-in"
                             title="点击放大"
                           >
