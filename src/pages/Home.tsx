@@ -7,19 +7,34 @@ import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 
 const PAGE = 30;
 
-/** 研发阶段归一（对齐原 app.py 的 stage_code：取最高阶段）。 */
+/** 研发阶段归一：取**最高阶段**。数据里 `status` 常是多阶段并列
+ *  （如 `Approval / Phase 1 / Phase 2`，同一药在不同适应症/国家不同期）⇒ 只取最高的那档显示，
+ *  原始写法保留在 tooltip。2026-11-03 起把「临床」细分为具体期数（owner 要求显示 1/2/3 期）。 */
 function stageOf(s: string | null): string {
   if (!s) return "未标注";
-  if (/approval/i.test(s)) return "已上市";
-  if (/phase|clinical trial/i.test(s)) return "临床";
-  if (/preclinical/i.test(s)) return "临床前";
+  const t = s.toLowerCase();
+  if (t.includes("approval")) return "已上市";
+  if (t.includes("phase 4")) return "4期";
+  if (t.includes("phase 3")) return "3期";
+  if (t.includes("phase 2/3")) return "2/3期";
+  if (t.includes("phase 2")) return "2期";
+  if (t.includes("phase 1/2")) return "1/2期";
+  if (t.includes("phase 1")) return "1期";
+  if (t.includes("clinical trial")) return "临床";
+  if (t.includes("preclinical")) return "临床前";
   return "未标注";
 }
 
-const STAGE_ORDER = ["已上市", "临床", "临床前", "未标注"];
+const STAGE_ORDER = ["已上市", "4期", "3期", "2/3期", "2期", "1/2期", "1期", "临床", "临床前", "未标注"];
 const STAGE_TONE: Record<string, string> = {
   已上市: "bg-[#e6f4f1] text-[#0a7d6f] border-[#c6e8e1]",
-  临床: "bg-[#e8f0fa] text-[#164a8a] border-[#d3e2f6]",
+  "4期": "bg-[#e6eefb] text-[#134a86] border-[#cfdff5]",
+  "3期": "bg-[#e8f0fa] text-[#164a8a] border-[#d3e2f6]",
+  "2/3期": "bg-[#eaf3fc] text-[#245e9c] border-[#d7e6f7]",
+  "2期": "bg-[#ecf4fd] text-[#2a6aa8] border-[#dae9f9]",
+  "1/2期": "bg-[#eef6fe] text-[#2f6fae] border-[#ddebf9]",
+  "1期": "bg-[#f0f7ff] text-[#3576b4] border-[#e0edfa]",
+  临床: "bg-[#f2f6fc] text-[#475f7d] border-[#e2e9f3]",
   临床前: "bg-[#f3e8fb] text-[#7a3fa8] border-[#e6d2f2]",
   未标注: "bg-[#eef2f8] text-[#516078] border-[#dfe6f0]",
 };
@@ -538,6 +553,7 @@ export default function Home() {
                   <td className="hidden px-3 py-2.5 sm:table-cell">
                     <span
                       className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium ${STAGE_TONE[d.stage]}`}
+                      title={enSafe(lang, d.status)}
                     >
                       {stageLabel(lang, d.stage)}
                     </span>
