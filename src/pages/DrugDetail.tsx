@@ -53,75 +53,214 @@ function DetailSkeleton() {
   );
 }
 
-/** 该药的时间-摄取曲线（每个器官一条线 · 只画 ≥2 个时间点的器官） */
+/** 生物分布可视化（2026-11-03 重构）。
+ *  旧版只画「时间-摄取曲线」，但实测 808 个有数据的药里 584 个（72.3%）只有单个时点 ⇒
+ *  大多数药只看到一句「不足以画趋势」。现在：
+ *  ① 默认「器官对比」散点（单时点也成立 · 不聚合、不跨文献连线 · 按时点上色）；
+ *  ② 只有存在「同一器官 ≥2 个时点」时才提供「时间曲线」，按 PMID 分段断线、可切线性/对数；
+ *  ③ 单位分开选：%ID/g 3,110 行 / %ID 256 行 / %ID/mL 25 行，混在一个轴上会失真。 */
 function DrugCurve({ pts }: { pts: Point[] }) {
-  const series = useMemo(() => {
-    const byOrgan = new Map<string, [number, number][]>();
-    for (const p of pts) {
-      if (p.time_h === null || p.time_h <= 0 || p.value_num <= 0) continue;
-      const arr = byOrgan.get(p.organ_norm) ?? [];
-      arr.push([p.time_h, p.value_num]);
-      byOrgan.set(p.organ_norm, arr);
-    }
-    return [...byOrgan.entries()]
-      .filter(([, a]) => a.length >= 2)
-      .sort((a, b) => b[1].length - a[1].length)
-      .slice(0, 6)
-      .map(([organ, data]) => ({
-        name: organ,
-        type: "line" as const,
-        smooth: true,
-        symbolSize: 6,
-        connectNulls: true,
-        data: [...data].sort((x, y) => x[0] - y[0]),
-      }));
+  const units = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of pts) m.set(p.value_unit, (m.get(p.value_unit) ?? 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
   }, [pts]);
+  const [unit, setUnit] = useState(() => units[0]?.[0] ?? "");
+  const [view, setView] = useState<"organ" | "curve">("organ");
+  const [logX, setLogX] = useState(false);
 
-  const option = useMemo(
-    () => ({
+  const rows = useMemo(() => pts.filter((p) => p.value_unit === unit && p.value_num > 0), [pts, unit]);
+
+  const times = useMemo(() => {
+    const s = new Set<number>();
+    for (const p of rows) if (p.time_h !== null && p.time_h > 0) s.add(p.time_h);
+    return [...s].sort((a, b) => a - b);
+  }, [rows]);
+
+  /** 可画时间曲线的器官（同一器官 ≥2 个时点） */
+  const curvable = useMemo(() => {
+    const m = new Map<string, Set<number>>();
+    for (const p of rows) {
+      if (p.time_h === null || p.time_h <= 0) continue;
+      const s = m.get(p.organ_norm) ?? new Set<number>();
+      s.add(p.time_h);
+      m.set(p.organ_norm, s);
+    }
+    return [...m.entries()].filter(([, s]) => s.size >= 2).map(([k]) => k);
+  }, [rows]);
+
+  /** 换药后若原单位已不存在，回落到行数最多的单位 */
+  useEffect(() => {
+    if (units.length && !units.some(([u]) => u === unit)) setUnit(units[0][0]);
+  }, [units, unit]);
+
+  /** 「器官对比」：x = 器官（按最大值降序取前 12），按时点分色，不聚合 */
+  const organOption = useMemo(() => {
+    const organs = (() => {
+      const m = new Map<string, number>();
+      for (const p of rows) m.set(p.organ_norm, Math.max(m.get(p.organ_norm) ?? 0, p.value_num));
+      return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k]) => k);
+    })();
+    const mk = (arr: Point[]) =>
+      arr.map((p) => ({
+        value: p.value_num,
+        name: p.organ_norm,
+        sd: p.value_sd,
+        pmid: p.doc_pmid,
+        species: p.species,
+      }));
+    const series: { name: string; type: "scatter"; symbolSize: number; data: unknown[] }[] = times
+      .slice(0, 6)
+      .map((t) => ({
+        name: `${t} h`,
+        type: "scatter",
+        symbolSize: 9,
+        data: mk(rows.filter((p) => p.time_h === t && organs.includes(p.organ_norm))),
+      }));
+    const noT = rows.filter((p) => (p.time_h === null || p.time_h <= 0) && organs.includes(p.organ_norm));
+    if (noT.length) series.push({ name: "未标注时点", type: "scatter", symbolSize: 9, data: mk(noT) });
+
+    return {
       color: PALETTE,
       tooltip: {
-        trigger: "axis",
-        formatter: (ps: { seriesName: string; value: [number, number] }[]) =>
-          ps
-            .map((p) => `${p.seriesName}: ${p.value[0]} h → ${p.value[1]} %ID/g`)
-            .join("<br/>"),
+        trigger: "item" as const,
+        formatter: (q: {
+          data: { name?: string; value: number; sd?: number | null; pmid?: string | null; species?: string | null };
+        }) => {
+          const d = q.data;
+          const sd = d.sd != null ? ` ± ${d.sd}` : "";
+          return [
+            `<b>${d.name}</b>`,
+            `${d.value}${sd} ${unit}`,
+            d.species ? `物种：${d.species}` : "",
+            d.pmid ? `PMID ${d.pmid}` : "",
+          ]
+            .filter(Boolean)
+            .join("<br/>");
+        },
       },
-      legend: { type: "scroll", top: 0, textStyle: { fontSize: 11, color: "#475569" } },
-      grid: { left: 54, right: 16, top: 38, bottom: 34 },
+      legend: { type: "scroll" as const, top: 0, textStyle: { fontSize: 11, color: "#475569" } },
+      grid: { left: 56, right: 18, top: 40, bottom: 62 },
       xAxis: {
-        type: "log",
-        name: "时间 (h, 对数)",
-        nameTextStyle: { color: "#94a3b8", fontSize: 11 },
-        ...AXIS,
+        type: "category" as const,
+        data: organs,
+        axisLabel: { color: "#94a3b8", fontSize: 10.5, rotate: 32, interval: 0 },
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: "#e4e9f2" } },
       },
-      yAxis: {
-        type: "log",
-        name: "%ID/g",
-        nameTextStyle: { color: "#94a3b8", fontSize: 11 },
-        ...AXIS,
-      },
+      yAxis: { type: "value" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
       series,
-    }),
-    [series]
-  );
+    };
+  }, [rows, times, unit]);
 
-  if (!series.length) {
+  /** 「时间曲线」：每个器官一条线，按 PMID 分段（换文献处断线，不把两篇论文连成一条趋势） */
+  const curveOption = useMemo(() => {
+    const series = curvable.slice(0, 6).map((organ) => {
+      const arr = rows.filter((p) => p.organ_norm === organ && p.time_h !== null && p.time_h > 0);
+      const byPmid = new Map<string, Point[]>();
+      for (const p of arr) {
+        const k = p.doc_pmid ?? "—";
+        const cur = byPmid.get(k);
+        if (cur) cur.push(p);
+        else byPmid.set(k, [p]);
+      }
+      const data: ({ value: [number, number]; pmid: string | null } | null)[] = [];
+      for (const [, group] of byPmid) {
+        for (const p of [...group].sort((a, b) => (a.time_h as number) - (b.time_h as number))) {
+          data.push({ value: [p.time_h as number, p.value_num], pmid: p.doc_pmid });
+        }
+        data.push(null);
+      }
+      return { name: organ, type: "line" as const, symbolSize: 6, connectNulls: false, smooth: false, data };
+    });
+    return {
+      color: PALETTE,
+      tooltip: {
+        trigger: "item" as const,
+        formatter: (q: { seriesName: string; data: { value: [number, number]; pmid: string | null } | null }) => {
+          if (!q.data) return "";
+          const [t, v] = q.data.value;
+          return `<b>${q.seriesName}</b><br/>${t} h → ${v} ${unit}` + (q.data.pmid ? `<br/>PMID ${q.data.pmid}` : "");
+        },
+      },
+      legend: { type: "scroll" as const, top: 0, textStyle: { fontSize: 11, color: "#475569" } },
+      grid: { left: 56, right: 18, top: 40, bottom: 40 },
+      xAxis: {
+        type: logX ? ("log" as const) : ("value" as const),
+        name: logX ? "时间 (h, 对数)" : "时间 (h)",
+        nameTextStyle: { color: "#94a3b8", fontSize: 11 },
+        ...AXIS,
+      },
+      yAxis: { type: "log" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
+      series,
+    };
+  }, [rows, curvable, unit, logX]);
+
+  if (!rows.length) {
     return (
       <div className="rounded-lg border border-dashed border-[#e8edf5] px-4 py-5 text-center text-[12.5px] text-ink-3">
-        该药的记录不足以画趋势（需要同一器官有 ≥2 个时点）
+        该药暂无可用于绘图的生物分布数值（当前单位 {unit || "—"}）
       </div>
     );
   }
   return (
     <div>
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[13px] font-medium text-ink">时间-摄取曲线</span>
-        <span className="text-[11.5px] text-ink-3">
-          每条线 = 一个器官 · 仅画 ≥2 个时点的器官（最多 6 条）· 双对数轴
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <span className="text-[13px] font-medium text-ink">生物分布可视化</span>
+        {units.length > 1 && (
+          <span className="flex flex-wrap items-center gap-1">
+            {units.map(([u, n]) => (
+              <button
+                key={u}
+                type="button"
+                onClick={() => setUnit(u)}
+                className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
+                  unit === u ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
+                }`}
+              >
+                {u} · {n}
+              </button>
+            ))}
+          </span>
+        )}
+        <span className="ml-auto flex flex-wrap items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setView("organ")}
+            className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
+              view === "organ" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
+            }`}
+          >
+            器官对比
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("curve")}
+            disabled={!curvable.length}
+            title={curvable.length ? "按时间画曲线" : "该药没有「同一器官 ≥2 个时点」的记录"}
+            className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
+              view === "curve" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
+            } ${curvable.length ? "" : "cursor-not-allowed opacity-45 hover:border-line"}`}
+          >
+            时间曲线{curvable.length ? "" : "（不可用）"}
+          </button>
+          {view === "curve" && (
+            <button
+              type="button"
+              onClick={() => setLogX((v) => !v)}
+              className="rounded-full border border-line bg-white px-2.5 py-0.5 text-[11.5px] text-ink-2 transition hover:border-[#b9d0e9]"
+            >
+              {logX ? "线性时间轴" : "对数时间轴"}
+            </button>
+          )}
         </span>
       </div>
-      <Chart option={option} height={300} />
+      <Chart option={view === "organ" ? organOption : curveOption} height={340} />
+      <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-3">
+        {view === "organ"
+          ? `每个点 = 一条原始记录，不取均值 · 横轴按最大值排序取前 12 个器官 · 颜色 = 时点 · 悬停看 SD / 物种 / PMID · 单位 ${unit}`
+          : `每条线 = 一个器官（最多 6 个）· 换文献处断线，不把两篇论文连成一条趋势 · 该药有 ${curvable.length} 个器官满足「≥2 个时点」`}
+      </div>
     </div>
   );
 }
@@ -253,11 +392,19 @@ export default function DrugDetail() {
   const [refMeta, setRefMeta] = useState<Record<string, Ref> | null>(null);
   // ★ 文献影像（pk295 U1）：`figs/manifest.json` 每条带 drug_id ⇒ 单药可直接筛
   const [figs, setFigs] = useState<Fig[] | null>(null);
+  /** 全库影像规模：用于空态说明「不是坏了，是这药还没命中」 */
+  const [figStats, setFigStats] = useState<{ total: number; drugs: number } | null>(null);
 
   useEffect(() => {
     let alive = true;
     loadFigManifest()
-      .then((m) => alive && setFigs(m.filter((f) => f.drug_id === did)))
+      .then((m) => {
+        if (!alive) return;
+        setFigs(m.filter((f) => f.drug_id === did));
+        const s = new Set<number>();
+        for (const f of m) s.add(f.drug_id);
+        setFigStats({ total: m.length, drugs: s.size });
+      })
       .catch(() => alive && setFigs([]));
     return () => {
       alive = false;
@@ -992,6 +1139,26 @@ export default function DrugDetail() {
                 图引自原文 Figure（非本库生成、非重绘）；点击可放大；许可随图标注，使用前请回原文核对。
               </div>
             </>
+          )}
+
+          {figs && figs.length === 0 && (
+            <div className="card mt-4">
+              <EmptyState
+                title="该药暂无收录的文献影像"
+                hint={
+                  figStats
+                    ? `本库影像图集现收 ${fmt(figStats.total)} 张、覆盖 ${fmt(figStats.drugs)} 个药，该药尚未命中。图集只收「图注里能定位到药物、且能取到原文 Figure」的图，因此不是每个药都有。`
+                    : "该药尚未命中文献影像。"
+                }
+              >
+                <Link
+                  to="/atlas"
+                  className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
+                >
+                  去影像图集看看 →
+                </Link>
+              </EmptyState>
+            </div>
           )}
         </section>
       )}
