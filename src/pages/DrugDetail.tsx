@@ -184,7 +184,7 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
               共 <b className="num text-ink-2">{fmt(tumor.length)}</b> 条 · 口径以原文为准
             </span>
           </div>
-          <div className="mt-2 overflow-x-auto rounded-[10px] border border-line">
+          <div className="mt-2 hscroll rounded-[10px] border border-line">
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
@@ -705,7 +705,7 @@ export default function DrugDetail() {
           </div>
         )}
         <div className="card mt-3 overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="hscroll">
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">

@@ -1,5 +1,5 @@
 import { NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useJSON, type Meta } from "./lib/data";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
@@ -33,6 +33,14 @@ function Nav() {
   const [sp] = useSearchParams();
   const nav = useNavigate();
   const q = sp.get("q") ?? "";
+  /** 小屏搜索：<md 时把搜索框折叠成图标，点开后在第二行铺满（2026-11-01 小屏适配） */
+  const [mOpen, setMOpen] = useState(false);
+  useEffect(() => {
+    if (!mOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mOpen]);
   const onSearch = (v: string) => {
     const next = new URLSearchParams(sp);
     if (v) next.set("q", v);
@@ -66,6 +74,16 @@ function Nav() {
           />
         </div>
 
+        <button
+          type="button"
+          onClick={() => setMOpen((v) => !v)}
+          aria-label={mOpen ? "关闭搜索" : "打开搜索"}
+          aria-expanded={mOpen}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-line bg-white text-[15px] text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink md:hidden"
+        >
+          {mOpen ? "✕" : "🔍"}
+        </button>
+
         <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1">
           {TABS.map((t) => (
             <NavLink
@@ -84,6 +102,24 @@ function Nav() {
           ))}
         </nav>
       </div>
+
+      {/* 小屏展开式搜索：整行铺满，Esc 或 ✕ 收起 */}
+      {mOpen && (
+        <div className="wrap pb-3 md:hidden">
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#9aa8bd]">
+              🔍
+            </span>
+            <input
+              autoFocus
+              value={q}
+              onChange={(e) => onSearch(e.target.value)}
+              placeholder="搜索核药、器官、核素…"
+              className="h-11 w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[14px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
+            />
+          </div>
+        </div>
+      )}
     </header>
   );
 }

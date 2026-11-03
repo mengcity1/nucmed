@@ -340,7 +340,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
           </button>
         </EmptyState>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="hscroll">
           <table className="w-full min-w-[720px] border-collapse text-[12.5px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11px] uppercase tracking-wide text-ink-3">

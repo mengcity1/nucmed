@@ -449,7 +449,7 @@ export default function Home() {
       <h2 className="mt-6 text-[16px] font-semibold">药物清单</h2>
 
       <div className="card mt-3 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="hscroll">
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">

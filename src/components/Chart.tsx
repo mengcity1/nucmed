@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts/core";
 import { BarChart, HeatmapChart, LineChart, ScatterChart } from "echarts/charts";
 import {
@@ -45,19 +45,41 @@ export function Chart({
   height?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  /** 小屏（<640px）高度按 0.72 缩放：320 → 230，避免手机上一屏放不下（2026-11-01 小屏适配） */
+  const [h, setH] = useState(height);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const apply = () => setH(mq.matches ? Math.round(height * 0.72) : height);
+    apply();
+    if (mq.addEventListener) mq.addEventListener("change", apply);
+    else mq.addListener(apply);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", apply);
+      else mq.removeListener(apply);
+    };
+  }, [height]);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const inst = echarts.init(el);
     inst.setOption(option);
     const onResize = () => inst.resize();
-    window.addEventListener("resize", onResize);
+    // ResizeObserver 优于 window.resize：容器因布局/断点变化而变宽时也会重绘
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(onResize);
+      ro.observe(el);
+    } else {
+      window.addEventListener("resize", onResize);
+    }
     return () => {
-      window.removeEventListener("resize", onResize);
+      if (ro) ro.disconnect();
+      else window.removeEventListener("resize", onResize);
       inst.dispose();
     };
-  }, [option]);
-  return <div ref={ref} style={{ height }} className="w-full" />;
+  }, [option, h]);
+  return <div ref={ref} style={{ height: h }} className="w-full" />;
 }
 
 /** 通用坐标轴样式 */
