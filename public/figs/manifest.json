@@ -2926,6 +2926,39 @@
   "file": "521_PMC6262544_cells-07-00187-g003.jpg"
  },
  {
+  "drug_id": 528,
+  "drug_name": "[125I]BT-1",
+  "pmid": "41003914",
+  "pmcid": "PMC12474822",
+  "label": "Fig. 3",
+  "caption": "Biodistribution of [177Lu]Lu-PSMA-617 (a), [177Lu]Lu-BT-117003 (b) and [177Lu]Lu-BT-117016 (c) in LNCaP clone FGC tumor-bearing mice after intravenous injection. Data points represent mean ± SD (n = 3/ time point)",
+  "license": "",
+  "attrib": "unclear",
+  "file": "528_PMC12474822_41181_2025_385_Fig3_HTML.jpg"
+ },
+ {
+  "drug_id": 528,
+  "drug_name": "[125I]BT-1",
+  "pmid": "41003914",
+  "pmcid": "PMC12474822",
+  "label": "Fig. 4",
+  "caption": "The non-decay corrected biodistribution (up to 960 h p.i.) and AUCs for tumor (a), kidney (b), blood (c) and liver (d) of [177Lu]Lu-PSMA-617, [177Lu]Lu-BT-117003, and [177Lu]Lu-BT-117016 in LNCaP clone FGC tumor-bearing mice. Data represent mean ± SD (n = 3/ time point)",
+  "license": "",
+  "attrib": "unclear",
+  "file": "528_PMC12474822_41181_2025_385_Fig4_HTML.gif"
+ },
+ {
+  "drug_id": 590,
+  "drug_name": "[131I]GV-620",
+  "pmid": "40888104",
+  "pmcid": "PMC12673465",
+  "label": "Figure 20",
+  "caption": "(A) Compounds synthesized to evaluate the stabilizing properties of the hydroxyl groups in the neopentyl glycol scaffold, and (B) benzoate reference compound. (C) Accumulation of 125I and 211At in the stomach and neck, respectively. Reprinted with permission from Suzuki et al. J. Med. Chem., 2021, 64, 15846‐15857. Copyright 2014 American Chemical Society. (D) Additional applications of the neopentyl glycol scaffold including an l‐tyrosine derivative (15), a PSMA‐targeting derivative (16), and an activated ester for biomolecule conjugation (17). (E) Synthesis, astatination, and deprotection of ",
+  "license": "",
+  "attrib": "unclear",
+  "file": "590_PMC12673465_MED-46-203-g034.jpg"
+ },
+ {
   "drug_id": 599,
   "drug_name": "[131I]IPBA-EE",
   "pmid": "38570359",
@@ -4114,6 +4147,17 @@
   "file": "873_PMC11413668_sc2.jpg"
  },
  {
+  "drug_id": 881,
+  "drug_name": "[191Pt]Pt-Cys-Hoechst33258",
+  "pmid": "35358392",
+  "pmcid": "PMC9014856",
+  "label": "Figure 5",
+  "caption": "(a) Cellular uptake (%ID/mg protein) and (b) intracellular distribution (%) of 191Pt and 111In in U2OS-53BP1 cells after incubation for 18 h (f1, cytosolic fraction; f2, membrane/organelle protein fraction; f3, nucleic protein fraction; f4, cytoskeletal fraction; A, amido analog; T, thiourea analog).",
+  "license": "CC BY-NC-ND",
+  "attrib": "unclear",
+  "file": "881_PMC9014856_jm1c02209_0006.gif"
+ },
+ {
   "drug_id": 888,
   "drug_name": "[211At]At-NpG-PSMA",
   "pmid": "39394527",
@@ -4477,6 +4521,138 @@
   "file": "949_PMC12943370_pharmaceuticals-19-00295-g011.gif"
  },
  {
+  "drug_id": 950,
+  "drug_name": "[68Ga]Ga-BL02",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 2",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL06 and [68Ga]Ga-BL02. Scales of the PET images of [68Ga]Ga-BL02 and [68Ga]Ga-BL06 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL06 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "950_PMC9316317_pharmaceutics-14-01502-g002.jpg"
+ },
+ {
+  "drug_id": 950,
+  "drug_name": "[68Ga]Ga-BL02",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 3",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 h p.i. [68Ga]Ga-BL17. Scales of the PET images of [68Ga]Ga-BL17 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL17; [68Ga]Ga-BL20; and [68Ga]Ga-BL25 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. [68Ga]Ga-BL25 was only evaluated at 2 h p.i.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "950_PMC9316317_pharmaceutics-14-01502-g003.jpg"
+ },
+ {
+  "drug_id": 950,
+  "drug_name": "[68Ga]Ga-BL02",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 5",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor. Scales of the PET images of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL31 in comparison to that of [68Ga]Ga-Pentixafor in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.05 = *, p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "950_PMC9316317_pharmaceutics-14-01502-g005.jpg"
+ },
+ {
+  "drug_id": 952,
+  "drug_name": "[68Ga]Ga-BL17",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 2",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL06 and [68Ga]Ga-BL02. Scales of the PET images of [68Ga]Ga-BL02 and [68Ga]Ga-BL06 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL06 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "952_PMC9316317_pharmaceutics-14-01502-g002.jpg"
+ },
+ {
+  "drug_id": 952,
+  "drug_name": "[68Ga]Ga-BL17",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 3",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 h p.i. [68Ga]Ga-BL17. Scales of the PET images of [68Ga]Ga-BL17 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL17; [68Ga]Ga-BL20; and [68Ga]Ga-BL25 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. [68Ga]Ga-BL25 was only evaluated at 2 h p.i.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "952_PMC9316317_pharmaceutics-14-01502-g003.jpg"
+ },
+ {
+  "drug_id": 952,
+  "drug_name": "[68Ga]Ga-BL17",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 5",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor. Scales of the PET images of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL31 in comparison to that of [68Ga]Ga-Pentixafor in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.05 = *, p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "952_PMC9316317_pharmaceutics-14-01502-g005.jpg"
+ },
+ {
+  "drug_id": 953,
+  "drug_name": "[68Ga]Ga-BL20",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 2",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL06 and [68Ga]Ga-BL02. Scales of the PET images of [68Ga]Ga-BL02 and [68Ga]Ga-BL06 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL06 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "953_PMC9316317_pharmaceutics-14-01502-g002.jpg"
+ },
+ {
+  "drug_id": 953,
+  "drug_name": "[68Ga]Ga-BL20",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 3",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 h p.i. [68Ga]Ga-BL17. Scales of the PET images of [68Ga]Ga-BL17 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL17; [68Ga]Ga-BL20; and [68Ga]Ga-BL25 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. [68Ga]Ga-BL25 was only evaluated at 2 h p.i.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "953_PMC9316317_pharmaceutics-14-01502-g003.jpg"
+ },
+ {
+  "drug_id": 953,
+  "drug_name": "[68Ga]Ga-BL20",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 5",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor. Scales of the PET images of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL31 in comparison to that of [68Ga]Ga-Pentixafor in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.05 = *, p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "953_PMC9316317_pharmaceutics-14-01502-g005.jpg"
+ },
+ {
+  "drug_id": 954,
+  "drug_name": "[68Ga]Ga-BL25",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 2",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL06 and [68Ga]Ga-BL02. Scales of the PET images of [68Ga]Ga-BL02 and [68Ga]Ga-BL06 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL06 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "954_PMC9316317_pharmaceutics-14-01502-g002.jpg"
+ },
+ {
+  "drug_id": 954,
+  "drug_name": "[68Ga]Ga-BL25",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 3",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 h p.i. [68Ga]Ga-BL17. Scales of the PET images of [68Ga]Ga-BL17 are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL17; [68Ga]Ga-BL20; and [68Ga]Ga-BL25 in comparison to that of [68Ga]Ga-BL02 in Daudi xenograft-bearing mice at 1 and 2 h p.i. [68Ga]Ga-BL25 was only evaluated at 2 h p.i.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "954_PMC9316317_pharmaceutics-14-01502-g003.jpg"
+ },
+ {
+  "drug_id": 954,
+  "drug_name": "[68Ga]Ga-BL25",
+  "pmid": "35890397",
+  "pmcid": "PMC9316317",
+  "label": "Figure 5",
+  "caption": "(A) Maximum intensity projections for PET/CT and PET alone at 1 and 2 h p.i. of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor. Scales of the PET images of [68Ga]Ga-BL31 and [68Ga]Ga-Pentixafor are 0–6 %ID/g. (B) Ex vivo biodistribution data of [68Ga]Ga-BL31 in comparison to that of [68Ga]Ga-Pentixafor in Daudi xenograft-bearing mice at 1 and 2 h p.i. (p < 0.05 = *, p < 0.01 = **, p < 0.001 = ***, p < 0.0001 = ****, ns = not significant).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "954_PMC9316317_pharmaceutics-14-01502-g005.jpg"
+ },
+ {
   "drug_id": 955,
   "drug_name": "[68Ga]Ga-BL30",
   "pmid": "35890397",
@@ -4486,6 +4662,50 @@
   "license": "CC BY 4.0",
   "attrib": "target",
   "file": "955_PMC9316317_pharmaceutics-14-01502-g001.jpg"
+ },
+ {
+  "drug_id": 991,
+  "drug_name": "[68Ga]Ga-TEoS-DAZA",
+  "pmid": "36559188",
+  "pmcid": "PMC9783202",
+  "label": "Figure 6",
+  "caption": "Biodistribution of [68Ga]Ga-TEoS-DAZA and [68Ga]Ga-TMoS-DAZA in ostrich embryos (n = 7), given as mean values of %IA/g. The standard deviation is indicated by error bars.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "991_PMC9783202_pharmaceutics-14-02695-g006.jpg"
+ },
+ {
+  "drug_id": 991,
+  "drug_name": "[68Ga]Ga-TEoS-DAZA",
+  "pmid": "36559188",
+  "pmcid": "PMC9783202",
+  "label": "Figure 7",
+  "caption": "PET/CT of [68Ga]Ga-TMoS-DAZA in an ostrich embryo at different time frames. At early time points the vitelline vein (yellow arrow) and the heart (red arrow) are visible, as well as early accumulation in the liver (short green arrows) and kidneys (pink arrows). After 15–20 min a weak activity accumulation in the cloaca (blue arrow) can be observed, while excretion into the duodenum (green arrows) is visible at 55–60 min. White arrows point to osseous structures.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "991_PMC9783202_pharmaceutics-14-02695-g007.jpg"
+ },
+ {
+  "drug_id": 992,
+  "drug_name": "[68Ga]Ga-TMoS-DAZA",
+  "pmid": "36559188",
+  "pmcid": "PMC9783202",
+  "label": "Figure 6",
+  "caption": "Biodistribution of [68Ga]Ga-TEoS-DAZA and [68Ga]Ga-TMoS-DAZA in ostrich embryos (n = 7), given as mean values of %IA/g. The standard deviation is indicated by error bars.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "992_PMC9783202_pharmaceutics-14-02695-g006.jpg"
+ },
+ {
+  "drug_id": 992,
+  "drug_name": "[68Ga]Ga-TMoS-DAZA",
+  "pmid": "36559188",
+  "pmcid": "PMC9783202",
+  "label": "Figure 7",
+  "caption": "PET/CT of [68Ga]Ga-TMoS-DAZA in an ostrich embryo at different time frames. At early time points the vitelline vein (yellow arrow) and the heart (red arrow) are visible, as well as early accumulation in the liver (short green arrows) and kidneys (pink arrows). After 15–20 min a weak activity accumulation in the cloaca (blue arrow) can be observed, while excretion into the duodenum (green arrows) is visible at 55–60 min. White arrows point to osseous structures.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "992_PMC9783202_pharmaceutics-14-02695-g007.jpg"
  },
  {
   "drug_id": 1002,
@@ -4992,6 +5212,50 @@
   "license": "",
   "attrib": "target",
   "file": "1047_PMC10144323_pharmaceuticals-16-00612-sch001.jpg"
+ },
+ {
+  "drug_id": 1055,
+  "drug_name": "[99mTc]Tc-L2-2-nitroimidazole",
+  "pmid": "37765084",
+  "pmcid": "PMC10537343",
+  "label": "Figure 4",
+  "caption": "In vitro cellular uptake of the studied 99mTc-complexes in S180 cells (hypoxia vs. normoxia, p < 0.05).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1055_PMC10537343_pharmaceuticals-16-01276-g004.jpg"
+ },
+ {
+  "drug_id": 1057,
+  "drug_name": "[99mTc]Tc-L3-2-nitroimidazole",
+  "pmid": "37765084",
+  "pmcid": "PMC10537343",
+  "label": "Figure 4",
+  "caption": "In vitro cellular uptake of the studied 99mTc-complexes in S180 cells (hypoxia vs. normoxia, p < 0.05).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1057_PMC10537343_pharmaceuticals-16-01276-g004.jpg"
+ },
+ {
+  "drug_id": 1059,
+  "drug_name": "[99mTc]Tc-L4-2-nitroimidazole",
+  "pmid": "37765084",
+  "pmcid": "PMC10537343",
+  "label": "Figure 4",
+  "caption": "In vitro cellular uptake of the studied 99mTc-complexes in S180 cells (hypoxia vs. normoxia, p < 0.05).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1059_PMC10537343_pharmaceuticals-16-01276-g004.jpg"
+ },
+ {
+  "drug_id": 1060,
+  "drug_name": "[99mTc]Tc-L5-2-nitroimidazole",
+  "pmid": "37765084",
+  "pmcid": "PMC10537343",
+  "label": "Figure 4",
+  "caption": "In vitro cellular uptake of the studied 99mTc-complexes in S180 cells (hypoxia vs. normoxia, p < 0.05).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1060_PMC10537343_pharmaceuticals-16-01276-g004.jpg"
  },
  {
   "drug_id": 1077,
@@ -7150,6 +7414,39 @@
   "file": "1345_PMC10301001_pharmaceuticals-16-00882-g005.jpg"
  },
  {
+  "drug_id": 1346,
+  "drug_name": "[111In]In-AAZTA 5-LM4",
+  "pmid": "36986637",
+  "pmcid": "PMC10053881",
+  "label": "Figure 3",
+  "caption": "Radioligand uptake internalization during 1 h incubation at 37 °C in HEK293-SST2R cells. (a) ■, [111In]In-AAZTA5-LM4 and ■, [111In]In-DOTA-LM3; (b) ■, [177Lu]Lu-AAZTA5-LM4 and ■, [177Lu]Lu-DOTA-LM3; MB = specific membrane bound, Internalized = specific internalized; Total = specific MB + specific Internalized, NS MB = non-specific MB, NS Intern = non-specific internalized. Results were acquired from 3 independent experiments performed in triplicate.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1346_PMC10053881_pharmaceutics-15-00776-g003.jpg"
+ },
+ {
+  "drug_id": 1346,
+  "drug_name": "[111In]In-AAZTA 5-LM4",
+  "pmid": "36986637",
+  "pmcid": "PMC10053881",
+  "label": "Figure 4",
+  "caption": "Comparative biodistribution data in SCID mice bearing twin HEK293-SST2R and wtHEK293 xenografts. (a) ■, [111In]In-AAZTA5-LM4 and ■, [111In]In-DOTA-LM3; (b) ■, [177Lu]Lu-AAZTA5-LM4 and ■, [177Lu]Lu-DOTA-LM3; solid bars for 4 h pi, checkered bars for 24 h pi and crossed bars for 48 h pi. Data are expressed as %IA/g and shown as average values ± sd, n = 4; Bl: blood, Li: liver, He: heart, Ki: kidneys, St: stomach, In: intestines, Sp: spleen, Mu: muscle, Lu: lungs, Pa: pancreas, Fe: femur, Tu+: HEK293-SST2R tumor, Tu-: wtHEK293 tumor.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1346_PMC10053881_pharmaceutics-15-00776-g004.jpg"
+ },
+ {
+  "drug_id": 1346,
+  "drug_name": "[111In]In-AAZTA 5-LM4",
+  "pmid": "36986637",
+  "pmcid": "PMC10053881",
+  "label": "Figure 5",
+  "caption": "Static whole-body SPECT/CT images of SCID mice bearing twin HEK293-SST2R and wtHEK293 tumors in their flanks at (a) and (b) 4 h pi and (c) at 24 h pi of [111In]In-AAZTA5-LM4; orange arrows are pointing to HEK293-SST2R xenografts and light blue arrows to wtHEK293 tumors, devoid of SST2R expression. Intense uptake is observed in the SST2R-expressing tumors but no uptake is evident in the negative controls. Yellow arrows are directed toward the kidneys; the initial kidney uptake at (a) and (b) 4 h pi notably declines at (c) 24 h pi. The color bars indicate the difference in accumulated activity (",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1346_PMC10053881_pharmaceutics-15-00776-g005.jpg"
+ },
+ {
   "drug_id": 1349,
   "drug_name": "[111In]In-AU-RM26-M1",
   "pmid": "37509170",
@@ -7698,6 +7995,17 @@
   "license": "",
   "attrib": "target",
   "file": "1409_PMC12030627_pharmaceuticals-18-00549-g003.jpg"
+ },
+ {
+  "drug_id": 1413,
+  "drug_name": "[125]c[RGDf(4-I)K]",
+  "pmid": "34684688",
+  "pmcid": "PMC8539346",
+  "label": "Figure 4",
+  "caption": "Blocking study. Comparison of tumor uptake (mean ± SD) of [125I]6 at 1 h postinjection under no-carrier-added conditions and with co-injection of an excess of c(RGDfK). Significance was determined by unpaired Student’s t-test (*** p < 0.001).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1413_PMC8539346_molecules-26-06107-g004.jpg"
  },
  {
   "drug_id": 1414,
@@ -8976,6 +9284,39 @@
   "file": "1536_PMC8866095_gr3.jpg"
  },
  {
+  "drug_id": 1555,
+  "drug_name": "[18F]AlF-P-FAPI",
+  "pmid": "35256951",
+  "pmcid": "PMC8897030",
+  "label": "Figure 4",
+  "caption": "Representative micro-PET images and time–activity curves. (A) A series of coronal and transverse dynamic PET images of A549-FAP tumor-bearing mice at 5, 30, 60, 90, and 120 min p.i. of [18F]AlF-P-FAPI. The A549-FAP tumors are delineated in white arrows. (B) Time–activity curves of organs and A549-FAP tumor for 2 h p.i. of [18F]AlF-P-FAPI. (C) MIP at 60 min post-intravenous injection of [18F]AlF-P-FAPI, [18F]FAPI-42, and [68Ga]Ga-FAPI-04 with and without DOTA-FAPI-04 as a competitor. Shoulder joint (SJ); tumor (T); gall bladder (GB); liver (L); bladder (BL). (D) Time−activity curves of A549-FAP",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1555_PMC8897030_gr4.gif"
+ },
+ {
+  "drug_id": 1555,
+  "drug_name": "[18F]AlF-P-FAPI",
+  "pmid": "35256951",
+  "pmcid": "PMC8897030",
+  "label": "Figure 5",
+  "caption": "Biodistribution studies of [18F]AlF-P-FAPI in A549-FAP bearing mice 1 h after intravenous injection. All the data are expressed as mean ± SD (n = 4).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1555_PMC8897030_gr5.jpg"
+ },
+ {
+  "drug_id": 1555,
+  "drug_name": "[18F]AlF-P-FAPI",
+  "pmid": "35256951",
+  "pmcid": "PMC8897030",
+  "label": "Figure 6",
+  "caption": "PET/CT images of a 41-year-old patient with newly diagnosed nasopharyngeal cancer. (A) and (C) The patient was examined using [18F]FDG in September 2020. (B) and (D) The second examination with [18F]AlF-P-FAPI was conducted 24 h later. [18F]AlF-P-FAPI images indicated tumor metastases uptake corresponding to [18F]FDG PET/CT images, represented by the arrow. The primary tumor is indicated by red arrows; lymph node metastases are indicated by blue arrows.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1555_PMC8897030_gr6.gif"
+ },
+ {
   "drug_id": 1560,
   "drug_name": "[18F]annexin V",
   "pmid": "38360704",
@@ -9711,6 +10052,72 @@
   "license": "CC BY 4.0",
   "attrib": "target",
   "file": "1625_PMC11767697_molecules-30-00212-sch001.jpg"
+ },
+ {
+  "drug_id": 1628,
+  "drug_name": "[61Cu]Cu-DOTA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 1",
+  "caption": "(A) Cellular uptake (surface bound + internalized) of the tested radiotracers in the HEK-SST2 cells after 4 h at 37°C. The results represent the mean ± standard deviation of the specific (=total − non-specific) uptake from a minimum of two separate experiments, each in triplicate. Cell membrane-bound and internalized fractions are indicated. (B) Efflux rate in the absence or in the presence of 1,000-fold excess of a competitor (DOTA-TOC) at 37°C. The data were analyzed according to the one-phase exponential decay equation (GraphPad Software Inc., Prism 9).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1628_PMC11503464_fnume-04-1481343-g001.jpg"
+ },
+ {
+  "drug_id": 1628,
+  "drug_name": "[61Cu]Cu-DOTA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 2",
+  "caption": "MIPs of the dynamic PET/CT scans of HEK-SST2 xenografts after an injection of 200 pmol/4-5mMBq [61Cu]Cu-DOTA-TOC (A) or [61Cu]Cu-NODAGA-TOC (B) from 0 to 1 h p.i., in 15 min frames. MIPs of static PET/CT scans at 4 h after an injection of 200 pmol/4-5 MBq [61Cu]Cu-DOTA-TOC (C) or [61Cu]Cu-NODAGA-TOC (D) into the HEK-SST2 xenografts. T, tumor; K, kidneys; L, liver; Gb, gallbladder; Bl, bladder; SUV, standard uptake value.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1628_PMC11503464_fnume-04-1481343-g002.jpg"
+ },
+ {
+  "drug_id": 1628,
+  "drug_name": "[61Cu]Cu-DOTA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 3",
+  "caption": "MIPs of the PET/CT scans of [61Cu]Cu-DOTA-TOC and [61Cu]Cu-NODAGA-TOC (100 µl/200 pmol/4-5 MBq) at 1 h p.i., with and without a pre-injection administration of a blocking agent (DOTA-TOC, 200 µmol). A PET/CT scan of [68Ga]Ga-DOTA-TOC (100 µl/200 pmol/5 MBq,) at 1 h p.i. is provided for visual comparison. The 61Cu-PET/CT scans were acquired in mice under anesthesia (full bladder), while the 68Ga-PET/CT scan was acquired in an euthanized mouse (bladder has been emptied mechanically). The PET images scale in 0-4 standardized uptake values (SUVs) for the 61Cu-PET images and 0-2 SUVs for the 68Ga-P",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1628_PMC11503464_fnume-04-1481343-g003.jpg"
+ },
+ {
+  "drug_id": 1631,
+  "drug_name": "[61Cu]Cu-NODAGA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 1",
+  "caption": "(A) Cellular uptake (surface bound + internalized) of the tested radiotracers in the HEK-SST2 cells after 4 h at 37°C. The results represent the mean ± standard deviation of the specific (=total − non-specific) uptake from a minimum of two separate experiments, each in triplicate. Cell membrane-bound and internalized fractions are indicated. (B) Efflux rate in the absence or in the presence of 1,000-fold excess of a competitor (DOTA-TOC) at 37°C. The data were analyzed according to the one-phase exponential decay equation (GraphPad Software Inc., Prism 9).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1631_PMC11503464_fnume-04-1481343-g001.jpg"
+ },
+ {
+  "drug_id": 1631,
+  "drug_name": "[61Cu]Cu-NODAGA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 2",
+  "caption": "MIPs of the dynamic PET/CT scans of HEK-SST2 xenografts after an injection of 200 pmol/4-5mMBq [61Cu]Cu-DOTA-TOC (A) or [61Cu]Cu-NODAGA-TOC (B) from 0 to 1 h p.i., in 15 min frames. MIPs of static PET/CT scans at 4 h after an injection of 200 pmol/4-5 MBq [61Cu]Cu-DOTA-TOC (C) or [61Cu]Cu-NODAGA-TOC (D) into the HEK-SST2 xenografts. T, tumor; K, kidneys; L, liver; Gb, gallbladder; Bl, bladder; SUV, standard uptake value.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1631_PMC11503464_fnume-04-1481343-g002.jpg"
+ },
+ {
+  "drug_id": 1631,
+  "drug_name": "[61Cu]Cu-NODAGA-TOC",
+  "pmid": "39464654",
+  "pmcid": "PMC11503464",
+  "label": "Figure 3",
+  "caption": "MIPs of the PET/CT scans of [61Cu]Cu-DOTA-TOC and [61Cu]Cu-NODAGA-TOC (100 µl/200 pmol/4-5 MBq) at 1 h p.i., with and without a pre-injection administration of a blocking agent (DOTA-TOC, 200 µmol). A PET/CT scan of [68Ga]Ga-DOTA-TOC (100 µl/200 pmol/5 MBq,) at 1 h p.i. is provided for visual comparison. The 61Cu-PET/CT scans were acquired in mice under anesthesia (full bladder), while the 68Ga-PET/CT scan was acquired in an euthanized mouse (bladder has been emptied mechanically). The PET images scale in 0-4 standardized uptake values (SUVs) for the 61Cu-PET images and 0-2 SUVs for the 68Ga-P",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1631_PMC11503464_fnume-04-1481343-g003.jpg"
  },
  {
   "drug_id": 1649,
@@ -10978,6 +11385,50 @@
   "file": "1815_PMC10892057_molecules-29-00800-g005.jpg"
  },
  {
+  "drug_id": 1817,
+  "drug_name": "[68Ga]Ga-B7H3-BCH",
+  "pmid": "39847434",
+  "pmcid": "PMC11910224",
+  "label": "Figure 2",
+  "caption": "Functional testing of [68Ga]Ga-B7H3-BCH radiotracer.(A) Cellular uptake and inhibition uptake of [68Ga]Ga-B7H3-BCH in B7H3-transfected and untransfected human lung cancer cells at different time points. Data are presented as the mean ± SD (n = 4). NS, P > 0.05; **P < 0.01 and ****P < 0.0001. (B) Expression of B7H3 protein in 4 cell lines by Western blot analysis. GAPDH was used as the loading control. (C) Cellular internalization of [68Ga]Ga-B7H3-BCH in A549CD276 cells. (D) PET/CT imaging of 5 different xenograft models — SW780, LS174T, U87, H3122, and BGC823 tumors at 1 and 2 hour after injec",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "1817_PMC11910224_jci-135-186388-g229.jpg"
+ },
+ {
+  "drug_id": 1818,
+  "drug_name": "[68Ga]Ga-bisNODAGA-16",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 4",
+  "caption": "(a) Representative PET imaging of AsPC-1 tumor-bearing mice injected with 3 ± 0.8 MBq; (423 ± 53 pmol) of [68Ga]Ga-DOTA-NT-20.3 (n=4). Dynamic acquisition was started immediately p.i. over 50 min. PET imaging was composed of 5 frames of 1 min computed in the same image and 4 frames of 10 min. Upper image: maximum intensity projection (MIP), middle image: coronal slice, lower image: transversal slice. Tumor uptake of [68Ga]Ga-DOTA-NT-20.3 is clearly visible (arrow). (b) Time activity curve analysis of dynamic PET imaging, data expressed in mean % of injected dose in the volume of interest (VOI)",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1818_PMC13152780_fonc-16-1817036-g004.jpg"
+ },
+ {
+  "drug_id": 1818,
+  "drug_name": "[68Ga]Ga-bisNODAGA-16",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 6",
+  "caption": "ROI uptake in major organs at 1 h/2 h, 4 h, 24 h, and 48 h post-injection after decay correction. Copyright © 2024, The Tao Zhang, Xinrui Ma, Muyun Xu, Jinghua Cai, Jianhua Cai, Yanguang Cao, Zhihao Zhang, Xin Ji, Jian He, German Oscar Fonseca Cabrera, Xuedan Wu, Weiling Zhao, Zhanhong Wu, Jin Xie, Zibo Li, under exclusive license to Springer-Verlag GmbH Germany, part of Springer Nature.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1818_PMC13152780_fonc-16-1817036-g006.gif"
+ },
+ {
+  "drug_id": 1818,
+  "drug_name": "[68Ga]Ga-bisNODAGA-16",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 8",
+  "caption": "The representative decay-corrected whole-body PET/CT images of nude mice bearing A431 tumor (region circled by white dashed line) acquired at 2, 4, 8, 16, and 24 h postinjection of CH-4T/SLB–MSN–Mdot/64Cu2+, showing (a) the transaxial (bottom) and coronal (top) PET images and (b) the overlaid CT (gray) and PET (golden) images. (c) The region of interest (ROI)-calculated biodistribution of CH-4T/SLB–MSN–Mdot/64Cu2+ in mice at 2, 4, 8, 16, and 24 h postinjection. (d) Biodistribution of CH-4T/SLB–MSN–Mdot/64Cu2+ in mice at 25 h. Means ± SD, n = 3. © 2019 WILEY‐VCH Verlag GmbH & Co. KGaA, Weinheim",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1818_PMC13152780_fonc-16-1817036-g008.jpg"
+ },
+ {
   "drug_id": 1820,
   "drug_name": "[68Ga]Ga-BQ7812",
   "pmid": "36672390",
@@ -12012,6 +12463,39 @@
   "file": "1943_PMC9948202_ao2c07814_0008.gif"
  },
  {
+  "drug_id": 1946,
+  "drug_name": "[68Ga]Ga-JMV6659",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 4",
+  "caption": "(a) Representative PET imaging of AsPC-1 tumor-bearing mice injected with 3 ± 0.8 MBq; (423 ± 53 pmol) of [68Ga]Ga-DOTA-NT-20.3 (n=4). Dynamic acquisition was started immediately p.i. over 50 min. PET imaging was composed of 5 frames of 1 min computed in the same image and 4 frames of 10 min. Upper image: maximum intensity projection (MIP), middle image: coronal slice, lower image: transversal slice. Tumor uptake of [68Ga]Ga-DOTA-NT-20.3 is clearly visible (arrow). (b) Time activity curve analysis of dynamic PET imaging, data expressed in mean % of injected dose in the volume of interest (VOI)",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1946_PMC13152780_fonc-16-1817036-g004.jpg"
+ },
+ {
+  "drug_id": 1946,
+  "drug_name": "[68Ga]Ga-JMV6659",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 6",
+  "caption": "ROI uptake in major organs at 1 h/2 h, 4 h, 24 h, and 48 h post-injection after decay correction. Copyright © 2024, The Tao Zhang, Xinrui Ma, Muyun Xu, Jinghua Cai, Jianhua Cai, Yanguang Cao, Zhihao Zhang, Xin Ji, Jian He, German Oscar Fonseca Cabrera, Xuedan Wu, Weiling Zhao, Zhanhong Wu, Jin Xie, Zibo Li, under exclusive license to Springer-Verlag GmbH Germany, part of Springer Nature.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1946_PMC13152780_fonc-16-1817036-g006.gif"
+ },
+ {
+  "drug_id": 1946,
+  "drug_name": "[68Ga]Ga-JMV6659",
+  "pmid": "42109681",
+  "pmcid": "PMC13152780",
+  "label": "Figure 8",
+  "caption": "The representative decay-corrected whole-body PET/CT images of nude mice bearing A431 tumor (region circled by white dashed line) acquired at 2, 4, 8, 16, and 24 h postinjection of CH-4T/SLB–MSN–Mdot/64Cu2+, showing (a) the transaxial (bottom) and coronal (top) PET images and (b) the overlaid CT (gray) and PET (golden) images. (c) The region of interest (ROI)-calculated biodistribution of CH-4T/SLB–MSN–Mdot/64Cu2+ in mice at 2, 4, 8, 16, and 24 h postinjection. (d) Biodistribution of CH-4T/SLB–MSN–Mdot/64Cu2+ in mice at 25 h. Means ± SD, n = 3. © 2019 WILEY‐VCH Verlag GmbH & Co. KGaA, Weinheim",
+  "license": "",
+  "attrib": "unclear",
+  "file": "1946_PMC13152780_fonc-16-1817036-g008.jpg"
+ },
+ {
   "drug_id": 1959,
   "drug_name": "[68Ga]Ga-LW01110",
   "pmid": "38305955",
@@ -12782,6 +13266,17 @@
   "file": "2048_PMC10303363_pharmaceuticals-16-00798-g005.jpg"
  },
  {
+  "drug_id": 2053,
+  "drug_name": "[68Ga]Ga-T2P",
+  "pmid": "42192025",
+  "pmcid": "PMC13402283",
+  "label": "Fig. 3",
+  "caption": "[68Ga]Ga-RAYZ-8009 PET/CT imaging in a 66-year-old patient with HCC. The images demonstrate high and specific tracer uptake in GPC-3-positive lesions, including intrahepatic tumors (C, D) and distant metastases (G). Conversely, no significant uptake is observed in biopsy-proven GPC-3-negative lesions, such as an HCC tumor in segment 5/6 (A, B) and a prostate cancer metastasis (H), confirming the tracer’s high specificity in vivo. Red arrows indicate the corresponding lesions and focal accumulations (Arrows have been enhanced for better visibility). (This research was originally published in JN",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2053_PMC13402283_13550_2026_1454_Fig3_HTML.jpg"
+ },
+ {
   "drug_id": 2059,
   "drug_name": "[68Ga]Ga-TacBOMB2",
   "pmid": "36838968",
@@ -13090,6 +13585,83 @@
   "file": "2067_PMC11677724_pharmaceuticals-17-01647-g007.gif"
  },
  {
+  "drug_id": 2069,
+  "drug_name": "[68Ga]Ga-THP-Pam",
+  "pmid": "37669973",
+  "pmcid": "PMC10480432",
+  "label": "Figure 3",
+  "caption": "Analysis of PET imaging. (a) CT and PET/CT images with [68Ga]Ga-THP-Pam (in rows indicated by red bars) and [18F]NaF (in rows indicated by blue bars) 60–120 min post-injection. The panels show (from top to bottom): axial view of the heart and lungs; axial view of the stomach and kidneys; coronal view of the abdomen; sagittal view of the abdominal spine and aorta. CT and PET scales are matched for each view. (b) Quantified PET data of the %IA in each organ of interest ([68Ga]Ga-THP-Pam: n = 4; [18F]NaF: n = 3). The entire organ has been included in the ROI, and stomach data from rats fed a heal",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2069_PMC10480432_41598_2023_41149_Fig3_HTML.jpg"
+ },
+ {
+  "drug_id": 2069,
+  "drug_name": "[68Ga]Ga-THP-Pam",
+  "pmid": "37669973",
+  "pmcid": "PMC10480432",
+  "label": "Figure 4",
+  "caption": "(a) Ex vivo biodistribution 2 h post-injection of [68Ga]Ga-THP-Pam (EC diet: n = 4; healthy diet: n = 5) and [18F]NaF (both diets: n = 3) in rats fed a diet to induce EC and rats fed a healthy diet. Data are tabulated in Table S2 (Supplementary Information). (b) Re-scaled ex vivo biodistribution in individual organs from panel a, presented for clarity.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2069_PMC10480432_41598_2023_41149_Fig4_HTML.jpg"
+ },
+ {
+  "drug_id": 2069,
+  "drug_name": "[68Ga]Ga-THP-Pam",
+  "pmid": "37669973",
+  "pmcid": "PMC10480432",
+  "label": "Figure 6",
+  "caption": "Ex vivo analysis of organs to identify calcification. The top half shows organs from rats fed the EC diet, the bottom half shows organs from rats fed the healthy diet. Each row is labelled with its modality. µCT MIP images show pseudo-coloured whole-organ images, both images for each organ have been calibrated to the same colour scale using the air and paraffin wax as reference points. Alizarin Red and von Kossa images show representative 5 µm slices from the organ stained with Alizarin Red S and von Kossa stains respectively to detect calcium. Both images for each organ are shown at the same ",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2069_PMC10480432_41598_2023_41149_Fig6_HTML.jpg"
+ },
+ {
+  "drug_id": 2074,
+  "drug_name": "[68Ga]GaNODAGA-DARPin12",
+  "pmid": "37415866",
+  "pmcid": "PMC10320840",
+  "label": "Fig. 9",
+  "caption": "Bar charts showing the ex vivo biodistribution analysis in selected organs for the five [68Ga]GaNODAGA-DARPin radiotracers in mice bearing subcutaneous LNCaP (PSA +ve) tumours. Statistically significant changes are displayed with *P < 0.05, **P < 0.01, ***P < 0.001, and n.s. (not specific) >0.05.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2074_PMC10320840_d3cb00010a-f9.jpg"
+ },
+ {
+  "drug_id": 2075,
+  "drug_name": "[68Ga]GaNODAGA-DARPin3",
+  "pmid": "37415866",
+  "pmcid": "PMC10320840",
+  "label": "Fig. 9",
+  "caption": "Bar charts showing the ex vivo biodistribution analysis in selected organs for the five [68Ga]GaNODAGA-DARPin radiotracers in mice bearing subcutaneous LNCaP (PSA +ve) tumours. Statistically significant changes are displayed with *P < 0.05, **P < 0.01, ***P < 0.001, and n.s. (not specific) >0.05.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2075_PMC10320840_d3cb00010a-f9.jpg"
+ },
+ {
+  "drug_id": 2076,
+  "drug_name": "[68Ga]GaNODAGA-DARPin6",
+  "pmid": "37415866",
+  "pmcid": "PMC10320840",
+  "label": "Fig. 9",
+  "caption": "Bar charts showing the ex vivo biodistribution analysis in selected organs for the five [68Ga]GaNODAGA-DARPin radiotracers in mice bearing subcutaneous LNCaP (PSA +ve) tumours. Statistically significant changes are displayed with *P < 0.05, **P < 0.01, ***P < 0.001, and n.s. (not specific) >0.05.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2076_PMC10320840_d3cb00010a-f9.jpg"
+ },
+ {
+  "drug_id": 2077,
+  "drug_name": "[68Ga]GaNODAGA-DARPin9",
+  "pmid": "37415866",
+  "pmcid": "PMC10320840",
+  "label": "Fig. 9",
+  "caption": "Bar charts showing the ex vivo biodistribution analysis in selected organs for the five [68Ga]GaNODAGA-DARPin radiotracers in mice bearing subcutaneous LNCaP (PSA +ve) tumours. Statistically significant changes are displayed with *P < 0.05, **P < 0.01, ***P < 0.001, and n.s. (not specific) >0.05.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2077_PMC10320840_d3cb00010a-f9.jpg"
+ },
+ {
   "drug_id": 2078,
   "drug_name": "[68Ga]HBED-CC-BN (2-14)",
   "pmid": "41647356",
@@ -13288,6 +13860,39 @@
   "file": "2086_PMC4452638_13550_2014_63_Fig7_HTML.gif"
  },
  {
+  "drug_id": 2093,
+  "drug_name": "[68Ga]MHLL1",
+  "pmid": "34335962",
+  "pmcid": "PMC8315078",
+  "label": "Fig 2",
+  "caption": "(A) In vitro uptake of [68Ga]MHLL1 in HT1080 wildtype (wt) cells and overexpressing human FAP (hFAP, blue) or murine FAP (mFAP, green) in the presence and absence of excess unlabeled (cold) reference compound. Inhibitory concentration by rising concentration of cold compound in (B) hFAP and (C) mFAP transfected HT1080 cells. **** p < 0.0001, Student's unpaired t-test. Binding kinetics assessed as (D) membrane bound, (E) internalized activity over 120 min, and (F) efflux over 180 min of tracer incubation. All measurements derived from three biological replicates in triplicate.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2093_PMC8315078_thnov11p7755g002.jpg"
+ },
+ {
+  "drug_id": 2093,
+  "drug_name": "[68Ga]MHLL1",
+  "pmid": "34335962",
+  "pmcid": "PMC8315078",
+  "label": "Fig 3",
+  "caption": "(A) Representative whole body 3D MIP PET/CT image of [68Ga]MHLL1 distribution in a healthy mouse at 2, 6, 15, 30, and 60 min after tracer injection displays gradual clearance from blood and accumulation in liver, kidney and urinary bladder. Distribution is paralleled by (B) ex vivo biodistribution counts in excised tissue at 60 min and (C) time activity curves of target organs. Mean ± SD, n = 4.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2093_PMC8315078_thnov11p7755g003.jpg"
+ },
+ {
+  "drug_id": 2093,
+  "drug_name": "[68Ga]MHLL1",
+  "pmid": "34335962",
+  "pmcid": "PMC8315078",
+  "label": "Fig 4",
+  "caption": "(A) Representative PET/CT fusion transaxial images at 7 d and 21 d after myocardial infarction (MI) with and without co-administration of unlabeled ligand (1mg/kg). Images display the localized accumulation of [68Ga]MHLL1 (orange) in the non-viable infarct territory defined by [18F]FDG (green) with additional distribution at the site of the surgical wound that is less prominent at 21 d after injury and limited dermal signal. (B) Reoriented cardiac axis images display the localization of the [68Ga]MHLL1 signal (colorscale) to the infarct defined by [18F]FDG (greyscale) at both timepoints, signi",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2093_PMC8315078_thnov11p7755g004.jpg"
+ },
+ {
   "drug_id": 2098,
   "drug_name": "[68Ga]NOTA-RGD",
   "pmid": "38279185",
@@ -13352,6 +13957,39 @@
   "license": "",
   "attrib": "target",
   "file": "2111_PMC13057495_fbioe-14-1793834-g007.gif"
+ },
+ {
+  "drug_id": 2113,
+  "drug_name": "[68Ga]UR-LS130",
+  "pmid": "39474267",
+  "pmcid": "PMC11503725",
+  "label": "Figure 5",
+  "caption": "Use of the [64Cu]WL12 peptide to image tumor PD-L1 expression in vivo. This figure shows NSG mice with hPD-L1 (red arrow) and CHO tumors (blue arrow) being intravenously given 150 μCi of the [64Cu]WL12 tracer. Images were taken 10, 30, 60, and 120 min after injection. Specific accumulation of [64Cu]WL12 is shown. Reprinted with permission from ref (99). Copyright 2008 Springer Nature.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2113_PMC11503725_im4c00030_0005.jpg"
+ },
+ {
+  "drug_id": 2113,
+  "drug_name": "[68Ga]UR-LS130",
+  "pmid": "36230845",
+  "pmcid": "PMC9564337",
+  "label": "Figure 4",
+  "caption": "Ratio of the %ID/g values of (A) kidney and liver and of (B) tumor and muscle, obtained from biodistribution experiments with [68Ga]21, [68Ga]33, [68Ga]37 and [68Ga]56 in HT-29 tumor-bearing mice. Given are mean values ± SD from three ([68Ga]33, [68Ga]37) or four ([68Ga]21, [68Ga]56) independent experiments. a Given is the relative area (as percentage of the total peak area) of the peak corresponding to the intact PET ligand in the radiochromatogram of the HPLC analysis of the urine sample obtained 45 min after injection of the tracer.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2113_PMC9564337_cancers-14-04922-g004.jpg"
+ },
+ {
+  "drug_id": 2113,
+  "drug_name": "[68Ga]UR-LS130",
+  "pmid": "36230845",
+  "pmcid": "PMC9564337",
+  "label": "Figure 5",
+  "caption": "Biodistribution data (%ID/g tissue) of [68Ga]56 obtained from HT-29 tumor-bearing mice. Given are mean values ± SD (n = 4). Blocking data were obtained by co-injection of 48 (560–700 nmol/mouse). Statistical analysis of differences between tracer accumulation in the tumor of unblocked and blocked animals was performed by an unpaired two-tailed t-test (p <0.05 was considered statistically significant). ** p <0.01. *** p <0.001.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2113_PMC9564337_cancers-14-04922-g005.jpg"
  },
  {
   "drug_id": 2121,
@@ -13596,6 +14234,61 @@
   "file": "2147_PMC9085681_11307_2021_1668_Sch1_HTML.jpg"
  },
  {
+  "drug_id": 2149,
+  "drug_name": "[99mTc]Tc(CO)3-CN5UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2149_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2150,
+  "drug_name": "[99mTc]Tc(CO)3-CN6UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2150_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2151,
+  "drug_name": "[99mTc]Tc(CO)3-CN7UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2151_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2152,
+  "drug_name": "[99mTc]Tc(CO)3-CN8UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2152_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2153,
+  "drug_name": "[99mTc]Tc(CO)3-CN9UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2153_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
   "drug_id": 2155,
   "drug_name": "[99mTc]Tc-AC12-GGGC",
   "pmid": "38625607",
@@ -13726,6 +14419,50 @@
   "license": "",
   "attrib": "target",
   "file": "2160_PMC10816394_ijms-25-01045-g008.gif"
+ },
+ {
+  "drug_id": 2161,
+  "drug_name": "[99mTc]Tc-CN6UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2161_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2162,
+  "drug_name": "[99mTc]Tc-CN7UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2162_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2163,
+  "drug_name": "[99mTc]Tc-CN8UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2163_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2164,
+  "drug_name": "[99mTc]Tc-CN9UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2164_PMC10816394_ijms-25-01045-g005.jpg"
  },
  {
   "drug_id": 2165,
@@ -13937,6 +14674,28 @@
   "file": "2219_PMC11279916_pharmaceuticals-17-00906-g005.jpg"
  },
  {
+  "drug_id": 2220,
+  "drug_name": "[99mTc]Tc-HYNIC-WL12-tricine/PDA",
+  "pmid": "39065756",
+  "pmcid": "PMC11279916",
+  "label": "Figure 2",
+  "caption": "Cellular uptake of [99mTc]Tc-HYNIC-WL12-tricine/M in MC38-B7H1 and MC38 cells (A–D) was blocked by WL12 in MC38-B7H1 cells (E–H) (n = 3, ** p < 0.01, *** p < 0.001).",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2220_PMC11279916_pharmaceuticals-17-00906-g002.gif"
+ },
+ {
+  "drug_id": 2220,
+  "drug_name": "[99mTc]Tc-HYNIC-WL12-tricine/PDA",
+  "pmid": "39065756",
+  "pmcid": "PMC11279916",
+  "label": "Figure 3",
+  "caption": "Biodistribution results of [99mTc]Tc-HYNIC-WL12-tricine/M in MC38-B7H1 (PD-L1-positive)- and MC38 (PD-L1-negative)-bearing mice and blocked results in MC38-B7H1-bearing mice at 2 h p.i. (n = 4, * p < 0.05, ** p < 0.01, *** p < 0.001). (A) Tumor uptake; (B) tumor-to-muscle ratio; and (C) tumor-to-blood ratio.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2220_PMC11279916_pharmaceuticals-17-00906-g003.jpg"
+ },
+ {
   "drug_id": 2221,
   "drug_name": "[99mTc]Tc-HYNIC-WL12-tricine/TPPTS",
   "pmid": "39065756",
@@ -14133,6 +14892,61 @@
   "license": "CC BY 4.0",
   "attrib": "target",
   "file": "2247_PMC10747430_pharmaceutics-15-02662-g011.jpg"
+ },
+ {
+  "drug_id": 2249,
+  "drug_name": "[99mTc]TcN-CN5UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2249_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2250,
+  "drug_name": "[99mTc]TcN-CN6UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2250_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2251,
+  "drug_name": "[99mTc]TcN-CN7UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2251_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2252,
+  "drug_name": "[99mTc]TcN-CN8UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2252_PMC10816394_ijms-25-01045-g005.jpg"
+ },
+ {
+  "drug_id": 2253,
+  "drug_name": "[99mTc]TcN-CN9UBI 29-41",
+  "pmid": "38256119",
+  "pmcid": "PMC10816394",
+  "label": "Figure 5",
+  "caption": "Biodistribution of the three series of 99mTc-labeled complexes in mice with bacterial infection at 120 min postinjection. [99mTc]Tc-CNnUBI 29-41 (a), [99mTc]Tc(CO)3-CNnUBI 29-41 (b), [99mTc]TcN-CNnUBI 29-41 (c).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2253_PMC10816394_ijms-25-01045-g005.jpg"
  },
  {
   "drug_id": 2265,
@@ -14542,6 +15356,39 @@
   "file": "2355_PMC7080250_pone.0230526.g006.gif"
  },
  {
+  "drug_id": 2367,
+  "drug_name": "225Ac-Macropa-PEG 4-YS5",
+  "pmid": "38389832",
+  "pmcid": "PMC10879874",
+  "label": "Figure 4",
+  "caption": "225Ac-Macropa-PEG4-YS5 shows a high binding affinity for 22Rv1 cells, efficient cell killing, and elicits a robust DNA damage response which correlates with radiopharmaceutical uptake in vivo. A) Saturation binding assay curve of 225Ac-Macropa-PEG4-YS5 in 22Rv1 cells. B) Activity-dependent cell death with 225Ac-Macropa-PEG4-YS5; improved cell killing seen in 225Ac-Macropa-PEG4-YS5 vs 225Ac-DOTA-YS5. C) Correlation of histology (H&E), immunofluorescence (phospho-γH2AX), and digital autoradiographic images after treatment with 225Ac-Macropa-PEG4-YS5 over 7 days (n = 3). Data represented as Mean ",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2367_PMC10879874_thnov14p1344g004.jpg"
+ },
+ {
+  "drug_id": 2367,
+  "drug_name": "225Ac-Macropa-PEG 4-YS5",
+  "pmid": "39945595",
+  "pmcid": "PMC12260511",
+  "label": "Figure 1.",
+  "caption": "Identification of disseminated microtumor growth for prostate cancer cell lines using in vivo and ex vivo BLI and µPET/CT with [89Zr]DFO-YS5. A, Measurements of whole-body bioluminescence (radiance) for 22Rv1-Luc, PC3-Luc, DU145-Luc, C42B-Luc, and LNCaP-AR-Luc cells inoculated with intracardiac injections (n = 4). B, The BLI image, CD46 PET scan (4 days after injection of [89Zr]DFO-YS5), and corresponding ex vivo analysis at week 5 after inoculations for 22Rv1-Luc cells (n = 4). C, Ex vivo analysis showing BLI and CD46 PET maximum intensity projection (MIP) images for 22Rv1-Luc, PC3-Luc, Du145",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2367_PMC12260511_ccr-24-2850_f1.jpg"
+ },
+ {
+  "drug_id": 2367,
+  "drug_name": "225Ac-Macropa-PEG 4-YS5",
+  "pmid": "39945595",
+  "pmcid": "PMC12260511",
+  "label": "Figure 5.",
+  "caption": "Treatment of the 22Rv1-Luc disseminated tumor model with [225Ac]Macropa-PEG4-YS5 at an early stage completely eliminates the disease. A, Schematic representation of the experimental plan for early treatment studies. Treatment studies were performed 1 week following intracardiac injection of 22Rv1-Luc cells. B, BLI scans for the mice injected with saline, 4.6 kBq, and 9.2 kBq activity of the [225Ac]Macropa-PEG4-YS5 at week 1 after intracardiac injections of the cells. CR was observed in 100% of the mice in the [225Ac]Macropa-PEG4-YS5 treatment group (n = 10 per arm). C, Quantification of the BL",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2367_PMC12260511_ccr-24-2850_f5.jpg"
+ },
+ {
   "drug_id": 2378,
   "drug_name": "64Cu-bevacizumab",
   "pmid": "37484224",
@@ -14650,6 +15497,28 @@
   "license": "",
   "attrib": "target",
   "file": "2382_PMC7591813_gr5.jpg"
+ },
+ {
+  "drug_id": 2392,
+  "drug_name": "68Ga-DOTA-A1K1",
+  "pmid": "40293556",
+  "pmcid": "PMC12037457",
+  "label": "Fig. 2",
+  "caption": "In vitro and in vivo comparisons of the sdAb A1-His, with its 4 mutants A1K1-His, A1K2-His, A1K3-His and A1K4-His. (A) Affinity evaluation by SPR for hMSLN, using a twofold dilution series up to 100 nM (red) to 0.4 nM (black). (B) Thermal stability evaluation by circular dichroism (CD). CD spectra obtained at different temperatures ranging from 25 to 80 °C. (C) MALDI-TOF–MS spectra. (D) RP-HPLC radiochromatograms after radiolabeling with 68Ga. (E) Representative PET/CT images 2 h after intravenous injection of 68Ga-DOTA-A1-His or its mutants. Blue arrows indicate HCC70 tumor; K = kidney; B = b",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2392_PMC12037457_41181_2025_340_Fig2_HTML.jpg"
+ },
+ {
+  "drug_id": 2392,
+  "drug_name": "68Ga-DOTA-A1K1",
+  "pmid": "40293556",
+  "pmcid": "PMC12037457",
+  "label": "Fig. 3",
+  "caption": "In vitro and in vivo comparison of sdAbs A1K2 and A1K4. (A) Affinity evaluation by SPR, using a twofold dilution series from up to 50 nM (orange) to 0.4 nM (black). (B) Thermal stability evaluation by circular dichroism (CD). CD spectra obtained at different temperatures ranging from 25 to 80 °C. (C) MALDI-TOF–MS spectra. (D) RP-HPLC radiochromatograms after radiolabeling of 68Ga-DOTA-A1K2 and 68Ga-DOTA- A1K4. (E) Representative images of the displacement study after intravenous injection. Maximum intensity projection representative of merged PET/CT. (n = 3). (F) Ex vivo biodistribution profil",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2392_PMC12037457_41181_2025_340_Fig3_HTML.jpg"
  },
  {
   "drug_id": 2397,
@@ -17127,6 +17996,17 @@
   "file": "2625_PMC12866200_12916_2025_4589_Fig4_HTML.jpg"
  },
  {
+  "drug_id": 2628,
+  "drug_name": "[18F]F-hu19V3",
+  "pmid": "36570796",
+  "pmcid": "PMC9747674",
+  "label": "Figure 5",
+  "caption": "18FF-hu19V3 immunoPET rapidly detected disseminated CHO-CLDN18.2 lesions(A) 18FF-hu19V3 immunoPET detected a disseminated CHO-CLDN18.2 lesion in the left lung 1 hour after injection of the tracer. The CHO-CLDN18.2 lesion was indicated by the white arrowhead. The left panel shows coronal images, and the right panel shows transversal images. (B) 18FF-hu19V3 also accumulated in the stomach (red arrowhead) with the remaining excreted from the urinary and hepatobiliary system. The gallbladders and intestines are indicated by yellow and blue arrowheads, respectively. The left panel are coronal image",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2628_PMC9747674_gr5.jpg"
+ },
+ {
   "drug_id": 2633,
   "drug_name": "[203Pb]Pb-MC1L",
   "pmid": "38095674",
@@ -17312,6 +18192,39 @@
   "license": "",
   "attrib": "target",
   "file": "2646_PMC8315072_thnov11p7735g007.jpg"
+ },
+ {
+  "drug_id": 2647,
+  "drug_name": "[225Ac]Ac-DOTA-hG250",
+  "pmid": "35631396",
+  "pmcid": "PMC9142961",
+  "label": "Figure 1",
+  "caption": "Biodistribution of radiolabeled hG250 in SK-RC-52 tumor-bearing mice at 1, 3, and 7 days after injection (n = 5).",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2647_PMC9142961_pharmaceuticals-15-00570-g001.jpg"
+ },
+ {
+  "drug_id": 2647,
+  "drug_name": "[225Ac]Ac-DOTA-hG250",
+  "pmid": "35631396",
+  "pmcid": "PMC9142961",
+  "label": "Figure 2",
+  "caption": "The calculated uptake of 213Bi at time of dissection (t0) in comparison to uptake of 213Bi at equilibrium state (teq: ~24 h after dissection) in organs of interest in SK-RC-52 tumor-bearing mice at 24, 72, or 168 h p.i. (A) Uptake in the kidneys. (B) Uptake in the blood. (C) Uptake in the tumor. (D) Uptake in the liver. p.i.: post injection.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2647_PMC9142961_pharmaceuticals-15-00570-g002.gif"
+ },
+ {
+  "drug_id": 2647,
+  "drug_name": "[225Ac]Ac-DOTA-hG250",
+  "pmid": "35631396",
+  "pmcid": "PMC9142961",
+  "label": "Figure 6",
+  "caption": "(A) Representative kidney slices stained with periodic acid-Schiff from non-tumor bearing mice either untreated or treated with different activity doses of 225Ac-hG250 or 177Lu-hG250, 18 weeks post-treatment. Arrows indicate tubular denudation. (B) Scoring of IFTA and tubular necrosis of the kidneys in treated mice. (C) Quantative uptake of 99mTc-DMSA in kidneys of treated mice, expressed as %IA/g. * = p < 0.05). (D) Visualization of 99mTc-DMSA SPECT imaging in treated mice. IFTA = interstitial fibrosis and tubular atrophy.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2647_PMC9142961_pharmaceuticals-15-00570-g006.jpg"
  },
  {
   "drug_id": 2652,
@@ -17554,6 +18467,39 @@
   "license": "CC BY 4.0",
   "attrib": "target",
   "file": "2667_PMC7139902_ijms-21-01972-g006.jpg"
+ },
+ {
+  "drug_id": 2669,
+  "drug_name": "[64Cu]CD19-mAb",
+  "pmid": "32948198",
+  "pmcid": "PMC7501720",
+  "label": "Fig. 1",
+  "caption": "Study design showing timeline of disease induction, immunostaining, PET/CT imaging, and ex vivo analyses. Twenty female C57BL/6 J mice were induced with EAE via subcutaneous administration of myelin oligodendrocyte glycoprotein (MOG1–125) and intraperitoneal injection of pertussis toxin (PTX). Mice were subsequently monitored for signs of paralysis from day 8 onwards. On day 14, n = 6 mice with hindlimb paralysis (scores 2.5–3.5) and n = 5 naive mice were intravenously injected with [64Cu]CD19-mAb and imaged using PET/CT 24 h later. The remaining EAE mice were used for in vitro autoradiography",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2669_PMC7501720_12974_2020_1880_Fig1_HTML.jpg"
+ },
+ {
+  "drug_id": 2669,
+  "drug_name": "[64Cu]CD19-mAb",
+  "pmid": "32948198",
+  "pmcid": "PMC7501720",
+  "label": "Fig. 4",
+  "caption": "Ex vivo biodistribution confirmed in vivo PET findings. Ex vivo gamma counting of [64Cu]CD19-mAb biodistribution in (a) central nervous system and (b) peripheral tissues 24 h after tracer injection, n = 5 per group, *p = < 0.05, **p = < 0.01, ***p = < 0.001, ****p = < 0.0001",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2669_PMC7501720_12974_2020_1880_Fig4_HTML.jpg"
+ },
+ {
+  "drug_id": 2669,
+  "drug_name": "[64Cu]CD19-mAb",
+  "pmid": "32948198",
+  "pmcid": "PMC7501720",
+  "label": "Fig. 5",
+  "caption": "High-resolution ex vivo autoradiography of brain sections and spinal cord tissue further confirmed in vivo PET results. Ex vivo autoradiography (autorad) of (a) 40 μm-thick sagittal brain sections and (b) dissected whole spinal cords—cervical/thoracic (left) and lumbar (right). Nissl staining and photographs are shown for brain sections and spinal cords respectively. (c) Quantitation of radiotracer signal in brainstem, cerebellar white matter (WM), and spinal cord regions, expressed as mean pixel intensity divided by decay-corrected dose injected (MPI/dose); n = 4 per group for brainstem analy",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2669_PMC7501720_12974_2020_1880_Fig5_HTML.jpg"
  },
  {
   "drug_id": 2674,
@@ -18414,6 +19360,17 @@
   "file": "2747_PMC10017100_research.0077.fig.006.gif"
  },
  {
+  "drug_id": 2751,
+  "drug_name": "[68Ga]Ga-NOTA-G2",
+  "pmid": "42192025",
+  "pmcid": "PMC13402283",
+  "label": "Fig. 3",
+  "caption": "[68Ga]Ga-RAYZ-8009 PET/CT imaging in a 66-year-old patient with HCC. The images demonstrate high and specific tracer uptake in GPC-3-positive lesions, including intrahepatic tumors (C, D) and distant metastases (G). Conversely, no significant uptake is observed in biopsy-proven GPC-3-negative lesions, such as an HCC tumor in segment 5/6 (A, B) and a prostate cancer metastasis (H), confirming the tracer’s high specificity in vivo. Red arrows indicate the corresponding lesions and focal accumulations (Arrows have been enhanced for better visibility). (This research was originally published in JN",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2751_PMC13402283_13550_2026_1454_Fig3_HTML.jpg"
+ },
+ {
   "drug_id": 2752,
   "drug_name": "[68Ga]Ga-NOTA-hu19V3",
   "pmid": "36570796",
@@ -18522,6 +19479,39 @@
   "license": "",
   "attrib": "target",
   "file": "2756_PMC13417530_im6c00002_0006.gif"
+ },
+ {
+  "drug_id": 2758,
+  "drug_name": "[68Ga]Ga-NOTA-RTD161",
+  "pmid": "39509246",
+  "pmcid": "PMC11684813",
+  "label": "Figure 1",
+  "caption": "Preparation and preclinical evaluation of 68Ga-MY6439.(A) The mechanism for radiolabeling MY6349 with 68Ga. RT, room temperature. (B and C) The binding affinity of 68Ga-MY6349 to Trop2, analyzed through half-maximal inhibitory concentration and equilibrium dissociation constant. (D) Representative PET images of 68Ga-MY6349 and blocking experiment in the BxPC-3 tumor model. Yellow arrows, kidneys; green arrows, bladder; white arros, tumor. (E) Quantification results from biodistribution studies of 68Ga-MY6349 with or without the simultaneous injection of unlabeled MY6349. (F) The correlation be",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2758_PMC11684813_jci-135-185408-g043.jpg"
+ },
+ {
+  "drug_id": 2758,
+  "drug_name": "[68Ga]Ga-NOTA-RTD161",
+  "pmid": "39509246",
+  "pmcid": "PMC11684813",
+  "label": "Figure 3",
+  "caption": "68Ga-MY6349 uptake across various cancers.(A) There were no significant differences in SUVmax values derived from 68Ga-MY6349 PET/CT between primary and metastatic tumors. (B) The average SUVmax values were derived from 68Ga-MY6349 PET/CT across 15 tumor entities, showing a distribution of low, intermediate, and high uptake, defined by cutoff values at SUVs of 5 and 10, respectively. Conversely, the average background (blood pool) SUV was 2.1. Ca, cancer; FTC, follicular thyroid carcinoma; HER2+ BC, human epidermal growth factor receptor 2–positive breast cancer; HNC, head and neck cancer; HR+",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2758_PMC11684813_jci-135-185408-g045.jpg"
+ },
+ {
+  "drug_id": 2758,
+  "drug_name": "[68Ga]Ga-NOTA-RTD161",
+  "pmid": "39509246",
+  "pmcid": "PMC11684813",
+  "label": "Figure 5",
+  "caption": "The correlation between 68Ga-MY6349 tumor uptake and Trop2 expression levels.(A) Representative 68Ga-MY6349 PET/CT images and immunohistochemically stained tissue samples from patients with various tumor types and different Trop2 expression scores (white arrows indicate tumor lesions). Top row, newly diagnosed TNBC; middle row, newly diagnosed prostate cancer; bottom row, newly diagnosed HER2+ breast cancer. Different levels of 68Ga-MY6349 uptake were observed in different tumor lesions with different Trop2 expression levels. First, SUVmax 16.2, Trop2 H score 270; second, SUVmax 9.6, Trop2 sco",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2758_PMC11684813_jci-135-185408-g047.jpg"
  },
  {
   "drug_id": 2765,
@@ -19382,6 +20372,39 @@
   "file": "2817_PMC9389524_bc2c00306_0008.jpg"
  },
  {
+  "drug_id": 2819,
+  "drug_name": "[89Zr]Zr-DFO-anti-γH2AX-TAT",
+  "pmid": "32483420",
+  "pmcid": "PMC7255009",
+  "label": "Figure 2",
+  "caption": "In vivo imaging of DNA damage with [89Zr]Zr-DFO-anti-γH2AX-TAT following β-PRIT in a PDAC mouse model. A. Schematic representation of the β-PRIT and 89Zr-PET imaging schedule in subcutaneous BxPC3 xenografted athymic nude mice. B. Representative transverse PET/CT images up to 4 days post-intravenous injection of [89Zr]Zr-DFO-anti-γH2AX-TAT (n=4 per cohort). Tumors are delineated with white dashed lines. C. Tumor VOI analysis of the PET/CT images up to 4 days p.i. (n=4 per cohort). D. Area under the curve of the tumor VOI analysis between 4 hours and 4 days p.i. (n=4 per cohort). E. Tumor uptak",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2819_PMC7255009_thnov10p5802g002.jpg"
+ },
+ {
+  "drug_id": 2819,
+  "drug_name": "[89Zr]Zr-DFO-anti-γH2AX-TAT",
+  "pmid": "32483420",
+  "pmcid": "PMC7255009",
+  "label": "Figure 3",
+  "caption": "In vivo imaging of DNA damage with [89Zr]Zr-DFO-anti-γH2AX-TAT following α-PRIT in a PDAC mouse model. Comparison with β-PRIT A. Representative transverse PET/CT images 24 hours post-intravenous injection of [89Zr]Zr-DFO-anti-γH2AX-TAT (n=4 per cohort). Tumors are delineated with white dashed lines. B. Tumor VOI analysis of the PET/CT images 24 hours p.i. (n=4 per cohort). C. Tumor uptake as determined through ex vivo gamma-counting post-animal sacrifice (n=5 per cohort). D. Comparison of the β-PRIT and α-PRIT DNA damage imaging cohorts in terms of [89Zr]Zr-DFO-anti-γH2AX-TAT tumor and muscle ",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2819_PMC7255009_thnov10p5802g003.jpg"
+ },
+ {
+  "drug_id": 2819,
+  "drug_name": "[89Zr]Zr-DFO-anti-γH2AX-TAT",
+  "pmid": "32483420",
+  "pmcid": "PMC7255009",
+  "label": "Figure 4",
+  "caption": "Ex vivo γH2AX immunostaining for the monitoring of α-/β-PRIT in tumor sections of PDAC mouse model 72 hours post-irradiation (n=3 per cohort). A. Representative microscopy images (orange scale = 200 μm, red scale = 50 μm). Zoomed-in area are provided in Supporting information (Figure S8) B. Percentage of γH2AX positive cells after immunohistochemistry analysis of tumor sections following α-/β-PRIT as compared to negative and positive controls (n=8 per slide). Quantification of: C. γH2AX fluorescent signal normalized to DAPI signal (n=8 per slide), and D. γH2AX foci per cell (n=6 per slide), af",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2819_PMC7255009_thnov10p5802g004.jpg"
+ },
+ {
   "drug_id": 2826,
   "drug_name": "[89Zr]Zr-DFO-C1-3",
   "pmid": "38182623",
@@ -19479,6 +20502,17 @@
   "license": "",
   "attrib": "target",
   "file": "2851_PMC10333401_11307_2023_1831_Fig6_HTML.gif"
+ },
+ {
+  "drug_id": 2853,
+  "drug_name": "[89Zr]Zr-DFO-N-suc-Adu-8D3",
+  "pmid": "36276653",
+  "pmcid": "PMC9576608",
+  "label": "Figure 3",
+  "caption": "Ex vivo brain uptake and brain distribution. 11-13 month old APP/PS1 TG mice were injected with 30 µg of the radioimmunoconjugates, and ex vivo analysis was performed on day 7 p.i.; The brain uptake is given as %ID/g (mean ±SD, n = 3-5 animals per group). A) Ex vivo brain uptake of all eight groups. Significant differences between the groups are marked with asterisks (**p < 0.01; ***p < 0.001) or marked as non-significant (ns). B) Autoradiography of 20 µm cryo-sections, exposure time being 2 weeks for the 89Zr-groups and 4 days for the 125I-groups.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2853_PMC9576608_thnov12p7067g003.jpg"
  },
  {
   "drug_id": 2854,
@@ -19624,6 +20658,17 @@
   "file": "2856_PMC11960605_jnumed.124.268387f3.jpg"
  },
  {
+  "drug_id": 2858,
+  "drug_name": "[89Zr]Zr-DFO-NCS-Adu-8D3",
+  "pmid": "36276653",
+  "pmcid": "PMC9576608",
+  "label": "Figure 3",
+  "caption": "Ex vivo brain uptake and brain distribution. 11-13 month old APP/PS1 TG mice were injected with 30 µg of the radioimmunoconjugates, and ex vivo analysis was performed on day 7 p.i.; The brain uptake is given as %ID/g (mean ±SD, n = 3-5 animals per group). A) Ex vivo brain uptake of all eight groups. Significant differences between the groups are marked with asterisks (**p < 0.01; ***p < 0.001) or marked as non-significant (ns). B) Autoradiography of 20 µm cryo-sections, exposure time being 2 weeks for the 89Zr-groups and 4 days for the 125I-groups.",
+  "license": "CC BY",
+  "attrib": "unclear",
+  "file": "2858_PMC9576608_thnov12p7067g003.jpg"
+ },
+ {
   "drug_id": 2878,
   "drug_name": "[89Zr]Zr-DFO-ToxAb",
   "pmid": "38665417",
@@ -19666,6 +20711,39 @@
   "license": "",
   "attrib": "target",
   "file": "2878_PMC11045290_IJBI2024-3655327.007.jpg"
+ },
+ {
+  "drug_id": 2880,
+  "drug_name": "[89Zr]Zr-DFO-trastuzumab-TCO",
+  "pmid": "31171598",
+  "pmcid": "PMC6836866",
+  "label": "FIGURE 2.",
+  "caption": "Lovastatin treatment increases in vitro membrane-bound pertuzumab and in vivo tumors’ avidity for pertuzumab. (A) Membrane-bound and internalized [89Zr]Zr-DFO-pertuzumab after treatment with lovastatin in NCI-N87 cancer cells. NCI-N87 untreated cells served as control. NCI-N87 cancer cells were incubated with 25 μM lovastatin for 4 h before addition of 1 μM 89Zr-labeled pertuzumab for 1.5 h. Data represent mean ± SEM (n = 4 experiments, *P < 0.05 based on Student t test). (B and C) Biodistribution (B) and representative maximum-intensity-projection images (MIPs) and coronal PET images (C) of [",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2880_PMC6836866_1569fig2.jpg"
+ },
+ {
+  "drug_id": 2880,
+  "drug_name": "[89Zr]Zr-DFO-trastuzumab-TCO",
+  "pmid": "31171598",
+  "pmcid": "PMC6836866",
+  "label": "FIGURE 3.",
+  "caption": "Lovastatin-mediated increase in membrane-bound pertuzumab is blocked with excess of pertuzumab. (A) Membrane-bound and internalized [89Zr]Zr-DFO-pertuzumab in presence of excess of unlabeled pertuzumab after lovastatin treatment in NCI-N87 cells. Blocking experiments were performed by incubation with 89Zr-labeled pertuzumab in presence of 30-fold excess of pertuzumab. Untreated NCI-N87 cells served as control. NCI-N87 cells were incubated with 25 μM lovastatin for 4 h before addition of 1 μM 89Zr-labeled pertuzumab and incubation for 1.5 h. Data represent mean ± SEM (n = 4 experiments, *P < 0.",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2880_PMC6836866_1569fig3.jpg"
+ },
+ {
+  "drug_id": 2880,
+  "drug_name": "[89Zr]Zr-DFO-trastuzumab-TCO",
+  "pmid": "31171598",
+  "pmcid": "PMC6836866",
+  "label": "FIGURE 4.",
+  "caption": "Trastuzumab-receptor blockade increases internalization of 89Zr-labeled pertuzumab. (A) Membrane-bound and internalized [89Zr]Zr-DFO-pertuzumab in presence of trastuzumab in NCI-N87 cancer cells with or without lovastatin treatment. Blocking experiments were performed by incubation with 89Zr-labeled pertuzumab in presence of 30-fold excess of trastuzumab. NCI-N87 untreated cells served as control. NCI-N87 cancer cells were incubated with 25 μM lovastatin for 4 h before addition of 1 μM 89Zr-labeled pertuzumab for 1.5 h. Data represent mean ± SEM (n = 4 experiments, *P < 0.05 based on Student t",
+  "license": "",
+  "attrib": "unclear",
+  "file": "2880_PMC6836866_1569fig4.gif"
  },
  {
   "drug_id": 2881,
