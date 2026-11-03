@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
+import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 import { Chart, PALETTE, AXIS } from "../components/Chart";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
@@ -376,6 +377,8 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
 }
 
 export default function DrugDetail() {
+  const tr = useT();
+  const { lang } = useLang();
   const { id } = useParams();
   const navigate = useNavigate();
   const did = id ? Number(id) : 0;
@@ -500,20 +503,18 @@ export default function DrugDetail() {
   if (!did) {
     return (
       <div className="pb-4">
-        <h1 className="text-[26px] font-bold tracking-tight">🔬 单药画像</h1>
-        <p className="mt-1.5 text-[13px] text-ink-3 text-balance">
-          搜索并选择一个核药，查看它的结构、生物分布与来源文献
-        </p>
+        <h1 className="text-[26px] font-bold tracking-tight">{tr("drug.title")}</h1>
+        <p className="mt-1.5 text-[13px] text-ink-3 text-balance">{tr("drug.lead")}</p>
         <div className="card mt-5 p-6">
           <input
             value={pick}
             onChange={(e) => setPick(e.target.value)}
-            placeholder="输入药名（中英文），如 PSMA…"
+            placeholder={tr("drug.searchPh")}
             className="h-10 w-full rounded-[10px] border border-line bg-white px-3.5 text-[13.5px] outline-none focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
           />
           {drugsErr && (
             <div className="mt-4">
-              <ErrorState message={`药物目录（drugs.json）加载失败：${drugsErr}`} onRetry={reloadDrugs} />
+              <ErrorState message={tr("drug.errDrugs") + drugsErr} onRetry={reloadDrugs} />
             </div>
           )}
 
@@ -529,15 +530,15 @@ export default function DrugDetail() {
           {/* 空：关键词 0 命中 —— 说清「查了什么 + 还有多少药 + 一键清空」 */}
           {!drugsErr && !drugsLoading && !hits.length && (
             <EmptyState
-              title="没有匹配的核药"
-              hint={`关键词「${pick.trim()}」在库内 ${fmt(drugs?.length ?? 0)} 个核药里没有命中。可以试英文名 / 通用名，或只输入片段（如 PSMA、DOTA）。`}
+              title={tr("drug.noMatch")}
+              hint={tr("drug.noMatchHint", { q: pick.trim(), n: fmt(drugs?.length ?? 0) })}
             >
               <button
                 type="button"
                 onClick={() => setPick("")}
                 className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
               >
-                清空关键词
+                {tr("drug.clearKw")}
               </button>
             </EmptyState>
           )}
@@ -553,7 +554,7 @@ export default function DrugDetail() {
                 >
                   <span className="min-w-0 flex-1 truncate font-medium text-ink">{d.name_en}</span>
                   <span className="ml-2 shrink-0 text-[11.5px] text-ink-3">
-                    {d.has_struct ? "✓ 结构" : ""}
+                    {d.has_struct ? tr("drug.hasStructTag") : ""}
                   </span>
                 </Link>
               ))}
@@ -562,7 +563,7 @@ export default function DrugDetail() {
 
           {drugs && !drugsErr && (
             <div className="mt-3 text-[12px] text-ink-3">
-              共 {fmt(drugs.length)} 个核药 · 仅显示前 24 个匹配项
+              {tr("drug.listCount", { n: fmt(drugs.length) })}
             </div>
           )}
         </div>
@@ -575,7 +576,7 @@ export default function DrugDetail() {
     if (drugsErr) {
       return (
         <div className="pb-4">
-          <ErrorState message={`药物目录（drugs.json）加载失败：${drugsErr}`} onRetry={reloadDrugs} />
+          <ErrorState message={tr("drug.errDrugs") + drugsErr} onRetry={reloadDrugs} />
         </div>
       );
     }
@@ -584,20 +585,20 @@ export default function DrugDetail() {
       <div className="pb-4">
         <div className="card mt-5">
           <EmptyState
-            title={`没有 #${did} 这个核药`}
-            hint="链接里的编号在库内不存在（可能是旧链接或被合并的编号）。可以回总览重新筛选，或去「单药画像」按名字选。"
+            title={tr("drug.notFoundTitle", { id: did })}
+            hint={tr("drug.notFoundHint")}
           >
             <Link
               to="/"
               className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:shadow-s2"
             >
-              ← 回总览
+              {tr("drug.backOverview")}
             </Link>
             <Link
               to="/drug"
               className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
             >
-              去「单药画像」选择 →
+              {tr("drug.pickByName")}
             </Link>
           </EmptyState>
         </div>
@@ -609,26 +610,31 @@ export default function DrugDetail() {
   const tabs: { key: TabKey; label: string; ok: boolean; hint: string }[] = [
     {
       key: "bio",
-      label: "生物分布",
+      label: tr("drug.tabBio"),
       ok: (drug.n_points ?? mine.length) > 0,
-      hint: `${fmt(drug.n_points ?? mine.length)} 条`,
+      hint: tr("drug.rows", { n: fmt(drug.n_points ?? mine.length) }),
     },
-    { key: "dos", label: "剂量学", ok: (drug.n_dosim ?? 0) > 0, hint: `${fmt(drug.n_dosim ?? 0)} 条` },
-    { key: "tbr", label: "靶本比", ok: (drug.has_tbr ?? 0) === 1, hint: "有记录" },
+    {
+      key: "dos",
+      label: tr("drug.tabDos"),
+      ok: (drug.n_dosim ?? 0) > 0,
+      hint: tr("drug.rows", { n: fmt(drug.n_dosim ?? 0) }),
+    },
+    { key: "tbr", label: tr("drug.tabTbr"), ok: (drug.has_tbr ?? 0) === 1, hint: tr("drug.hasRecord") },
     {
       key: "refs",
-      label: "文献",
+      label: tr("drug.tabRefs"),
       // ★ 用「药物级参考文献」的真实条数（drug_refs），而不是 biodist 来源数；
       //   无文献时不显示「该药暂无」（用户要求），只显示「文献」两个字。
       ok: (drugRefs?.length ?? drug.n_refs ?? 0) > 0,
-      hint: drugRefs && drugRefs.length ? `${fmt(drugRefs.length)} 篇` : "",
+      hint: drugRefs && drugRefs.length ? tr("drug.articles", { n: fmt(drugRefs.length) }) : "",
     },
     {
       key: "img",
-      label: "文献影像",
+      label: tr("drug.tabImg"),
       // pk295 U1：figs/manifest.json 里该药的图（含 target/unclear/comparator 三类，渲染时分区）
       ok: (figs?.length ?? 0) > 0,
-      hint: figs && figs.length ? `${fmt(figs.length)} 张` : "",
+      hint: figs && figs.length ? tr("drug.figsN", { n: fmt(figs.length) }) : "",
     },
   ];
 
@@ -639,7 +645,7 @@ export default function DrugDetail() {
         onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
         className="text-[12.5px] text-ink-3 transition hover:text-brand"
       >
-        ← 返回（保留筛选条件）
+        {tr("drug.back")}
       </button>
 
       <div className="mt-3 flex flex-wrap items-baseline gap-3">
@@ -648,22 +654,24 @@ export default function DrugDetail() {
           # {drug.drug_id}
         </span>
         {drug.has_struct ? (
-          <span className="text-[12px] text-ok">✓ 有结构图</span>
+          <span className="text-[12px] text-ok">{tr("drug.hasStruct")}</span>
         ) : (
-          <span className="text-[12px] text-ink-3">无结构图</span>
+          <span className="text-[12px] text-ink-3">{tr("drug.noStruct")}</span>
         )}
       </div>
 
       <section className="card mt-5 grid gap-5 p-6 md:grid-cols-4">
-        <Field label="类型">{drug.drug_type ?? "—"}</Field>
-        <Field label="核素">{drug.radionuclides_zh ?? "—"}</Field>
-        <Field label="研发阶段">{drug.status ?? "—"}</Field>
-        <Field label="中文名">{drug.name_zh ?? "—"}</Field>
+        <Field label={tr("drug.fType")}>{enSafe(lang, drug.drug_type) || "—"}</Field>
+        <Field label={tr("drug.fIsotope")}>
+          {lang === "en" ? nuclideEn(drug.radionuclides_zh) || "—" : drug.radionuclides_zh || "—"}
+        </Field>
+        <Field label={tr("drug.fStage")}>{drug.status ? stageLabel(lang, drug.status) : "—"}</Field>
+        <Field label={tr("drug.fNameZh")}>{enSafe(lang, drug.name_zh) || "—"}</Field>
         <div className="md:col-span-2">
-          <Field label="靶点">{drug.targets_zh ?? "—"}</Field>
+          <Field label={tr("drug.fTargets")}>{enSafe(lang, drug.targets_zh) || "—"}</Field>
         </div>
         <div className="md:col-span-2">
-          <Field label="适应症">{drug.diseases_zh ?? "—"}</Field>
+          <Field label={tr("drug.fDiseases")}>{enSafe(lang, drug.diseases_zh) || "—"}</Field>
         </div>
       </section>
 
@@ -804,7 +812,7 @@ export default function DrugDetail() {
                     on ? "text-white/75" : t.ok ? "text-ink-3" : "text-[#a98a5c]"
                   }`}
                 >
-                  {t.key === "refs" ? t.hint : t.ok ? t.hint : "该药暂无"}
+                  {t.key === "refs" ? t.hint : t.ok ? t.hint : tr("drug.none")}
                 </span>
               </button>
             );
