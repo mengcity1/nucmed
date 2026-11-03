@@ -107,10 +107,11 @@ function Nav() {
         <div
           role="group"
           aria-label="Language"
+          data-allow-cjk=""
           className="ml-1 flex shrink-0 items-center rounded-[10px] border border-line bg-[#f5f8fc] p-0.5"
         >
           {([
-            { v: "zh" as Lang, label: "ZH" },
+            { v: "zh" as Lang, label: "中文" },
             { v: "en" as Lang, label: "EN" },
           ]).map((o) => {
             const on = lang === o.v;
@@ -226,11 +227,14 @@ export default function App() {
   }, [lang]);
 
   /** ★ 英文模式守卫：DOM 里一旦出现汉字就告警。
-   *  这是「英文版零汉字」的现场自检 —— 迁移漏了哪一处，控制台立刻点名。 */
+   *  这是「英文版零汉字」的现场自检 —— 迁移漏了哪一处，控制台立刻点名。
+   *  唯一白名单：语言切换器本身（它必须写「中文」，owner 2026-11-03 明确要求）。 */
   useEffect(() => {
     if (lang !== "en") return;
     const timer = window.setTimeout(() => {
-      const hits = document.body.innerText.match(/[\u4e00-\u9fa5]+/g);
+      const clone = document.body.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll("[data-allow-cjk]").forEach((n) => n.remove());
+      const hits = (clone.textContent ?? "").match(/[\u4e00-\u9fa5]+/g);
       if (hits) console.warn("[i18n] English mode still contains Chinese:", [...new Set(hits)].slice(0, 20));
     }, 800);
     return () => window.clearTimeout(timer);
