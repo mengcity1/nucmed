@@ -2,11 +2,13 @@
  * 三种状态（加载 / 空 / 错）的统一呈现。
  * 原则：空状态必须说清「为什么空 + 下一步能做什么」，错误状态必须可重试。
  */
+import { useT } from "../lib/i18n";
 
 /** 骨架屏：表格形态，行数 / 列数可调。 */
 export function TableSkeleton({ rows = 8, cols = 5 }: { rows?: number; cols?: number }) {
+  const tr = useT();
   return (
-    <div className="animate-pulse p-1" aria-busy="true" aria-label="加载中">
+    <div className="animate-pulse p-1" aria-busy="true" aria-label={tr("common.loading")}>
       <div className="flex gap-3 border-b border-[#f1f4f9] px-4 py-3">
         {Array.from({ length: cols }).map((_, i) => (
           <div
@@ -42,7 +44,7 @@ export function CardSkeleton({ className = "" }: { className?: string }) {
 }
 
 export function EmptyState({
-  title = "没有匹配的记录",
+  title,
   hint,
   children,
 }: {
@@ -50,12 +52,13 @@ export function EmptyState({
   hint?: string;
   children?: React.ReactNode;
 }) {
+  const tr = useT();
   return (
     <div className="flex flex-col items-center px-6 py-14 text-center">
       <div className="grid h-11 w-11 place-items-center rounded-full border border-line bg-[#f7f9fd] text-[18px] text-ink-3">
         ∅
       </div>
-      <div className="mt-3 text-[14px] font-semibold text-ink">{title}</div>
+      <div className="mt-3 text-[14px] font-semibold text-ink">{title ?? tr("common.emptyTitle")}</div>
       {hint && <div className="mt-1.5 max-w-[460px] text-[12.5px] leading-relaxed text-ink-3">{hint}</div>}
       {children && <div className="mt-4 flex flex-wrap justify-center gap-2">{children}</div>}
     </div>
@@ -69,9 +72,10 @@ export function ErrorState({
   message: string;
   onRetry?: () => void;
 }) {
+  const tr = useT();
   return (
     <div className="rounded-md2 border border-[#f6c9c9] bg-[#fdf2f2] p-5 text-[13px] text-bad">
-      <div className="font-semibold">数据加载失败</div>
+      <div className="font-semibold">{tr("common.errorTitle")}</div>
       <div className="mt-1.5 break-all text-[12.5px] leading-relaxed text-[#a23b3b]">{message}</div>
       {onRetry && (
         <button
@@ -79,7 +83,7 @@ export function ErrorState({
           onClick={onRetry}
           className="mt-3 rounded-lg border border-[#eeb9b9] bg-white px-3 py-1.5 text-[12.5px] font-medium text-bad transition hover:bg-[#fff7f7]"
         >
-          重试
+          {tr("common.retry")}
         </button>
       )}
     </div>

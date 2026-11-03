@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
 import { ErrorState } from "../components/States";
+import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 
 const PAGE = 30;
 
@@ -102,6 +103,15 @@ export default function Home() {
     const v = sp.get(k);
     return v ? v.split(",").filter(Boolean) : [];
   };
+  const tr = useT();
+  const { lang } = useLang();
+  /** 类型显示：中文站做中文化简，英文站保留原枚举（`home.microsphere` 在两语言下各取所需） */
+  const typeLabel = (t: string | null) => {
+    if (!t) return tr("home.uncategorized");
+    return t.replace("-based RP", "").replace("Microsphere/Nanoconstruct", tr("home.microsphere"));
+  };
+  /** 核素：中文站显示「镥-177」，英文站规则转「Lu-177」（数据层只有中文核素名） */
+  const nucLabel = (v: string | null | undefined) => (lang === "en" ? nuclideEn(v) || "—" : v || "—");
   const [types, setTypes] = useState<string[]>(() => arr("type"));
   const [nucs, setNucs] = useState<string[]>(() => arr("nuc"));
   const [targets, setTargets] = useState<string[]>(() => arr("tgt"));
@@ -228,52 +238,54 @@ export default function Home() {
   return (
     <div className="pb-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-[26px] font-bold tracking-tight">💊 核药总览</h1>
+        <h1 className="text-[26px] font-bold tracking-tight">{tr("home.title")}</h1>
         <p className="text-[13px] text-ink-3">
-          有数据 <b className="num font-semibold text-ink-2">{st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…"}</b> 个
-          · 目录收录 <b className="num font-semibold text-ink-2">{st ? fmt(st.drugs) : "…"}</b>
+          {tr("home.countLine", {
+            a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+            b: st ? fmt(st.drugs) : "…",
+          })}
         </p>
       </div>
-      <p className="mt-1.5 text-[13px] text-ink-3">按类型 / 核素 / 靶点 / 适应症筛选 · 点标签即生效</p>
+      <p className="mt-1.5 text-[13px] text-ink-3">{tr("home.lead")}</p>
 
       {error && (
         <div className="mt-4">
-          <ErrorState message={`药物目录（drugs.json）加载失败：${error}`} onRetry={reload} />
+          <ErrorState message={tr("home.errDrugs") + error} onRetry={reload} />
         </div>
       )}
 
       {/* 常用查询（一行胶囊 · 不占版面） */}
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <span className="text-[12px] text-ink-3">常用：</span>
+        <span className="text-[12px] text-ink-3">{tr("home.quick")}</span>
         <Chip on={onlyPts} onClick={() => setOnlyPts((v) => !v)}>
-          有生物分布数据（{st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…"}）
+          {tr("home.onlyPts", { n: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…" })}
         </Chip>
         <Chip on={hideBad} onClick={() => setHideBad((v) => !v)}>
-          隐藏疑似非药名（175）
+          {tr("home.hideBad", { n: 175 })}
         </Chip>
-        <Chip onClick={() => setKw("PSMA")}>PSMA 相关核药</Chip>
-        <Chip onClick={() => setNucs(["镥-177"])}>Lu-177 标记药物</Chip>
-        <Chip onClick={() => setNucs(["镓-68"])}>Ga-68 标记药物</Chip>
+        <Chip onClick={() => setKw("PSMA")}>{tr("home.psma")}</Chip>
+        <Chip onClick={() => setNucs(["镥-177"])}>{tr("home.lu177")}</Chip>
+        <Chip onClick={() => setNucs(["镓-68"])}>{tr("home.ga68")}</Chip>
       </div>
 
       {/* 筛选卡（常驻展开 · 对齐原页「不要折叠」） */}
       <section className="card mt-5 p-6">
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <b className="text-[15px] tracking-tight">筛选条件</b>
+            <b className="text-[15px] tracking-tight">{tr("home.filters")}</b>
             <span className="rounded-full bg-[#eef2f8] px-2 py-0.5 text-[11.5px] font-medium text-ink-3">
-              {view.length !== (drugs?.length ?? 0) ? "已筛选" : "全库"}
+              {view.length !== (drugs?.length ?? 0) ? tr("home.filtered") : tr("home.allLib")}
             </span>
           </div>
           <button onClick={reset} className="text-[13px] text-ink-3 transition hover:text-brand">
-            ↺ 重置
+            {tr("home.reset")}
           </button>
         </div>
 
         <div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
           <div>
             <GroupLabel icon="layers" count={allTypes.length}>
-              药物类型
+              {tr("home.drugType")}
             </GroupLabel>
             <div className="flex flex-wrap gap-2">
               {allTypes.map((t) => (
@@ -285,7 +297,7 @@ export default function Home() {
                     setPage(0);
                   }}
                 >
-                  {t.replace("-based RP", "").replace("Microsphere/Nanoconstruct", "微球/纳米")}
+                  {typeLabel(t)}
                 </Chip>
               ))}
             </div>
@@ -293,12 +305,13 @@ export default function Home() {
 
           <div>
             <GroupLabel icon="atom" count={nucFreq.size}>
-              核素 <span className="font-normal text-ink-3/60">· 按当前筛选动态排序</span>
+              {tr("home.isotope")}{" "}
+              <span className="font-normal text-ink-3/60">· {tr("home.dynamicOrder")}</span>
             </GroupLabel>
             <input
               value={qNuc}
               onChange={(e) => setQNuc(e.target.value)}
-              placeholder={`搜索核素（中文或符号，如 镥 / Lu）· 共 ${nucOrdered.length} 个`}
+              placeholder={tr("home.searchIsotope", { n: nucOrdered.length })}
               className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
             />
             <div
@@ -318,7 +331,7 @@ export default function Home() {
                       setPage(0);
                     }}
                   >
-                    {n}
+                    {nucLabel(n)}
                     <span className="ml-1 text-[10.5px] opacity-60">{nucFreq.get(n) ?? 0}</span>
                   </Chip>
                 ))}
@@ -331,9 +344,7 @@ export default function Home() {
                 className="mt-2 flex w-full items-center justify-between rounded-lg border border-line bg-[#f7f9fd] px-2.5 py-1.5 text-[12px] text-ink-2 transition hover:border-[#b9d0e9] hover:bg-white"
               >
                 <span>
-                  {nucAll
-                    ? `收起（只看前 12 个）`
-                    : `展开全部 ${nucOrdered.length} 个核素`}
+                  {nucAll ? tr("home.collapse") : tr("home.expand", { n: nucOrdered.length })}
                 </span>
                 <span className="text-ink-3">{nucAll ? "▲" : "▼"}</span>
               </button>
@@ -341,11 +352,11 @@ export default function Home() {
           </div>
 
           <div className="md:col-span-2">
-            <GroupLabel icon="target" count={allTargets.length}>靶点</GroupLabel>
+            <GroupLabel icon="target" count={allTargets.length}>{tr("home.targets")}</GroupLabel>
             <input
               value={qTgt}
               onChange={(e) => setQTgt(e.target.value)}
-              placeholder={`搜索靶点（共 ${allTargets.length} 个）`}
+              placeholder={tr("home.searchTargets", { n: allTargets.length })}
               className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
             />
             <select
@@ -366,52 +377,70 @@ export default function Home() {
             </select>
           </div>
 
-          <div className="md:col-span-2">
-            <GroupLabel icon="heart" count={allDiseases.length}>适应症</GroupLabel>
-            <input
-              value={qDis}
-              onChange={(e) => setQDis(e.target.value)}
-              placeholder={`搜索适应症（共 ${allDiseases.length} 个）`}
-              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
-            />
-            <select
-              multiple
-              size={9}
-              value={diseases}
-              onChange={(e) => {
-                setDiseases([...e.target.selectedOptions].map((o) => o.value));
-                setPage(0);
-              }}
-              className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
-            >
-              {[...new Set([...diseases, ...(qDis.trim() ? allDiseases.filter((t) => t.toLowerCase().includes(qDis.trim().toLowerCase())) : allDiseases)])].map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
+          {lang === "zh" ? (
+            <div className="md:col-span-2">
+              <GroupLabel icon="heart" count={allDiseases.length}>{tr("home.diseases")}</GroupLabel>
+              <input
+                value={qDis}
+                onChange={(e) => setQDis(e.target.value)}
+                placeholder={tr("home.searchDiseases", { n: allDiseases.length })}
+                className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+              />
+              <select
+                multiple
+                size={9}
+                value={diseases}
+                onChange={(e) => {
+                  setDiseases([...e.target.selectedOptions].map((o) => o.value));
+                  setPage(0);
+                }}
+                className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
+              >
+                {[...new Set([...diseases, ...(qDis.trim() ? allDiseases.filter((t) => t.toLowerCase().includes(qDis.trim().toLowerCase())) : allDiseases)])].map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="md:col-span-2">
+              <GroupLabel icon="heart" count={0}>{tr("home.diseases")}</GroupLabel>
+              <p className="text-[12.5px] leading-relaxed text-ink-3">{tr("home.diseasesEnOnly")}</p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* 结果带：4 个指标（对齐原页 st.metric 四格） */}
       <section className="mt-5 grid grid-cols-2 gap-4 border-y border-line py-4 lg:grid-cols-4">
         <Metric
-          label="结果药物"
+          label={tr("home.kpiResult")}
           value={fmt(view.length)}
-          hint={`有数据 ${st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…"} / 目录 ${st ? fmt(st.drugs) : "…"}`}
+          hint={tr("home.kpiResultHint", {
+            a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+            b: st ? fmt(st.drugs) : "…",
+          })}
         />
-        <Metric label="已上市" value={fmt(stageCount["已上市"] ?? 0)} hint="最高阶段 = Approval" />
         <Metric
-          label="结构图覆盖"
+          label={tr("home.kpiApproved")}
+          value={fmt(stageCount["已上市"] ?? 0)}
+          hint={tr("home.kpiApprovedHint")}
+        />
+        <Metric
+          label={tr("home.kpiStruct")}
           value={fmt(nStruct)}
-          hint={`${view.length ? ((nStruct / view.length) * 100).toFixed(1) : "0.0"}% · 有背证结构`}
+          hint={tr("home.kpiStructHint", {
+            p: view.length ? ((nStruct / view.length) * 100).toFixed(1) : "0.0",
+          })}
         />
         <Metric
-          label="剂量学记录"
+          label={tr("home.kpiDosim")}
           value={fmt(st?.dosimetry?.total ?? 0)}
           hint={
-            st?.dosimetry ? `${fmt(st.dosimetry.drugs)} 个药 · ${st.dosimetry.organs} 器官` : "暂无"
+            st?.dosimetry
+              ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
+              : tr("home.none")
           }
         />
       </section>
@@ -419,18 +448,18 @@ export default function Home() {
       {/* 研发阶段徽章 + 排序 */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[12px] text-ink-3">研发阶段：</span>
+          <span className="text-[12px] text-ink-3">{tr("home.stage")}</span>
           {STAGE_ORDER.filter((s) => stageCount[s]).map((s) => (
             <span
               key={s}
               className={`rounded-full border px-2 py-0.5 text-[11.5px] font-medium ${STAGE_TONE[s]}`}
             >
-              {s} {fmt(stageCount[s])}
+              {stageLabel(lang, s)} {fmt(stageCount[s])}
             </span>
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[12px] text-ink-3">排序</span>
+          <span className="text-[12px] text-ink-3">{tr("home.sort")}</span>
           <select
             value={sort}
             onChange={(e) => {
@@ -439,29 +468,35 @@ export default function Home() {
             }}
             className="rounded-lg border border-line bg-white px-2 py-1 text-[12.5px] outline-none focus:border-[#9dc0ea]"
           >
-            {["阶段优先", "名称 A→Z", "名称 Z→A"].map((o) => (
-              <option key={o}>{o}</option>
+            {[
+              { v: "阶段优先", k: "home.sortStage" as const },
+              { v: "名称 A→Z", k: "home.sortAZ" as const },
+              { v: "名称 Z→A", k: "home.sortZA" as const },
+            ].map((o) => (
+              <option key={o.v} value={o.v}>
+                {tr(o.k)}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      <h2 className="mt-6 text-[16px] font-semibold">药物清单</h2>
+      <h2 className="mt-6 text-[16px] font-semibold">{tr("home.list")}</h2>
 
       <div className="card mt-3 overflow-hidden">
         <div className="hscroll">
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
-                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">单药画像</th>
-                <th className="px-2 py-2.5 text-left font-semibold sm:px-4">核药</th>
-                <th className="px-2 py-2.5 text-left font-semibold sm:px-3">类型</th>
-                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">核素</th>
-                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">靶点</th>
-                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">适应症</th>
-                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">阶段</th>
-                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">分布</th>
-                <th className="hidden px-3 py-2.5 text-center font-semibold sm:table-cell">结构</th>
+                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thProfile")}</th>
+                <th className="px-2 py-2.5 text-left font-semibold sm:px-4">{tr("home.thDrug")}</th>
+                <th className="px-2 py-2.5 text-left font-semibold sm:px-3">{tr("home.thType")}</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">{tr("home.thIsotope")}</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">{tr("home.thTarget")}</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">{tr("home.thDisease")}</th>
+                <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">{tr("home.thStage")}</th>
+                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thPoints")}</th>
+                <th className="hidden px-3 py-2.5 text-center font-semibold sm:table-cell">{tr("home.thStruct")}</th>
               </tr>
             </thead>
             <tbody>
@@ -472,7 +507,7 @@ export default function Home() {
                       to={`/drug/${d.drug_id}`}
                       className="inline-block whitespace-nowrap rounded-lg border border-line bg-white px-2.5 py-1 text-[12px] font-medium text-brand transition hover:border-brand hover:bg-brand-soft"
                     >
-                      查看 →
+                      {tr("home.view")}
                     </Link>
                   </td>
                   <td className="px-2 py-2.5 sm:px-4">
@@ -482,39 +517,36 @@ export default function Home() {
                     >
                       {d.name_en}
                     </Link>
-                    {d.name_zh && <div className="text-[11.5px] text-ink-3">{d.name_zh}</div>}
                     <div className="text-[11px] text-ink-3 sm:hidden">
-                      {d.radionuclides_zh || "—"} · {d.stage}
+                      {nucLabel(d.radionuclides_zh)} · {stageLabel(lang, d.stage)}
                     </div>
                   </td>
-                  <td className="px-2 py-2.5 text-ink-2 sm:px-3">
-                    {(d.drug_type || "未分类").replace("-based RP", "")}
-                  </td>
-                  <td className="hidden px-3 py-2.5 text-ink-2 sm:table-cell">{d.radionuclides_zh || "—"}</td>
+                  <td className="px-2 py-2.5 text-ink-2 sm:px-3">{typeLabel(d.drug_type)}</td>
+                  <td className="hidden px-3 py-2.5 text-ink-2 sm:table-cell">{nucLabel(d.radionuclides_zh)}</td>
                   <td
                     className="hidden max-w-[190px] truncate px-3 py-2.5 text-ink-2 lg:table-cell"
-                    title={d.targets_zh || ""}
+                    title={enSafe(lang, d.targets_zh)}
                   >
-                    {d.targets_zh || "—"}
+                    {enSafe(lang, d.targets_zh) || "—"}
                   </td>
                   <td
                     className="hidden max-w-[190px] truncate px-3 py-2.5 text-ink-2 lg:table-cell"
-                    title={d.diseases_zh || ""}
+                    title={enSafe(lang, d.diseases_zh)}
                   >
-                    {d.diseases_zh || "—"}
+                    {enSafe(lang, d.diseases_zh) || "—"}
                   </td>
                   <td className="hidden px-3 py-2.5 sm:table-cell">
                     <span
                       className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium ${STAGE_TONE[d.stage]}`}
                     >
-                      {d.stage}
+                      {stageLabel(lang, d.stage)}
                     </span>
                   </td>
                   <td className="num px-2 py-2.5 text-center text-[12.5px] sm:px-3">
                     {d.n_points ? (
                       <span className="font-semibold text-ink">{d.n_points}</span>
                     ) : (
-                      <span className="text-ink-3" title="暂无生物分布记录">
+                      <span className="text-ink-3" title={tr("home.noPts")}>
                         —
                       </span>
                     )}
@@ -548,15 +580,13 @@ export default function Home() {
               {drugs && !rows.length && (
                 <tr>
                   <td colSpan={9} className="px-4 py-16 text-center">
-                    <div className="text-[13.5px] font-medium text-ink-2">当前条件没有匹配的核药</div>
-                    <div className="mt-1 text-[12.5px] text-ink-3">
-                      试试去掉最窄的那个条件（靶点 / 适应症通常最窄）
-                    </div>
+                    <div className="text-[13.5px] font-medium text-ink-2">{tr("home.emptyTitle")}</div>
+                    <div className="mt-1 text-[12.5px] text-ink-3">{tr("home.emptyHint")}</div>
                     <button
                       onClick={reset}
                       className="mt-4 rounded-lg border border-brand bg-brand-soft px-4 py-2 text-[13px] font-medium text-brand-deep transition hover:bg-brand/15"
                     >
-                      清除全部筛选 · 回到全库 {drugs.length.toLocaleString("en-US")} 个
+                      {tr("home.clearAll", { n: drugs.length.toLocaleString("en-US") })}
                     </button>
                   </td>
                 </tr>
@@ -567,23 +597,21 @@ export default function Home() {
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12.5px] text-ink-3">
-        <div>
-          共 {fmt(view.length)} 条 · 第 {cur + 1} / {pages} 页
-        </div>
+        <div>{tr("home.pageInfo", { n: fmt(view.length), a: cur + 1, b: pages })}</div>
         <div className="flex gap-2">
           <button
             disabled={cur === 0}
             onClick={() => setPage(cur - 1)}
             className="rounded-lg border border-line bg-white px-3 py-1 transition hover:border-[#c3d6ea] disabled:opacity-40"
           >
-            上一页
+            {tr("home.prev")}
           </button>
           <button
             disabled={cur >= pages - 1}
             onClick={() => setPage(cur + 1)}
             className="rounded-lg border border-line bg-white px-3 py-1 transition hover:border-[#c3d6ea] disabled:opacity-40"
           >
-            下一页
+            {tr("home.next")}
           </button>
         </div>
       </div>

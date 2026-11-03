@@ -1,6 +1,6 @@
-import { NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
-import { useJSON, type Meta } from "./lib/data";
+import { setDataLang, useJSON, type Meta } from "./lib/data";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
@@ -162,6 +162,28 @@ function Footer() {
   );
 }
 
+/** 英文站占位：这些页面的文案尚未迁移完 ⇒ 英文模式下给英文说明，**绝不让中文漏出**。
+ *  迁移完成后删掉对应路由上的 <EnGate> 包裹即可。 */
+function EnGate({ children }: { children: React.ReactNode }) {
+  const { lang } = useLang();
+  const tr = useT();
+  if (lang === "zh") return <>{children}</>;
+  return (
+    <div className="card mt-6 p-8 text-center">
+      <div className="text-[15px] font-semibold text-ink">{tr("en.pending.title")}</div>
+      <p className="mx-auto mt-2 max-w-[560px] text-[13px] leading-relaxed text-ink-3">
+        {tr("en.pending.body")}
+      </p>
+      <Link
+        to="/"
+        className="mt-4 inline-block rounded-lg border border-brand bg-brand-soft px-4 py-2 text-[13px] font-medium text-brand-deep transition hover:bg-brand/15"
+      >
+        {tr("en.pending.back")}
+      </Link>
+    </div>
+  );
+}
+
 export default function App() {
   /** 语言：URL `?lang=en` 优先，其次上次选择（localStorage），默认中文 */
   const [lang, setLang] = useState<Lang>(() => {
@@ -171,11 +193,23 @@ export default function App() {
   });
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    setDataLang(lang);
     try {
       localStorage.setItem("nucmed.lang", lang);
     } catch {
       /* 隐私模式下 storage 可能被禁用，忽略 */
     }
+  }, [lang]);
+
+  /** ★ 英文模式守卫：DOM 里一旦出现汉字就告警。
+   *  这是「英文版零汉字」的现场自检 —— 迁移漏了哪一处，控制台立刻点名。 */
+  useEffect(() => {
+    if (lang !== "en") return;
+    const timer = window.setTimeout(() => {
+      const hits = document.body.innerText.match(/[\u4e00-\u9fa5]+/g);
+      if (hits) console.warn("[i18n] English mode still contains Chinese:", [...new Set(hits)].slice(0, 20));
+    }, 800);
+    return () => window.clearTimeout(timer);
   }, [lang]);
 
   return (
@@ -194,12 +228,12 @@ export default function App() {
         >
           <Routes>
             <Route path="/" element={<Overview />} />
-            <Route path="/drug" element={<DrugDetail />} />
-            <Route path="/drug/:id" element={<DrugDetail />} />
+            <Route path="/drug" element={<EnGate><DrugDetail /></EnGate>} />
+            <Route path="/drug/:id" element={<EnGate><DrugDetail /></EnGate>} />
             <Route path="/atlas" element={<Atlas />} />
             {/* 兼容旧链接 /drugs/:id */}
-            <Route path="/drugs/:id" element={<DrugDetail />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/drugs/:id" element={<EnGate><DrugDetail /></EnGate>} />
+            <Route path="/about" element={<EnGate><About /></EnGate>} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />
             ))}

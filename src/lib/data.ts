@@ -100,6 +100,19 @@ export type Meta = {
 
 const cache = new Map<string, unknown>();
 
+/** ★ 数据层的语言：由 `App` 在切换语言时写入。
+ *  为什么需要：英文站**不允许出现任何汉字**，而这里的错误消息/链接文字是模块级函数现场拼的，
+ *  拿不到 React context。 */
+let dataLang: "zh" | "en" = "zh";
+export function setDataLang(l: "zh" | "en") {
+  dataLang = l;
+}
+const msg = {
+  loadFailed: (name: string, status: number) =>
+    dataLang === "en" ? `Failed to load ${name}: HTTP ${status}` : `${name} 加载失败：HTTP ${status}`,
+  sourceLink: (fallback: string) => fallback || (dataLang === "en" ? "Source link" : "原文链接"),
+};
+
 /** 从 public/data 加载（同一次会话内缓存，避免重复请求）。
  *  ★ cache: "no-cache" —— 数据文件名不带 hash，GitHub Pages 默认 max-age=600，
  *    部署后 10 分钟内浏览器还会拿旧 JSON（refs.json 从 280→528 时就撞过）。
@@ -109,7 +122,7 @@ export function loadJSON<T>(name: string): Promise<T> {
   if (hit) return Promise.resolve(hit as T);
   return fetch(`${import.meta.env.BASE_URL}data/${name}`, { cache: "no-cache" })
     .then((r) => {
-      if (!r.ok) throw new Error(`${name} 加载失败：HTTP ${r.status}`);
+      if (!r.ok) throw new Error(msg.loadFailed(name, r.status));
       return r.json() as Promise<T>;
     })
     .then((v) => {
@@ -151,7 +164,7 @@ export function refLink(id: string | null | undefined, raw?: string | null): Ref
   if (/^\d{1,9}$/.test(s)) return { href: `https://pubmed.ncbi.nlm.nih.gov/${s}/`, text: `PMID ${s}`, kind: "pmid" };
   if (/^NCT\d+$/i.test(s)) return { href: `https://clinicaltrials.gov/study/${s.toUpperCase()}`, text: s.toUpperCase(), kind: "nct" };
   if (/^PMC\d+$/i.test(s)) return { href: `https://pmc.ncbi.nlm.nih.gov/articles/${s.toUpperCase()}/`, text: s.toUpperCase(), kind: "pmcid" };
-  if (/^https?:\/\//i.test(s)) return { href: s, text: title || "原文链接", kind: "url" };
+  if (/^https?:\/\//i.test(s)) return { href: s, text: msg.sourceLink(title), kind: "url" };
   if (/^10\.\d{4,9}\//.test(s)) return { href: `https://doi.org/${s}`, text: `DOI ${s}`, kind: "doi" };
   return { href: null, text: s, kind: "other" };
 }
@@ -187,7 +200,7 @@ export function loadFigManifest(force = false): Promise<Fig[]> {
   if (figInflight) return figInflight;
   figInflight = fetch(`${import.meta.env.BASE_URL}figs/manifest.json`, { cache: "no-cache" })
     .then((r) => {
-      if (!r.ok) throw new Error(`manifest.json 加载失败：HTTP ${r.status}`);
+      if (!r.ok) throw new Error(msg.loadFailed("manifest.json", r.status));
       return r.json() as Promise<Fig[]>;
     })
     .then((v) => {
