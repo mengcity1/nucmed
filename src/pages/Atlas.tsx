@@ -347,8 +347,17 @@ export default function Atlas() {
           alt={`${zoom.drug_name} · ${zoom.label}`}
           onClose={() => setZoom(null)}
           footer={
-            <span>
-              {zoom.caption ? `${zoom.caption.slice(0, 120)}${zoom.caption.length > 120 ? "…" : ""} · ` : ""}
+            <span className="text-[12.5px] leading-relaxed">
+              {zoom.caption && (
+                <>
+                  <span className="text-white/60">{tr("atlas.captionLabel")}</span>
+                  {zoom.caption}
+                  {zoom.caption.length >= 400 && (
+                    <span className="ml-1.5 text-amber-200">{tr("atlas.truncated")}</span>
+                  )}
+                  {" · "}
+                </>
+              )}
               PMID {zoom.pmid}
               {zoom.pmcid && (
                 <>

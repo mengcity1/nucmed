@@ -62,28 +62,30 @@ export default function ImageViewer({
       aria-label={alt || "图片查看"}
       className="fixed inset-0 z-[100] flex flex-col bg-black/88 backdrop-blur-sm"
     >
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-white/10 px-3 py-2 text-white/85">
-        <span className="min-w-0 flex-1 truncate text-[12px]">{alt}</span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/15 bg-black/40 px-3 py-2.5 text-white">
+        <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">{alt}</span>
         {nat && (
-          <span className="num text-[11.5px] text-white/55">
-            原图 {nat.w} × {nat.h} px
+          <span className="num text-[12.5px] text-white/75">
+            {tr("atlas.origSize", { w: nat.w, h: nat.h })}
           </span>
         )}
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setScale((v) => clamp(v - 0.5))}
-            aria-label="缩小"
-            className="grid h-7 w-7 place-items-center rounded-md border border-white/20 text-[13px] transition hover:bg-white/10"
+            aria-label="Zoom out"
+            className="grid h-10 w-10 place-items-center rounded-lg border border-white/30 text-[18px] leading-none transition hover:bg-white/15 active:bg-white/25"
           >
             −
           </button>
-          <span className="num w-11 text-center text-[12px]">{Math.round(scale * 100)}%</span>
+          <span className="num w-16 text-center text-[14px] font-semibold">
+            {Math.round(scale * 100)}%
+          </span>
           <button
             type="button"
             onClick={() => setScale((v) => clamp(v + 0.5))}
-            aria-label="放大"
-            className="grid h-7 w-7 place-items-center rounded-md border border-white/20 text-[13px] transition hover:bg-white/10"
+            aria-label="Zoom in"
+            className="grid h-10 w-10 place-items-center rounded-lg border border-white/30 text-[18px] leading-none transition hover:bg-white/15 active:bg-white/25"
           >
             ＋
           </button>
@@ -93,17 +95,17 @@ export default function ImageViewer({
               setScale(1);
               setPos({ x: 0, y: 0 });
             }}
-            className="rounded-md border border-white/20 px-2 py-1 text-[11.5px] transition hover:bg-white/10"
+            className="rounded-lg border border-white/30 px-3 py-2 text-[13px] font-medium transition hover:bg-white/15 active:bg-white/25"
           >
-            重置
+            {tr("atlas.reset")}
           </button>
           <button
             type="button"
             onClick={onClose}
-            aria-label="关闭（Esc）"
-            className="rounded-md border border-white/20 px-2 py-1 text-[11.5px] transition hover:bg-white/10"
+            aria-label="Close (Esc)"
+            className="rounded-lg border border-white/30 px-3 py-2 text-[13px] font-medium transition hover:bg-white/15 active:bg-white/25"
           >
-            关闭 ✕
+            {tr("atlas.close")}
           </button>
         </span>
       </div>
@@ -141,14 +143,14 @@ export default function ImageViewer({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 px-3 py-2 text-[11.5px] leading-relaxed text-white/65">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-white/15 bg-black/40 px-3 py-2.5 text-[13px] leading-relaxed text-white/85">
         <span>{tr("atlas.viewerHint")}</span>
         {nat && nat.w < 800 && (
-          <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-amber-200">
+          <span className="rounded bg-amber-400/20 px-2 py-0.5 text-[12.5px] font-medium text-amber-100">
             {tr("atlas.narrow", { w: nat.w })}
           </span>
         )}
-        {footer && <span className="ml-auto">{footer}</span>}
+        {footer && <span className="ml-auto max-w-full">{footer}</span>}
       </div>
     </div>
   );
