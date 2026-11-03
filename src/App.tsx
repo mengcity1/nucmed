@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { useJSON, type Meta } from "./lib/data";
+import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
 // ★ pk262 B6：单药画像按需加载 —— Chart 依赖 echarts（586 kB / gzip 195 kB），
@@ -9,12 +10,12 @@ const DrugDetail = lazy(() => import("./pages/DrugDetail"));
 import About from "./pages/About";
 import Atlas from "./pages/Atlas";
 
-/** 全站 4 页（3 页 + 2026-10-28 新增「文献影像图集」） */
-const TABS: { to: string; label: string; icon: IconName; end: boolean }[] = [
-  { to: "/", label: "核药总览", icon: "grid", end: true },
-  { to: "/drug", label: "单药画像", icon: "flask", end: false },
-  { to: "/atlas", label: "影像图集", icon: "layers", end: false },
-  { to: "/about", label: "关于", icon: "info", end: false },
+/** 全站 4 页（3 页 + 2026-10-28 新增「文献影像图集」）· 标签文案走 i18n 表 */
+const TABS: { to: string; key: StrKey; icon: IconName; end: boolean }[] = [
+  { to: "/", key: "nav.overview", icon: "grid", end: true },
+  { to: "/drug", key: "nav.drug", icon: "flask", end: false },
+  { to: "/atlas", key: "nav.atlas", icon: "layers", end: false },
+  { to: "/about", key: "nav.about", icon: "info", end: false },
 ];
 
 /** 已下线路径（v2 砍掉的 6 页 + 独立剂量学页）⇒ 一律回总览，不留白屏 */
@@ -33,6 +34,8 @@ function Nav() {
   const [sp] = useSearchParams();
   const nav = useNavigate();
   const q = sp.get("q") ?? "";
+  const tr = useT();
+  const { lang, setLang } = useLang();
   /** 小屏搜索：<md 时把搜索框折叠成图标，点开后在第二行铺满（2026-11-01 小屏适配） */
   const [mOpen, setMOpen] = useState(false);
   useEffect(() => {
@@ -55,9 +58,9 @@ function Nav() {
             ⚛
           </span>
           <span className="hidden leading-none sm:block">
-            <b className="block text-[15px] font-semibold tracking-wide">核药数据库</b>
+            <b className="block text-[15px] font-semibold tracking-wide">{tr("brand.name")}</b>
             <span className="mt-0.5 block text-[11px] font-medium tracking-[.6px] text-ink-3">
-              NUCMED DB
+              {tr("brand.sub")}
             </span>
           </span>
         </NavLink>
@@ -69,7 +72,7 @@ function Nav() {
           <input
             value={q}
             onChange={(e) => onSearch(e.target.value)}
-            placeholder="搜索核药、器官、核素…"
+            placeholder={tr("nav.searchPh")}
             className="h-[38px] w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[13.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
           />
         </div>
@@ -77,7 +80,7 @@ function Nav() {
         <button
           type="button"
           onClick={() => setMOpen((v) => !v)}
-          aria-label={mOpen ? "关闭搜索" : "打开搜索"}
+          aria-label={mOpen ? tr("nav.searchClose") : tr("nav.searchOpen")}
           aria-expanded={mOpen}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-line bg-white text-[15px] text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink md:hidden"
         >
@@ -85,22 +88,31 @@ function Nav() {
         </button>
 
         <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1">
-          {TABS.map((t) => (
+          {TABS.map((tab) => (
             <NavLink
-              key={t.to}
-              to={t.to}
-              end={t.end}
+              key={tab.to}
+              to={tab.to}
+              end={tab.end}
               className={({ isActive }) =>
                 `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
               }
             >
               <span className="hidden sm:inline-flex">
-                <Icon name={t.icon} size={15} className="shrink-0 opacity-90" />
+                <Icon name={tab.icon} size={15} className="shrink-0 opacity-90" />
               </span>
-              {t.label}
+              {tr(tab.key)}
             </NavLink>
           ))}
         </nav>
+        <button
+          type="button"
+          onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+          aria-label={lang === "zh" ? "Switch to English" : "切换到中文"}
+          title={lang === "zh" ? "Switch to English" : "切换到中文"}
+          className="ml-1 shrink-0 rounded-[10px] border border-line bg-white px-2.5 py-1.5 text-[12px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink"
+        >
+          {lang === "zh" ? "EN" : "中文"}
+        </button>
       </div>
 
       {/* 小屏展开式搜索：整行铺满，Esc 或 ✕ 收起 */}
@@ -114,7 +126,7 @@ function Nav() {
               autoFocus
               value={q}
               onChange={(e) => onSearch(e.target.value)}
-              placeholder="搜索核药、器官、核素…"
+              placeholder={tr("nav.searchPh")}
               className="h-11 w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[14px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
             />
           </div>
@@ -126,28 +138,48 @@ function Nav() {
 
 function Footer() {
   const { data: meta } = useJSON<Meta>("meta.json");
+  const tr = useT();
   return (
     <footer className="wrap mt-12 border-t border-line pb-14 pt-6 text-[12px] text-ink-3">
       <div className="flex flex-wrap justify-between gap-4 pt-1">
         <div>
           {meta ? (
             <>
-              版本 <b className="font-semibold text-ink-2">{meta.version}</b> · sha{" "}
+              {tr("footer.version")} <b className="font-semibold text-ink-2">{meta.version}</b> · sha{" "}
               <b className="font-mono font-semibold text-ink-2">{meta.db_sha16}</b> ·{" "}
-              {meta.db_bytes.toLocaleString("en-US")} B · <b className="text-ink-2">CC BY-NC 4.0</b>
+              {meta.db_bytes.toLocaleString("en-US")} B ·{" "}
+              <b className="text-ink-2">{tr("footer.license")}</b>
             </>
           ) : (
-            "加载版本信息…"
+            "…"
           )}
         </div>
-        <div>NucMed DB · 中国药科大学</div>
+        <div>
+          {tr("brand.name")} · {tr("footer.org")}
+        </div>
       </div>
     </footer>
   );
 }
 
 export default function App() {
+  /** 语言：URL `?lang=en` 优先，其次上次选择（localStorage），默认中文 */
+  const [lang, setLang] = useState<Lang>(() => {
+    const q = new URLSearchParams(window.location.search).get("lang");
+    if (q === "en" || q === "zh") return q;
+    return localStorage.getItem("nucmed.lang") === "en" ? "en" : "zh";
+  });
+  useEffect(() => {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    try {
+      localStorage.setItem("nucmed.lang", lang);
+    } catch {
+      /* 隐私模式下 storage 可能被禁用，忽略 */
+    }
+  }, [lang]);
+
   return (
+    <LangCtx.Provider value={{ lang, setLang }}>
     <div className="min-h-screen">
       <Nav />
       <main className="wrap pt-12">
@@ -178,5 +210,6 @@ export default function App() {
       </main>
       <Footer />
     </div>
+    </LangCtx.Provider>
   );
 }

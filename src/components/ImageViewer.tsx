@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "../lib/i18n";
 
 /** 图片查看器（2026-11-03 新增）：缩放（滚轮 / 按钮 / 双击）、拖动平移、Esc 关闭，并显示原图像素尺寸。
  *
@@ -22,6 +23,7 @@ export default function ImageViewer({
   const [nat, setNat] = useState<{ w: number; h: number } | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const tr = useT();
 
   const clamp = (v: number) => Math.min(6, Math.max(1, Math.round(v * 10) / 10));
 
@@ -140,10 +142,10 @@ export default function ImageViewer({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 px-3 py-2 text-[11.5px] leading-relaxed text-white/65">
-        <span>滚轮 / ＋− 缩放 · 拖动平移 · 双击切换 · Esc 关闭</span>
+        <span>{tr("atlas.viewerHint")}</span>
         {nat && nat.w < 800 && (
           <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-amber-200">
-            源图较窄（{nat.w} px），放大只能看清局部，细节以原文为准
+            {tr("atlas.narrow", { w: nat.w })}
           </span>
         )}
         {footer && <span className="ml-auto">{footer}</span>}
