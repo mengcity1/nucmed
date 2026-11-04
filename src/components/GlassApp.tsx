@@ -74,26 +74,42 @@ export function paintWallpaper(
   }
 
   if (variant === "platinum") {
-    // 亮铂金（2026-11-04）：比米白更"中性偏冷"、略暗一点点 ⇒ 玻璃（白 42% 叠加）能明显浮起来；
-    // 再拉一道 115° 的金属斜光，做出"拉丝铂金"的质感。
+    // 亮铂金 · 金属版（2026-11-04 v35）：① 更硬的明暗过渡 ② 115° 多段金属亮带 ③ 细拉丝纹理（各向异性）
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#f3f1ea");
-    g.addColorStop(0.5, "#e4e0d7");
+    g.addColorStop(0, "#f2f0e9");
+    g.addColorStop(0.5, "#dfdad0");
     g.addColorStop(1, "#f5f3ec");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
-    // 金属斜光（拉丝的那道亮带 + 右下一点冷灰）
+
+    // ② 金属亮带：亮 → 半亮 → 微暗 → 次亮 → 边缘暗（拉丝金属的宏观反射）
     const sheen = ctx.createLinearGradient(0, 0, w * 0.95, h);
-    sheen.addColorStop(0, "rgba(255,255,255,.55)");
-    sheen.addColorStop(0.42, "rgba(255,255,255,.10)");
-    sheen.addColorStop(0.62, "rgba(255,255,255,0)");
-    sheen.addColorStop(1, "rgba(204,204,196,.22)");
+    sheen.addColorStop(0.0, "rgba(255,255,255,.62)");
+    sheen.addColorStop(0.3, "rgba(255,255,255,.18)");
+    sheen.addColorStop(0.46, "rgba(150,146,136,.10)");
+    sheen.addColorStop(0.66, "rgba(255,255,255,.10)");
+    sheen.addColorStop(1.0, "rgba(120,118,110,.14)");
     ctx.fillStyle = sheen;
     ctx.fillRect(0, 0, w, h);
+
+    // ③ 细拉丝纹理：沿 115° 的 1px 线，亮/暗交替，alpha 1–5%（各向异性 = 金属的关键）
+    const step = Math.max(2, Math.round(w / 520));
+    for (let i = -h; i < w + h; i += step) {
+      const a = 0.012 + Math.random() * 0.03;
+      ctx.strokeStyle =
+        (i / step) % 3 === 0 ? `rgba(255,255,255,${(a * 1.7).toFixed(3)})` : `rgba(120,116,108,${a.toFixed(3)})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i - h, h);
+      ctx.stroke();
+    }
+
+    // ④ 中心柔光压弱（金属是有方向性的，柔光太强会变"塑料"）
     ctx.save();
-    ctx.filter = `blur(${Math.max(28, Math.round(w * 0.038))}px)`;
-    blob(0.5, 0.4, 0.55, "rgba(255,255,255,.45)");
-    blob(0.86, 0.92, 0.55, "rgba(208,210,214,.3)");
+    ctx.filter = `blur(${Math.max(26, Math.round(w * 0.035))}px)`;
+    blob(0.45, 0.32, 0.55, "rgba(255,255,255,.35)");
+    blob(0.9, 0.95, 0.5, "rgba(150,148,140,.22)");
     ctx.restore();
     return;
   }
@@ -230,11 +246,11 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     //    2026-11-04 **实装**：默认 = 深色（owner 定）；浅色方案仍可 `?bg=mesh` 等切回。
     const qs = new URLSearchParams(window.location.search);
     const g = (qs.get("g") ?? "mid").toLowerCase();
-    const bgRaw = (qs.get("bg") ?? (theme === "light" ? "cream" : "dark")).toLowerCase();
+    const bgRaw = (qs.get("bg") ?? (theme === "light" ? "platinum" : "dark")).toLowerCase();
     const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw)
       ? (bgRaw as BgVariant)
       : theme === "light"
-        ? "cream"
+        ? "platinum"
         : "dark";
     // ★ `.dark` 必须**在**窄屏早退之前加上：手机端不建 WebGL，靠 CSS 深色令牌渲染；
     //   若放在后面，手机就会退回"浅底 + 浅字"（不可读）。

@@ -1280,7 +1280,7 @@
     color: #33302a;
     background:
       linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0) 62%, rgba(204, 204, 196, 0.22) 100%),
-      linear-gradient(160deg, #f3f1ea 0%, #e4e0d7 55%, #f5f3ec 100%);
+      linear-gradient(160deg, #f2f0e9 0%, #dfdad0 55%, #f5f3ec 100%);
   }
 
   /* ── v27 排序下拉（原生 <select>）在深色下看不清 ─────────────────────
