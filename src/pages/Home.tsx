@@ -169,6 +169,23 @@ export default function Home() {
   const { data: drugs, error, reload } = useJSON<Drug[]>("drugs.json");
   const { data: st } = useJSON<Stats>("stats.json");
 
+  /** ★ 2026-11-04：结构图来源表（36 KB）—— 用来把 `schematic`（海报式示意图）从「✓ 结构」里剔除，
+   *  否则 575 个抗体药会在列表里假装"有结构图"。 */
+  const [structSrc, setStructSrc] = useState<Record<string, string> | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}struct/manifest.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string>) => alive && setStructSrc(m ?? {}))
+      .catch(() => alive && setStructSrc({}));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  /** 真结构 = 库内标记有图 ∧ 来源不是 schematic（manifest 未到时先按库内标记显示） */
+  const realStruct = (id: number, flag?: number) =>
+    !!flag && (structSrc ? structSrc[String(id)] !== "schematic" : true);
+
   const [sp, setSp] = useSearchParams();
   const kw = sp.get("q") ?? "";
   const setKw = (v: string) => {
@@ -336,7 +353,11 @@ export default function Home() {
     return m;
   }, [facetBase]);
 
-  const nStruct = useMemo(() => view.filter((d) => d.has_struct).length, [view]);
+  const nStruct = useMemo(
+    () => view.filter((d) => realStruct(d.drug_id, d.has_struct)).length,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [view, structSrc]
+  );
   const pages = Math.max(1, Math.ceil(view.length / PAGE));
   const cur = Math.min(page, pages - 1);
   const rows = view.slice(cur * PAGE, cur * PAGE + PAGE);
@@ -711,7 +732,11 @@ export default function Home() {
                     )}
                   </td>
                   <td className="hidden px-3 py-2.5 text-center text-[13px] sm:table-cell">
-                    {d.has_struct ? <span className="text-ok">✓</span> : <span className="text-ink-3">—</span>}
+                    {realStruct(d.drug_id, d.has_struct) ? (
+                      <span className="text-ok">✓</span>
+                    ) : (
+                      <span className="text-ink-3">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -474,6 +474,11 @@ export default function DrugDetail() {
 
   const drug = useMemo(() => (drugs ?? []).find((d) => d.drug_id === did), [drugs, did]);
   const mine = useMemo(() => (pts ?? []).filter((p) => p.drug_id === did), [pts, did]);
+  /** ★ 2026-11-04：`schematic` 不再当作「结构图」展示 —— 这批 575 张是**海报式示意图**
+   *  （抗体 Y 形卡通 + 大量中文标注，含"核素/螯合剂/半衰期"等重复信息），既无结构信息、
+   *  又会在英文站露出中文（站内自检只扫 DOM，扫不到图片像素）。等浙大 2D 图补齐后再替换。 */
+  const hasRealStruct = drug?.has_struct === 1 && structSrc !== "schematic";
+
   /** 器官去重数：详情页头「关键指标」用（同一器官多个时点只算一次） */
   const organCount = useMemo(() => new Set(mine.map((p) => p.organ_norm)).size, [mine]);
   /** `has_raw = 0` ⇒ 只有 PMID、没有原文片段（487/3,391，pk263）。
@@ -664,7 +669,7 @@ export default function DrugDetail() {
       {/* 详情页页头（2026-11-04 v4）：结构缩略 + 药名 + 编号 + 一行关键指标 + 渐变细条 */}
       <section className="card mt-3 flex flex-wrap items-center gap-4 p-4">
         <div className="hidden h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-line bg-white sm:flex">
-          {drug.has_struct && !imgErr.struct ? (
+          {hasRealStruct && !imgErr.struct ? (
             <img
               src={`${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`}
               alt={drug.name_en}
@@ -681,8 +686,8 @@ export default function DrugDetail() {
             <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
               # {drug.drug_id}
             </span>
-            <span className={`text-[12px] ${drug.has_struct ? "text-ok" : "text-ink-3"}`}>
-              {drug.has_struct ? tr("drug.hasStruct") : tr("drug.noStruct")}
+            <span className={`text-[12px] ${hasRealStruct ? "text-ok" : "text-ink-3"}`}>
+              {hasRealStruct ? tr("drug.hasStruct") : tr("drug.noStruct")}
             </span>
           </div>
           <span
@@ -791,7 +796,7 @@ export default function DrugDetail() {
           ))}
         </div>
 
-        {drug.has_struct === 1 && (
+        {hasRealStruct && (
           <div className="mt-5 border-t border-line pt-4">
             <div className="mb-3 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-ink">

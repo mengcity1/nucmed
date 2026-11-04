@@ -11,8 +11,10 @@ from PIL import Image
 ROOT = Path(r"D:\nucmed")
 STRUCT = ROOT / "docs" / "assets" / "structures"
 OUT = ROOT / "web" / "public" / "struct"
-# 按优先级处理：同 id 只保留第一个命中的（真结构 > 肽段 2D > 抗体示意）
-SRCS = ["ligand", "peptide2d", "schematic"]
+# 按优先级处理：同 id 只保留第一个命中的（真结构 > 肽段 2D）
+# ★ 2026-11-04：**移除 schematic** —— 那 575 张是"海报式示意图"（抗体 Y 形卡通 + 中文标注），
+#   既不是结构图、又会在英文站露出中文，属"画蛇添足"。等浙大 2D 图补齐后再替换。
+SRCS = ["ligand", "peptide2d"]
 MAXW = 900
 QUALITY = 82
 
