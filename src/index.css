@@ -858,10 +858,14 @@
   }
   /* 语义文字令牌 */
   .app-stage.dark .text-bad {
-    color: #ff9f9f;
+    color: #ffa8a8 !important;
   }
   .app-stage.dark .text-good {
-    color: #7fe0ac;
+    color: #7fe0ac !important;
+  }
+  /* 表格里的 ✓ 用 text-ok(青绿 #0d9488) —— 深灰底上只有 2.41:1，实测自检点名 22 处 */
+  .app-stage.dark .text-ok {
+    color: #5fe5c6 !important;
   }
   /* 打印：深色不能污染 PDF —— 强制白底 + 深字（在深色主题下也必须） */
   @media print {
@@ -1045,7 +1049,20 @@
   .app-stage.dark [class*="#4b3ea3"] {
     color: #c3baff !important;
   }
-  .app-stage.dark [class*="#8a5a12"] {
-    color: #f3c98a !important;
+  /* 徽标（A/B/C 级）：浅色底是写在 `.badge-*` 类里的（不是元素上的 bg 工具类），兜底规则抓不到 ⇒ 单独处理 */
+  .app-stage.dark .badge-a {
+    background: rgba(10, 125, 111, 0.3);
+    border-color: rgba(94, 229, 198, 0.45);
+    color: #7ff0d8 !important;
+  }
+  .app-stage.dark .badge-b {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #dbe6f4 !important;
+  }
+  .app-stage.dark .badge-c {
+    background: rgba(169, 98, 13, 0.3);
+    border-color: rgba(240, 192, 122, 0.45);
+    color: #f7d6a6 !important;
   }
 }

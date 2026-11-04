@@ -24,11 +24,14 @@ export function runContrastAudit() {
   const bgOf = (el: Element): number[] => {
     let n: Element | null = el;
     while (n) {
+      // body/html 的浅底在深色下是被舞台盖住的，不能作为文字底色
+      if (n === document.body || n === document.documentElement) break;
       const c = nums(getComputedStyle(n).backgroundColor);
       if (c.length >= 3 && (c[3] === undefined || c[3] > 0.55)) return c;
       n = n.parentElement;
     }
-    return [255, 255, 255];
+    // 走到头都没有不透明底 ⇒ 说明文字浮在 canvas 玻璃上：用**舞台底色**近似（CSS 拿不到 canvas 像素）
+    return document.querySelector(".app-stage.dark") ? [74, 77, 82] : [247, 241, 227];
   };
 
   type Row = { sel: string; ratio: number; color: string; bg: string; text: string };
