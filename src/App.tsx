@@ -251,16 +251,31 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [lang]);
 
-  /** 丝绸层滚动视差（2026-11-04 v11）：-4% 位移，仅 transform + rAF 节流 + passive 监听；
-   *  reduced-motion 直接退出（不做视差）；不劫持滚动、不改布局。 */
+  /** 丝绸层滚动视差 + **液态玻璃联动**（2026-11-04 v13）：
+   *  - 视差：-4% 位移；
+   *  - 液感：把滚动速度写进 `--scroll-v`（0..1），CSS 用它放大 blur/saturate、抬高导航阴影；
+   *  - 静止 140ms 后自动回落到 0 ⇒ 停下时玻璃"恢复平静"；
+   *  - 只动 transform 与一个 CSS 变量；rAF 节流 + passive；reduced-motion 直接退出。 */
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const el = document.querySelector<HTMLElement>(".silk-parallax");
-    if (!el) return;
+    const root = document.documentElement;
     let raf = 0;
+    let decay = 0;
+    let lastY = window.scrollY;
+    let lastT = performance.now();
     const apply = () => {
       raf = 0;
-      el.style.transform = `translate3d(0, ${Math.round(window.scrollY * -0.04)}px, 0)`;
+      const y = window.scrollY;
+      const t = performance.now();
+      const dt = Math.max(16, t - lastT);
+      const v = Math.min(1, (Math.abs(y - lastY) / dt) * 6);
+      lastY = y;
+      lastT = t;
+      if (el) el.style.transform = `translate3d(0, ${Math.round(y * -0.04)}px, 0)`;
+      root.style.setProperty("--scroll-v", v.toFixed(3));
+      window.clearTimeout(decay);
+      decay = window.setTimeout(() => root.style.setProperty("--scroll-v", "0"), 140);
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(apply);
@@ -269,7 +284,9 @@ export default function App() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(decay);
       if (raf) cancelAnimationFrame(raf);
+      root.style.removeProperty("--scroll-v");
     };
   }, []);
 
