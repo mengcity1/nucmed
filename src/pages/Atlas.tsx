@@ -198,7 +198,7 @@ export default function Atlas() {
                     }`}
                   >
                     <span className="truncate">{d.name}</span>
-                    <span className="num shrink-0 text-[11px] text-ink-3">{d.n} 张</span>
+                    <span className="num shrink-0 text-[11px] text-ink-3">{d.n} {tr("atlas.imgUnit")}</span>
                   </button>
                 </li>
               ))}
@@ -261,7 +261,7 @@ export default function Atlas() {
                   type="button"
                   onClick={() => setZoom(f)}
                   className="block w-full cursor-zoom-in bg-[#0b1220]"
-                  title="点击放大"
+                  title={tr("drug.clickZoom")}
                 >
                   <img
                     src={`${BASE}figs/${f.file}`}

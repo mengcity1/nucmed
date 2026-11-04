@@ -261,7 +261,7 @@ export default function App() {
             <Route path="/atlas" element={<Atlas />} />
             {/* 兼容旧链接 /drugs/:id */}
             <Route path="/drugs/:id" element={<EnGate><DrugDetail /></EnGate>} />
-            <Route path="/about" element={<EnGate><About /></EnGate>} />
+            <Route path="/about" element={<About />} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />
             ))}

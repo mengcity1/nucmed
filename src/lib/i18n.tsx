@@ -289,6 +289,81 @@ export const STR = {
     zh: "本图集只收「原文图注明确是 PET / MIP / 全身显像」的 Figure。换一个药物、或点「全部」看看；也可回总览检索其他核药。",
     en: "This atlas only collects Figures whose captions mention PET / MIP / whole-body imaging. Try another drug or “All”; you can also search from the overview.",
   },
+
+  /* ── 关于页（2026-11-04 英文化：原来 0 条键、全页中文硬编码）── */
+  "about.title": { zh: "ℹ 关于", en: "ℹ About" },
+  "about.lead": {
+    zh: "核药数据库（NucMed DB）· 可追溯的器官级生物分布资源与可复现基准",
+    en: "NucMed DB — a traceable organ-level biodistribution resource with a reproducible benchmark",
+  },
+  "about.verTitle": { zh: "版本与标识", en: "Version and identifiers" },
+  "about.kVersion": { zh: "数据版本", en: "Data version" },
+  "about.kSha": { zh: "库指纹 sha256", en: "Database fingerprint (sha256)" },
+  "about.shaSuffix": { zh: "（前 16 位）", en: " (first 16 hex chars)" },
+  "about.kBytes": { zh: "库体积", en: "Database size" },
+  "about.kExported": { zh: "导出时间", en: "Exported at" },
+  "about.kScale": { zh: "规模", en: "Scale" },
+  "about.scaleLine": {
+    zh: "{a} 条分布记录 · {b} 个核药 · {c} 张表 · {d} 篇文献",
+    en: "{a} biodistribution records · {b} drugs · {c} tables · {d} papers",
+  },
+  "about.kContext": { zh: "语境校验", en: "Context check" },
+  "about.contextLine": {
+    zh: "{a} / {b} 条通过多药比较句校验（剔除 {c} 条 C 级记录）",
+    en: "{a} / {b} rows passed the multi-drug comparative-sentence check ({c} tier-C rows removed)",
+  },
+  "about.kLicense": { zh: "许可", en: "Licence" },
+  "about.loading": { zh: "加载中…", en: "Loading…" },
+  "about.availTitle": { zh: "数据可用性", en: "Data availability" },
+  "about.availLead": {
+    zh: "前端所用的全部数据均可直接下载（JSON · UTF-8）——不需要账号，不需要申请",
+    en: "All data used by this site can be downloaded directly (JSON, UTF-8) — no account and no application required",
+  },
+  "about.availFullDb": {
+    zh: "完整 SQLite 库（{mb} MB）与复现脚本见仓库；论文正式发表后补充 Zenodo DOI。",
+    en: "The full SQLite database ({mb} MB) and the reproduction scripts are in the repository; a Zenodo DOI will be added on publication.",
+  },
+  "about.citeTitle": { zh: "引用", en: "Citation" },
+  "about.citeNote": {
+    zh: "作者顺序与 DOI 将在论文接收后更新；当前以「NucMed DB contributors」统一署名。",
+    en: "Author order and DOI will be updated after acceptance; until then the dataset is attributed to “NucMed DB contributors”.",
+  },
+  "about.srcTitle": { zh: "数据来源与口径", en: "Data sources and definitions" },
+  "about.srcIngest": { zh: "摄取记录", en: "Record ingestion" },
+  "about.srcIngestBody": {
+    zh: "PubMed / PMC 全文与表格抽取，保留原始文本片段与 PMID 指针；少数无原文片段的记录在详情页明确标注「仅文献级追溯」，只给 PMID，不用空白框冒充原文。",
+    en: "Extracted from PubMed / PMC full texts and tables, keeping the original text snippet and a PMID pointer. For the few records without a snippet, the drug page explicitly marks “literature-level traceability only” and shows the PMID — no blank box is used to imitate a quotation.",
+  },
+  "about.srcStruct": { zh: "结构数据", en: "Structures" },
+  "about.srcStructBody": {
+    zh: "配体结构来自 radiopharm.idrblab.cn（口径 ligand_only）；分段结构（螯合剂 / 连接子 / 载体）由库内 SMILES 经 RDKit 现画。",
+    en: "Ligand structures come from radiopharm.idrblab.cn (ligand_only convention); component-level schematics (chelator / linker / vector) are rendered from in-database SMILES via RDKit.",
+  },
+  "about.srcDose": { zh: "剂量学", en: "Dosimetry" },
+  "about.srcDoseBody": {
+    zh: "仅取自 FDA 获批药品说明书的「剂量与给药」表（dosage_and_administration_table），每条保留 set_id 与原始单元格文本；未经单位换算的原始数值不参与统计，μGy/Gy 一律先归一到 mGy/MBq 再入库。",
+    en: "Taken only from the “Dosage and administration” tables of FDA-approved labels (dosage_and_administration_table); each row keeps its set_id and raw cell text. Unconverted values never enter statistics — μGy/Gy are normalised to mGy/MBq before ingestion.",
+  },
+  "about.srcTrace": { zh: "可追溯性", en: "Traceability" },
+  "about.srcTraceBody": {
+    zh: "分三层报告 —— 有 PMID 指针 / 库内可关联文献元数据 / 已标注 OA，不合并成一个百分比。",
+    en: "Reported as three separate layers — has a PMID pointer / linkable in-database metadata / flagged open access — never merged into a single percentage.",
+  },
+  "about.srcMissing": { zh: "未收录即不画", en: "Nothing is drawn unless recorded" },
+  "about.srcMissingBody": {
+    zh: "缺失的组件显示「—」或虚线框，不用占位图冒充数据。",
+    en: "Missing components show “—” or a dashed box; no placeholder image is used to imitate data.",
+  },
+  "about.contactTitle": { zh: "联系与反馈", en: "Contact and feedback" },
+  "about.kOrg": { zh: "维护单位", en: "Maintained by" },
+  "about.org": { zh: "中国药科大学", en: "China Pharmaceutical University" },
+  "about.kIssues": { zh: "问题反馈", en: "Issues" },
+  "about.issuesAt": { zh: "{repo}/issues（占位）", en: "{repo}/issues (placeholder)" },
+  "about.kStack": { zh: "技术栈", en: "Stack" },
+  "about.stack": {
+    zh: "Vite + React + TypeScript + Tailwind CSS（纯静态，无后端）",
+    en: "Vite + React + TypeScript + Tailwind CSS (static site, no backend)",
+  },
 } as const;
 
 export type StrKey = keyof typeof STR;
