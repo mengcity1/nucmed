@@ -18,15 +18,17 @@ import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
 
-/** 背景壁纸：**极简中性色**（v20.7）——
- *  去掉暖橙/薄荷/藕粉的彩色倾向，只保留一层几乎无彩的冷灰白，
- *  加两团极淡的中性灰罩（一冷一暖，chroma 很低）制造一点纵深，再整层虚化。
- *  ⇒ 观感 = 一张干净的浅灰白纸，玻璃与文字是唯一的主角。 */
+/** 背景壁纸：**极简中性 + 可被玻璃模糊的结构**（v20.8）
+ *  上一版（v20.7）纯中性灰白 ⇒ 玻璃背后没有任何细节 ⇒ 看起来就是"白卡片"，没有透明感。
+ *  这一版仍保持单一中性色（不加彩色），但补两样"结构"：
+ *   ① 从顶到底的**轻微明暗渐变**（#fcfdff → #eceff5）：玻璃面板在深浅交界处能看出透过关系；
+ *   ② **极淡细网格**（28px、alpha .045）—— 在纸上是清晰的，透过玻璃被模糊/扭曲 ⇒ 一眼看出透明。
+ *  ⇒ 既不花，又有透明感。 */
 function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: { width: number; height: number }) {
-  const base = ctx.createLinearGradient(0, 0, w, h);
-  base.addColorStop(0, "#fcfcfd");
-  base.addColorStop(0.5, "#f5f6f9");
-  base.addColorStop(1, "#fafbfc");
+  const base = ctx.createLinearGradient(0, 0, 0, h);
+  base.addColorStop(0, "#fdfeff");
+  base.addColorStop(0.55, "#f4f6fa");
+  base.addColorStop(1, "#e9edf4");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
 
@@ -38,20 +40,36 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
     ctx.fillRect(0, 0, w, h);
   };
   ctx.save();
-  ctx.filter = `blur(${Math.max(36, Math.round(w * 0.045))}px)`;
-  // 只有两团：冷灰蓝（右上）+ 中性暖灰（左下）；chroma 压到 ~10，几乎看不出色相
-  blob(0.84, 0.02, 0.55, "rgba(176,188,210,.34)");
-  blob(0.08, 0.92, 0.55, "rgba(203,201,205,.26)");
+  ctx.filter = `blur(${Math.max(30, Math.round(w * 0.035))}px)`;
+  blob(0.18, 0.02, 0.6, "rgba(255,255,255,.55)"); // 上方一团白光（提亮、出层次）
+  blob(0.92, 0.95, 0.55, "rgba(196,204,218,.30)"); // 右下压一点冷灰
   ctx.restore();
-  ctx.fillStyle = "rgba(253,254,255,.10)";
-  ctx.fillRect(0, 0, w, h);
+
+  // 极淡细网格（**不过 blur**）：纸上清晰、玻璃后模糊 ⇒ 透明感的来源
+  ctx.save();
+  ctx.strokeStyle = "rgba(15,23,42,.075)";
+  ctx.lineWidth = 1;
+  const step = 28;
+  for (let x = 0; x <= w; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x + 0.5, 0);
+    ctx.lineTo(x + 0.5, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= h; y += step) {
+    ctx.beginPath();
+    ctx.moveTo(0, y + 0.5);
+    ctx.lineTo(w, y + 0.5);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 /** 三档强度：地址栏加 `?g=soft|mid|strong` 即可在线切换（默认 mid）。
  *  用途：owner 现场挑档，不用每次都改代码重部署。 */
 const MATERIALS: Record<string, Record<string, number>> = {
   soft: { refraction: 0.6, blur: 0.26, dispersion: 0.28 },
-  mid: { refraction: 0.78, blur: 0.16, dispersion: 0.4 },
+  mid: { refraction: 0.78, blur: 0.26, dispersion: 0.4 },
   strong: { refraction: 0.95, blur: 0.08, dispersion: 0.55 },
 };
 
