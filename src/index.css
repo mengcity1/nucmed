@@ -827,6 +827,66 @@
       rgba(255, 255, 255, 0) 64%
     );
   }
+  /* 手机端（≤900px 不建 WebGL）走 `.fallback`：vendor 会把面板刷成近白 —— 深色下必须盖掉 */
+  .app-stage.dark.fallback .lg-surface {
+    background: rgba(38, 50, 70, 0.78);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    backdrop-filter: blur(14px) saturate(1.1);
+  }
+  /* 兜底：源码里成片的浅色底（`bg-[#f…]` / `bg-[#e…]`）统一压成半透明白，
+     免得再出现"白块 + 浅字"；语义色（绿/黄/红）在下面单独盖回来。 */
+  .app-stage.dark [class*="bg-[#f"],
+  .app-stage.dark [class*="bg-[#e"] {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+  }
+  .app-stage.dark [class*="bg-[#fffbeb]"],
+  .app-stage.dark [class*="bg-[#fef3c7]"] {
+    background-color: rgba(251, 191, 36, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-[#dcfce7]"] {
+    background-color: rgba(52, 211, 153, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-[#fee2e2]"],
+  .app-stage.dark [class*="bg-[#fdf2f2]"] {
+    background-color: rgba(248, 113, 113, 0.16) !important;
+  }
+  /* 写死的深色字兜底扩到 `#9/#a/#b`（Atlas 的语义 chip 用了 #92400e / #991b1b 这类） */
+  .app-stage.dark [class*="text-[#9"],
+  .app-stage.dark [class*="text-[#a"],
+  .app-stage.dark [class*="text-[#b"] {
+    color: #dbe6f4 !important;
+  }
+  /* 语义文字令牌 */
+  .app-stage.dark .text-bad {
+    color: #ff9f9f;
+  }
+  .app-stage.dark .text-good {
+    color: #7fe0ac;
+  }
+  /* 打印：深色不能污染 PDF —— 强制白底 + 深字（在深色主题下也必须） */
+  @media print {
+    .app-stage.dark.lg-stage {
+      background: #fff;
+      color: #0f172a;
+    }
+    .app-stage.dark .text-ink,
+    .app-stage.dark .text-ink-2,
+    .app-stage.dark .text-ink-3,
+    .app-stage.dark [class*="text-[#"] {
+      color: #0f172a !important;
+    }
+    .app-stage.dark .card,
+    .app-stage.dark .card-solid,
+    .app-stage.dark .table-booktabs thead th,
+    .app-stage.dark .table-booktabs tbody tr,
+    .app-stage.dark [class*="bg-[#"] {
+      background: #fff !important;
+    }
+    .app-stage.dark .lg-surface {
+      background-image: none !important;
+      box-shadow: none !important;
+    }
+  }
   .app-stage.dark .text-ink {
     color: #e3ebf6;
   }

@@ -153,18 +153,22 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     if (!el) return;
     const narrow = window.matchMedia("(max-width: 900px)").matches;
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // ── 主题与材质（地址栏可覆盖：?bg=mesh|dots|grain|waves|none|dark · ?g=soft|mid|strong）──
+    //    2026-11-04 **实装**：默认 = 深色（owner 定）；浅色方案仍可 `?bg=mesh` 等切回。
+    const qs = new URLSearchParams(window.location.search);
+    const g = (qs.get("g") ?? "mid").toLowerCase();
+    const bgRaw = (qs.get("bg") ?? "dark").toLowerCase();
+    const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw) ? (bgRaw as BgVariant) : "dark";
+    // ★ `.dark` 必须**在**窄屏早退之前加上：手机端不建 WebGL，靠 CSS 深色令牌渲染；
+    //   若放在后面，手机就会退回"浅底 + 浅字"（不可读）。
+    if (bg === "dark") el.classList.add("dark");
+
     if (narrow) {
       el.classList.add("fallback");
       return;
     }
-    // ?g=soft|mid|strong —— 玻璃强度；?bg=mesh|dots|grain|waves|none —— 背景结构（都只在浏览器地址栏生效）
-    const qs = new URLSearchParams(window.location.search);
-    const g = (qs.get("g") ?? "mid").toLowerCase();
-    const bgRaw = (qs.get("bg") ?? "mesh").toLowerCase();
-    const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw) ? (bgRaw as BgVariant) : "mesh";
     const material = MATERIALS[g] ?? MATERIALS.mid;
-    // 深色变体：给舞台加 `.dark`，由 index.css 里的深色令牌把文字/表格/按钮一并翻过去
-    if (bg === "dark") el.classList.add("dark");
     const sys = createGlassSystem(el, {
       material,
       scene: "aurora",
