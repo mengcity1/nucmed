@@ -725,7 +725,9 @@
      否则深底黑字直接不可读 —— 下面这一组就是那套翻转令牌（用 (0,2,0)+ 压过 Tailwind 工具类）。 */
   .app-stage.dark.lg-stage {
     color: #e8eef7;
-    background: linear-gradient(160deg, #454950 0%, #51555d 52%, #3d4146 100%);
+    background:
+      radial-gradient(60% 55% at 52% 42%, rgba(120, 170, 255, 0.18) 0%, rgba(120, 170, 255, 0) 70%),
+      linear-gradient(160deg, #1b1d23 0%, #1c1e24 52%, #171920 100%);
   }
   /* ⚠ 深色下最大的坑：源码里 `bg-white`(32 处) 与一堆写死的浅底仍是**白块**，
      而文字已被转浅 ⇒ 浅字压白块 = 不可读。这里把它们统一压成半透明白/淡色。 */
@@ -783,9 +785,13 @@
     color: #f3c98a !important;
   }
   /* 降高光：玻璃边光/按钮/输入框的白色量都调低一档（owner：有的地方太白高亮了） */
+  /* 参考图：玻璃描边 = 白 19%（深色下原来的 6% 深边等于看不见） */
+  .app-stage.dark .lg-surface {
+    border: 1px solid rgba(255, 255, 255, 0.19);
+  }
   .app-stage.dark.webgl-ready .lg-surface {
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.13),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
       inset 0 0 0 1px rgba(255, 255, 255, 0.06),
       inset 0 -20px 28px -26px rgba(0, 0, 0, 0.5),
       0 14px 36px -26px rgba(0, 0, 0, 0.7);
@@ -829,9 +835,9 @@
   }
   /* 手机端（≤900px 不建 WebGL）走 `.fallback`：vendor 会把面板刷成近白 —— 深色下必须盖掉 */
   .app-stage.dark.fallback .lg-surface {
-    background: rgba(66, 69, 74, 0.78);
-    -webkit-backdrop-filter: blur(14px) saturate(1.1);
-    backdrop-filter: blur(14px) saturate(1.1);
+    background: rgba(255, 255, 255, 0.13);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    backdrop-filter: blur(16px) saturate(1.1);
   }
   /* 兜底：源码里成片的浅色底（`bg-[#f…]` / `bg-[#e…]`）统一压成半透明白，
      免得再出现"白块 + 浅字"；语义色（绿/黄/红）在下面单独盖回来。 */
@@ -916,7 +922,7 @@
     color: #eef4fc;
   }
   .app-stage.dark .card-tint {
-    background: rgba(72, 75, 80, 0.6);
+    background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
   }
   .app-stage.dark .text-brand-deep {
@@ -937,14 +943,14 @@
   }
   /* 卡片 / 表格 */
   .app-stage.dark .card {
-    background: rgba(74, 77, 82, 0.55);
+    background: rgba(255, 255, 255, 0.07);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
   .app-stage.dark .card-solid {
-    background: rgba(70, 73, 78, 0.6);
+    background: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
   }
