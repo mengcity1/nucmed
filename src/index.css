@@ -575,38 +575,71 @@
     border: 1px solid rgba(15, 23, 42, 0.06);
   }
   .app-stage .lg-surface.glass-bar {
-    border-radius: 0;
-    border: 0;
+    /* v20.4：**必须是圆角**。渲染器按元素 computed border-radius 决定透镜半径，
+       radius 0 ⇒ 折射/色散为 0（实测 nav 面板对材质变化 0% 响应）。 */
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+  .app-stage .lg-surface.glass-bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.08) 38%,
+      rgba(255, 255, 255, 0) 70%
+    );
   }
   .app-stage.webgl-ready .lg-surface {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.7),
       0 1px 2px rgba(15, 23, 42, 0.04);
   }
-  /* ── v20.2 导航：容器条只做 CSS 半透明+模糊，**玻璃在按钮上** ──────────────
-     两层 canvas 玻璃相接会显缝；容器改用 CSS（均匀一层，不会和按钮的折射打架）。 */
+  /* ── v20.3 玻璃归属（实测驱动）────────────────────────────────────
+     canvas 玻璃只给**大面板**（导航条 / KPI / 卡片 / 表格）—— 实测它们会随材质变化（KPI 7.95% 像素差）；
+     `data-glass="small"` 的小件实测**不渲染**（soft↔极端值 0% 差），所以按钮改 CSS 玻璃高光。
+     好处：按钮不再叠第二层 canvas 玻璃 ⇒ 不会出现"间隙与背景不搭"。 */
   .nav-sheet {
-    background: rgba(255, 255, 255, 0.42);
-    -webkit-backdrop-filter: blur(20px) saturate(1.25);
-    backdrop-filter: blur(20px) saturate(1.25);
+    /* 导航条本身已是 canvas 玻璃面板，这里不再叠 CSS 白纱（否则把玻璃洗掉） */
+    background: transparent;
   }
-  /* 小件（tab / chip）自己就是玻璃；状态用"多半透明白"表达，(0,3,0) 压过 vendor 的 (0,2,0) */
-  .app-stage .tab.lg-surface:hover {
-    background: rgba(255, 255, 255, 0.3);
+  /* 按钮 = 玻璃板上的"高光片"：半透明白 + 顶部内高光 + 极淡描边 */
+  .tab {
+    border: 1px solid transparent;
+  }
+  .tab:hover {
+    background: rgba(255, 255, 255, 0.34);
+    border-color: rgba(255, 255, 255, 0.6);
     color: #0f172a;
   }
-  .app-stage .tab-on.lg-surface {
-    background: rgba(255, 255, 255, 0.5);
+  .tab-on {
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(255, 255, 255, 0.9);
     color: #164a8a;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      0 1px 3px rgba(15, 23, 42, 0.06);
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 1px 3px rgba(15, 23, 42, 0.07);
   }
-  .app-stage .chip-off.lg-surface {
-    background: rgba(255, 255, 255, 0.42);
+  .app-stage .chip-off {
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
-  .app-stage .chip-on.lg-surface {
+  .app-stage .chip-on {
     background: rgba(30, 91, 168, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  /* 面板的"玻璃厚度"：顶沿 1px 亮边 + 亮轮廓 + **底部内阴影**（厚度感）+ 极淡外投影。
+     这一层是 CSS，不依赖 canvas —— 实测 canvas 折射在浅色背景上很轻（KPI 区 13.4% 像素差），
+     厚度感主要靠这三条边光，视觉上才"像玻璃"。 */
+  .app-stage.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      inset 0 -20px 28px -26px rgba(15, 23, 42, 0.22),
+      0 12px 32px -26px rgba(15, 23, 42, 0.5);
   }
   @media print {
     .app-stage {

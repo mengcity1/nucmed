@@ -51,6 +51,14 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
   ctx.fillRect(0, 0, w, h);
 }
 
+/** 三档强度：地址栏加 `?g=soft|mid|strong` 即可在线切换（默认 mid）。
+ *  用途：owner 现场挑档，不用每次都改代码重部署。 */
+const MATERIALS: Record<string, Record<string, number>> = {
+  soft: { refraction: 0.6, blur: 0.26, dispersion: 0.28 },
+  mid: { refraction: 0.78, blur: 0.16, dispersion: 0.4 },
+  strong: { refraction: 0.95, blur: 0.08, dispersion: 0.55 },
+};
+
 export default function GlassApp({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -63,9 +71,11 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       el.classList.add("fallback");
       return;
     }
+    // ?g=soft|mid|strong —— 只在浏览器地址栏生效，不写进构建
+    const g = (new URLSearchParams(window.location.search).get("g") ?? "mid").toLowerCase();
+    const material = MATERIALS[g] ?? MATERIALS.mid;
     const sys = createGlassSystem(el, {
-      // 背景是虚化的雾 ⇒ 玻璃要"宽而柔"：折射带大、雾化高、只留少量色散
-      material: { refraction: 0.78, blur: 0.16, dispersion: 0.40 },
+      material,
       scene: "aurora",
       motion: !calm,
       audio: { enabled: false },
