@@ -1468,8 +1468,8 @@
     background-image:
       radial-gradient(
         520px circle at var(--mx, 50%) var(--my, -20%),
-        rgba(206, 224, 255, 0.22) 0%,
-        rgba(206, 224, 255, 0.05) 38%,
+        var(--glow-a, rgba(214, 234, 242, 0.22)) 0%,
+        var(--glow-b, rgba(214, 234, 242, 0.05)) 38%,
         rgba(206, 224, 255, 0) 66%
       ),
       radial-gradient(
@@ -1484,7 +1484,7 @@
     background-image:
       radial-gradient(
         110px circle at var(--mx, 50%) var(--my, -40%),
-        rgba(206, 224, 255, 0.24) 0%,
+        var(--glow-c, rgba(214, 234, 242, 0.24)) 0%,
         rgba(206, 224, 255, 0) 70%
       ),
       radial-gradient(
@@ -1511,7 +1511,7 @@
     background-image:
       radial-gradient(
         130px circle at var(--mx, 50%) var(--my, -40%),
-        rgba(186, 212, 255, 0.32) 0%,
+        var(--glow-d, rgba(196, 226, 236, 0.32)) 0%,
         rgba(186, 212, 255, 0) 72%
       ),
       radial-gradient(

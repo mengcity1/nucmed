@@ -215,6 +215,22 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     el.classList.toggle("dark", bg === "dark");
     el.classList.toggle("light", bg === "cream");
 
+    // 浅色模式"跟随光标的光泽"配色（`?glow=cool|cyan|champagne|violet|blue|mono`，默认 cool）
+    // 说明：米白偏暖 ⇒ 光泽越"无色"越像真玻璃；带色只是为了气质，不是必须。
+    const GLOWS: Record<string, [string, string, string, string]> = {
+      cool: ["rgba(226,236,246,.30)", "rgba(226,236,246,.07)", "rgba(226,236,246,.32)", "rgba(232,242,250,.40)"],
+      cyan: ["rgba(198,240,234,.30)", "rgba(198,240,234,.07)", "rgba(198,240,234,.32)", "rgba(190,236,228,.40)"],
+      champagne: ["rgba(255,246,224,.34)", "rgba(255,246,224,.08)", "rgba(255,246,224,.36)", "rgba(255,248,230,.44)"],
+      violet: ["rgba(226,214,255,.30)", "rgba(226,214,255,.07)", "rgba(226,214,255,.32)", "rgba(232,222,255,.40)"],
+      blue: ["rgba(206,224,255,.22)", "rgba(206,224,255,.05)", "rgba(206,224,255,.24)", "rgba(186,212,255,.32)"],
+      mono: ["rgba(255,255,255,.30)", "rgba(255,255,255,.08)", "rgba(255,255,255,.32)", "rgba(255,255,255,.42)"],
+    };
+    const glowPreset = GLOWS[(qs.get("glow") ?? "cool").toLowerCase()] ?? GLOWS.cool;
+    el.style.setProperty("--glow-a", glowPreset[0]);
+    el.style.setProperty("--glow-b", glowPreset[1]);
+    el.style.setProperty("--glow-c", glowPreset[2]);
+    el.style.setProperty("--glow-d", glowPreset[3]);
+
     if (narrow) {
       el.classList.add("fallback");
       return;
