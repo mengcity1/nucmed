@@ -14,6 +14,15 @@
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
   }
+  /* v20：页面滚动交给 `.app-scroll`（一体背景舞台内部），文档本身不再滚动 */
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    overflow: hidden;
+  }
 
   /* ── 2026-11-04 v4：整体精致化（滚动条 / 焦点环 / 文本选中）──
      只影响观感，不动任何布局与信息结构。 */
@@ -483,16 +492,27 @@
   /* ⚠ Lens 的 `.lg-stage button{border:0}`（0,1,1）会清掉舞台内所有按钮描边，
      而本站的 chip / pill 全靠 `border` 描边 ⇒ 在舞台内还原（`.glass-stage .chip` = 0,2,0 胜出）。
      颜色也必须一起还原：`border:0` 同时把 border-color 重置成 currentColor。 */
-  .glass-stage .chip,
-  .glass-stage .chip-sm {
+  .app-stage .chip,
+  .app-stage .chip-sm {
     border-width: 1px;
     border-style: solid;
   }
-  .glass-stage .chip-off {
+  .app-stage .chip-off {
     border-color: rgba(15, 23, 42, 0.1);
   }
-  .glass-stage .chip-on {
+  .app-stage .chip-on {
     border-color: rgba(30, 91, 168, 0.25);
+  }
+  /* chip / tab 也要液态玻璃：底改半透明（玻璃画在 canvas 上，透过底色显出来）；
+     选中态再洗回一层淡色，保住"这是选中的"可读性。选择器 (0,3,0) 压过 vendor 的 (0,2,0)。 */
+  .app-stage .chip-off.lg-surface {
+    background: rgba(255, 255, 255, 0.42);
+  }
+  .app-stage .chip-on.lg-surface {
+    background: rgba(30, 91, 168, 0.14);
+  }
+  .app-stage .tab-on.lg-surface {
+    background: rgba(30, 91, 168, 0.1);
   }
   .glass-bar .lg-surface {
     border-radius: 0;
@@ -520,6 +540,59 @@
     .glass-edge .table-booktabs thead th,
     .glass-edge .table-booktabs tbody tr {
       background: #fff !important;
+    }
+  }
+
+  /* ── v20 一体背景舞台（全站唯一 · 2026-11-04）──────────────────────
+     架构：`.app-stage` 固定铺满视口，内部 `.app-scroll` 承载页面滚动
+     ⇒ 背景只有**一张**（淡 + 虚化），导航/卡片/表格/chip 都浮在上面做液态玻璃。
+     代价：页面滚动从 document 改到 `.app-scroll`（sticky 照常生效；
+     `window.scrollY` 全项目已无使用处，`--scroll-v` 也从未被 JS 赋值）。 */
+  .app-stage.lg-stage {
+    position: fixed;
+    inset: 0;
+    border-radius: 0;
+    color: inherit;
+    font: inherit;
+    /* 无 WebGL / 移动端时的静态底：与 `paintWallpaper()` 同一套色，糊成雾 */
+    background:
+      radial-gradient(120% 90% at 12% 0%, #ffded0 0%, rgba(255, 255, 255, 0) 55%),
+      radial-gradient(110% 85% at 92% 6%, #dbe4ff 0%, rgba(255, 255, 255, 0) 52%),
+      radial-gradient(120% 90% at 55% 100%, #cff2ea 0%, rgba(255, 255, 255, 0) 58%),
+      #fbfcfe;
+  }
+  .app-scroll {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+  .app-stage .lg-surface {
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+  .app-stage .lg-surface.glass-bar {
+    border-radius: 0;
+    border: 0;
+  }
+  .app-stage.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  /* 玻璃上的小件（chip / tab）：更薄一点，别抢读数 */
+  .app-stage .lg-surface[data-glass="small"] {
+    border-radius: 999px;
+  }
+  @media print {
+    .app-stage {
+      position: static;
+      height: auto;
+      background: #fff;
+    }
+    .app-scroll {
+      height: auto;
+      overflow: visible;
     }
   }
 

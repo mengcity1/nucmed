@@ -1,10 +1,9 @@
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
-import { mountBackgroundShader } from "./lib/backgroundShader";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
-import GlassStage from "./components/GlassStage";
+import GlassApp from "./components/GlassApp";
 import Overview from "./pages/Home";
 // ★ pk262 B6：单药画像按需加载 —— Chart 依赖 echarts（586 kB / gzip 195 kB），
 //   静态引入会让总览首屏也拉这个包。改为路由级 lazy 后 echarts 只在进入画像时才下载。
@@ -12,7 +11,6 @@ const DrugDetail = lazy(() => import("./pages/DrugDetail"));
 import About from "./pages/About";
 import Atlas from "./pages/Atlas";
 /** 临时：液态玻璃选型对照页（选完删除） */
-const GlassLab = lazy(() => import("./pages/GlassLab"));
 
 /** 全站 4 页（3 页 + 2026-10-28 新增「文献影像图集」）· 标签文案走 i18n 表 */
 const TABS: { to: string; key: StrKey; icon: IconName; end: boolean }[] = [
@@ -42,8 +40,7 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)]">
       {/* 导航条（2026-11-04 v18）：整条交给 WebGL 玻璃 —— 满宽、直角；
           WebGL2 不可用 / ≤640px ⇒ `.fallback` 自动退回 CSS 毛玻璃，视觉仍成立。 */}
-      <GlassStage variant="shell" radius={0} className="glass-bar">
-        <div data-glass="panel" className="lg-surface">
+        <div data-glass="panel" className="lg-surface glass-bar">
           <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
             <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
               <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
@@ -63,8 +60,9 @@ function Nav() {
                   key={tab.to}
                   to={tab.to}
                   end={tab.end}
+                  data-glass="small"
                   className={({ isActive }) =>
-                    `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
+                    `tab lg-surface shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
                   }
                 >
                   <span className="hidden sm:inline-flex">
@@ -110,7 +108,6 @@ function Nav() {
             </div>
           </div>
         </div>
-      </GlassStage>
     </header>
   );
 }
@@ -261,21 +258,17 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [lang]);
 
-  /** 背景色场（2026-11-04 v17）：WebGL 片元着色器画缓慢流体柔光；
-   *  只在桌面、非 reduced-motion 下运行；不支持时返回 null ⇒ CSS 背景照旧。 */
+  /** v20：页面滚动改由 `.app-scroll` 承载 ⇒ 路由切换必须**手动回到顶部**
+   *  （document 不再滚动，浏览器/Router 的默认行为都失效，不加这条会"翻页后停在半页"）。 */
   useEffect(() => {
-    const dispose = mountBackgroundShader();
-    return () => dispose?.();
-  }, []);
+    document.querySelector<HTMLElement>(".app-scroll")?.scrollTo({ top: 0, behavior: "auto" });
+  }, [loc.pathname]);
 
   return (
     <LangCtx.Provider value={{ lang, setLang }}>
-    <div className="min-h-screen">
-      {/* 丝绸光斑层（2026-11-04 v10/v11）：外层滚动视差（-4%），内层 52s 缓慢漂移；
-          两层都在 `prefers-reduced-motion` 下静止，且 `pointer-events:none` 不吃点击。 */}
-      <div className="silk-parallax" aria-hidden>
-        <span className="silk-layer" />
-      </div>
+    {/* v20：全站只有**一个**玻璃舞台 —— 固定壁纸 + 页内滚动容器；组件浮在上面做液态玻璃。
+        旧的 v17 背景色场与 v10 丝绸层都撤掉（否则两套背景打架）。 */}
+    <GlassApp>
       <Nav />
       <PageBar pathname={loc.pathname} q={q} onSearch={onSearch} />
       <main className="wrap pt-6">
@@ -296,7 +289,6 @@ export default function App() {
             {/* 兼容旧链接 /drugs/:id */}
             <Route path="/drugs/:id" element={<DrugDetail />} />
             <Route path="/about" element={<About />} />
-            <Route path="/lab/glass" element={<GlassLab />} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />
             ))}
@@ -306,7 +298,7 @@ export default function App() {
         </Suspense>
       </main>
       <Footer />
-    </div>
+    </GlassApp>
     </LangCtx.Provider>
   );
 }

@@ -133,6 +133,7 @@
 | 2026-11-04 | **v17 WebGL 背景色场**：新增 `src/lib/backgroundShader.ts` —— 单 canvas 全屏 quad，片元着色器画 **4 个指数衰减柔光球**（暖橙/淡紫/薄荷/天蓝）以 ~3.5% 振幅极慢漂移 + **1.5/255 抖动去 banding**；DPR ≤1.5、**限 30fps**、页面隐藏即停、`prefers-reduced-motion` 只画一帧、≤640px 不启用、WebGL 不可用返回 null（CSS 背景原样保留）。玻璃卡片仍用 `backdrop-filter` 采样这层**活颜色** |
 | 2026-11-04 | **v18.1 玻璃扩围（≤6 处舞台）**：由「导航 + KPI」扩到 **6 处 / 11 个面片** —— 导航条 · 首页 KPI · 首页筛选卡 · About 内容卡组（**2 舞台 / 5 面片**）· 单药详情首屏三卡（1 舞台 / 3 面片）。新增 **两档材质**（`strength`：外壳 1 / 内容 0.5）与两个必须知道的坑：① 渲染器默认 `brightness:.95`，**大面积会变灰板** ⇒ 内容区设 `1.02`；② `.lg-stage button{border:0}` 会清掉舞台内按钮描边 ⇒ `index.css` 按类还原。**不做**：每卡一舞台（上下文上限）、数据面板玻璃化 |
 | 2026-11-04 | **v19 最大档（质感重做）**：v18 的问题被定位为**背景太淡**（近白背景折射=看不出），改为 **3 档高对比绸带背景**（`shell` / `veil` / `edge`）+ 材质提到 `refr .90 / disp .42`；**数据表也进玻璃**（`edge` 档：绸带 + 饱和色环 + 内缩白板，行底 `rgba(255,255,255,.62)`，打印强制纯白）。实测：导航 chroma **35** / KPI **32** / 表格中心 值 **253** / 边带 chroma **17**。舞台 **7 处 / 13 面片**（每页 ≤4，全部 `webgl-ready`） |
+| 2026-11-04 | **v20 一体背景 + 组件浮起（owner 指定形态）**："背景是一体的、组件和按钮在上面做液态玻璃" ⇒ 架构改为 **1 个舞台**（`position:fixed` 铺满视口 + 唯一 canvas）+ 内部 `.app-scroll` 承载页面滚动；背景改**淡 + 虚化**（近白 + 4 团柔光 + `blur(≈5vw)` + 8% 白纱）；面片扩到 **13 个**（含导航 tab 4 个、chip、两张数据表）；撤掉 v17 背景色场与 v10 丝绸层（两套背景会打架）。实测背景左 chroma **13.6** / 右 **19.6**、导航 **16.7/242**、表格中心 **249**；单 `lg-canvas` 无回退 |
 | 2026-11-04 | **v18 真折射玻璃（vendor Lens · WebGL2）**：`src/vendor/lens/`（MIT · ruiqichenbiec/design-systems · 22 文件 158 KB 源码，**零依赖、不进 package.json**）。`components/GlassStage.tsx` 把**导航条**与**首页 KPI 带**变成真玻璃：`artwork()` 自绘「近白 + 极淡三色柔光 + 冷灰丝绸曲线」作为**场景纹理**，片元着色器对其真实采样弯折（`refraction .72 / blur .18 / dispersion .28`），并带 `JellyController` 弹簧；文字仍是**真 DOM**（`.webgl-ready .lg-surface` 只把背景置透明）⇒ 可读、可选中、可打印。≤640px / 无 WebGL2 / `prefers-reduced-motion` ⇒ `.fallback` 退回 CSS 毛玻璃。实测增量 **+19.7 KB gzip (JS) + 5.1 KB (CSS)** |
 
 ## 10. 版式骨架（v8 起）
@@ -155,34 +156,39 @@
 **为什么 vendor 而不 `npm i`**：本项目**零新依赖**原则；它是 MIT + 零运行时依赖 + `as-is` 不再维护
 ⇒ 固定版本拷进 `src/vendor/lens/`，保留 `LICENSE`，**不 fork 维护**，升级=重拷 + 重跑验收。
 
-**允许挂玻璃的地方（白名单 · 2026-11-04 扩围后）**
+**允许挂玻璃的地方（v20：**1 个舞台 / 13 个面片**）**
 
-| 允许（全站 **7 处舞台 / 13 个面片**） | 禁止 |
-|---|---|
-| 导航条（`.glass-bar`，满宽直角，`shell`） | **每卡一舞台**（每舞台 = 1 上下文 + 1 块舞台尺寸 canvas；上限 ~8–16 个上下文） |
-| 首页 KPI 带（1 面片 · `shell`） | 覆盖整页的单舞台（canvas 面积 = 舞台面积 × dpr²，长页面必炸显存） |
-| 首页筛选卡（1 面片 · `veil`） | 移动端（≤640px 一律回退） |
-| About 内容卡组（**2 舞台 / 5 面片** · `veil`） | 图集海报（`card-solid` + 图为主体：玻璃只会脏掉判读） |
-| 单药详情首屏三卡（1 舞台 / 3 面片 · `veil`） | — |
-| **数据表**：首页药物清单 + 详情剂量表（各 1 舞台 / 1 面片 · `edge`） | — |
+| 面片（`data-glass`） | 数量 | 备注 |
+|---|---|---|
+| 导航条（`panel` + `.glass-bar`） | 1 | 满宽直角 |
+| 导航 tab（`small`） | 4 | `.tab-on.lg-surface` 洗一层淡色保住选中态 |
+| 首页 KPI 带（`panel`） | 1 | — |
+| 首页筛选卡（`panel`） | 1 | chip 也是 `small` 面片 |
+| 首页 chip（`small`） | 3+ | chip 底改半透明，玻璃透出来 |
+| About 内容卡（`panel`） | 5 | — |
+| 单药详情首屏（`panel`） | 3 | — |
+| 数据表（`panel` + `.glass-edge`） | 2 | 首页药物清单 + 详情剂量表 |
 
-**三档背景 / 材质（v19 · `GlassStage variant`）**
+**禁止**：再**新增舞台**（每多一个 = 多一张背景 = 拼接感回来）；图集海报不做玻璃（图是主体）。
 
-| variant | 背景（artwork） | 材质 | brightness | 圆角 | 用在哪 |
-|---|---|---|---|---|---|
-| `shell` | 彩色绸带（4 层薄片 + 阴影） | `refr .90 / blur .12 / disp .42` | 默认 `.95` | 20（导航 0） | 导航、KPI |
-| `veil` | 绸带 + **62% 白纱** | `refr .84 / blur .16 / disp .34` | `1.02` | 14 | 筛选卡、About 卡组、详情首屏 |
-| `edge` | 绸带 + 饱和色环 + **内缩白板**（rim = 10% 短边，模糊 0.38×rim） | `refr .90 / blur .14 / disp .40` | `1.02` | 14 | 数据表 |
+**v20 架构：一体背景 + 组件浮起（现行）**
 
-> **观感 100% 由 artwork 决定**（v18 的教训）：v18 用近白背景 + 低色散，实测整片是"白玻璃"= 看不出折射；
-> v19 换成高对比绸带后，导航实测 **chroma 35 / 值 211**、KPI **chroma 32**（着色明显），
-> 表格中心 **值 253（白纸可读）**、边带 **chroma 17**（可见彩边）。
-> ⚠ 行/表头底必须**半透明**（`.glass-edge .table-booktabs tbody tr` = `rgba(255,255,255,.62)`），
-> 否则 1px 边框里露不出玻璃（实测 chr=1–4）；打印用 `@media print` 强制回纯白。
-> ⚠ **坑 1**：`brightness` 默认 `.95`，大面积会变灰板 ⇒ 内容档设 `1.02`。
-> ⚠ **坑 2**：`.lg-stage button{border:0}`（0,1,1）会清掉舞台内所有按钮描边
-> ⇒ `index.css` 用 `.glass-stage .chip*`（0,2,0）还原宽度/样式/**颜色**。
-> **选型对照页**：`/lab/glass`（临时路由，3.4 KB，决定后删除）。
+```
+<div class="lg-stage app-stage">        ← fixed inset:0，唯一的 canvas（= 唯一背景）
+  <div class="app-scroll">              ← 页面滚动容器（sticky/锚点/IO 均照常）
+     <nav> <main> <footer>              ← 组件都是 [data-glass] 面片，浮在背景上
+```
+
+- **为什么必须一个舞台**：Lens 的玻璃只采样**同舞台内**画布（`renderer.js`：`stage.querySelectorAll('[data-glass]')`，
+  canvas 尺寸 = 舞台面积 × dpr）。多舞台 ⇒ 背景被切成一块块拼接色块（v19 的毛病）+ canvas 面积 ×N。
+- **代价（已处理）**：`body{overflow:hidden}`；路由切换手动 `.app-scroll.scrollTo(0)`；
+  `@media print` 把 stage/scroll 还原成静态流式；`--scroll-v` 与 `window.scrollY` 全项目本就无使用处。
+- **背景**：近白 + 4 团柔光（alpha .58–.78）+ `ctx.filter: blur(≈5vw)` 整组糊掉 + 8% 白纱 ⇒ 淡、虚化、**一体**。
+- **材质**：`refraction .70 / blur .12 / dispersion .38`，`brightness 1.00`（⚠ 1.06 会把淡色洗成白：实测 chroma 13.6→2.6）。
+- **面片**：导航条 / KPI / 筛选卡 / About 卡组 / 详情首屏 / 两张数据表 = `panel`；导航 tab 与 chip = `small`（共 13 个）。
+- **实测**（1440×900 采样）：背景左 `chroma 13.6` 暖、右 `chroma 19.6` 冷（同一张壁纸的两侧）、导航 `chroma 16.7 / 值 242`、
+  KPI `13.5 / 245`、表格中心 `值 249`（白纸可读）；`webgl-ready`×1 · `lg-canvas`×1 · 面片 13 ⇒ 单上下文、无回退。
+- **旋钮**：`GlassApp.tsx` 的 `material.*` / `paintWallpaper` 的 alpha 与 blur / `.glass-edge` 行底透明度（.62）。
 
 **用法**（新增一处玻璃）：
 ```tsx
