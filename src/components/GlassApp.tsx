@@ -287,6 +287,13 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       artwork: (ctx, info) => paintWallpaper(ctx, info, bg),
     });
     sys.renderer?.set({ brightness: 1.0 });
+    // v37（2026-11-04 owner：「我只要拖到底了没框就行」）——
+    // **画布从此不画面板玻璃**：`renderer.js:488` 的 `if(!settings.opaque)` 整段跳过透镜 pass，
+    // 画布只剩背景壁纸。原因：canvas 的框要主线程重读矩形再画，而滚动在合成器线程 ⇒
+    // 二者永远差 1–2 帧（拖动时框拖在原地、停下来又"追上去"= 一闪一闪）。
+    // 面板玻璃改由 CSS `backdrop-filter` 承担（与滚动同在合成器层 ⇒ 天然同步），
+    // 从此**不存在任何"留在原地"的框**，也不需要按滚动来回切换（那正是闪的来源）。
+    sys.renderer?.set({ opaque: true });
 
     // v20.5：**光标波纹**（CSS 层，独立于 WebGL）——
     // 着色器的 glint 也跟指针，但只在面板边缘看得出；这一层让每块玻璃上都能看到柔光斑随光标移动。
@@ -310,34 +317,6 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     };
     if (!calm) el.addEventListener("pointermove", onMove, { passive: true });
 
-    // v36b 滚动期降级（owner：「不止顶部框，下面每个框都有这现象」）：
-    // 真正的根因 —— 页面滚动由**合成器线程**完成（DOM 面板每帧即时移动），
-    // 而 canvas 玻璃必须由**主线程**重读矩形再画 ⇒ 永远慢 1–2 帧，
-    // 拖动时每个面板的玻璃都会"拖在原地"（旧框留在画布上）。
-    // ⇒ 滚动一开始就 `set({opaque:true})`：**跳过透镜 pass**，画布重绘一帧干净背景
-    //    （旧框被整幅覆盖 ⇒ 不可能再残留），面板改由 `.is-scrolling` 的 CSS 毛玻璃顶上；
-    // 停手 140ms 后恢复 `opaque:false`，静止时仍是真折射。
-    const scroller = el.querySelector<HTMLElement>(".app-scroll");
-    const renderer = sys.renderer;
-    let scrollTimer = 0;
-    let lensPaused = false;
-    const onScroll = () => {
-      el.classList.add("is-scrolling");
-      if (renderer && !lensPaused) {
-        lensPaused = true;
-        renderer.set({ opaque: true });
-      }
-      if (scrollTimer) window.clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(() => {
-        scrollTimer = 0;
-        el.classList.remove("is-scrolling");
-        if (renderer && lensPaused) {
-          lensPaused = false;
-          renderer.set({ opaque: false });
-        }
-      }, 140);
-    };
-    scroller?.addEventListener("scroll", onScroll, { passive: true });
     // ?contrast=1：对比度自检（结果写进 DOM，便于无头浏览器读取）
     if (qs.get("contrast") === "1") {
       runContrastAudit();
@@ -346,9 +325,6 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     return () => {
       if (raf) cancelAnimationFrame(raf);
       el.removeEventListener("pointermove", onMove);
-      if (scrollTimer) window.clearTimeout(scrollTimer);
-      scroller?.removeEventListener("scroll", onScroll);
-      el.classList.remove("is-scrolling");
       sys.destroy();
     };
   }, [theme]);

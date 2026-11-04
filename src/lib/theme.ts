@@ -1,5 +1,5 @@
-/** 主题（深色 / 浅色·米白）—— 2026-11-04 实装
- *  - 默认深色；`?theme=light|dark` 可临时覆盖；选择写进 localStorage。
+/** 主题（浅色·亮铂金 / 深色·午夜靛）
+ *  - **默认浅色**（2026-11-04 owner 定）；`?theme=dark` 可临时覆盖；选择写进 localStorage。
  *  - 切换通过自定义事件广播，GlassApp 监听后重建舞台（重画背景）。
  */
 import { useEffect, useState } from "react";
@@ -17,7 +17,7 @@ export function readTheme(): Theme {
   } catch {
     /* 隐私模式禁用 storage，忽略 */
   }
-  return "dark";
+  return "light";
 }
 
 export function writeTheme(t: Theme) {
