@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
+import { mountBackgroundShader } from "./lib/backgroundShader";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
@@ -250,6 +251,13 @@ export default function App() {
     }, 800);
     return () => window.clearTimeout(timer);
   }, [lang]);
+
+  /** 背景色场（2026-11-04 v17）：WebGL 片元着色器画缓慢流体柔光；
+   *  只在桌面、非 reduced-motion 下运行；不支持时返回 null ⇒ CSS 背景照旧。 */
+  useEffect(() => {
+    const dispose = mountBackgroundShader();
+    return () => dispose?.();
+  }, []);
 
   return (
     <LangCtx.Provider value={{ lang, setLang }}>

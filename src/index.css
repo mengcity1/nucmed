@@ -55,6 +55,11 @@
     pointer-events: none;
     will-change: transform;
   }
+  /* WebGL 背景启用时隐藏 CSS 静态柔光层，避免两层颜色叠加 */
+  html.has-gl-bg .silk-parallax {
+    display: none;
+  }
+
   /* 三团极淡色温（v16）：只给玻璃一点"透上去的颜色"，不做流动动画 */
   .silk-layer {
     position: absolute;
