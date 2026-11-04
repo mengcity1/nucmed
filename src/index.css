@@ -1364,7 +1364,7 @@
         rgba(255, 255, 255, 0.55) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.7) 0%,
@@ -1392,7 +1392,7 @@
         rgba(255, 255, 255, 0.75) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
     box-shadow:
       inset 0 1px 0 #fff,
@@ -1418,7 +1418,7 @@
         rgba(255, 255, 255, 0.24) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.17) 0%,
@@ -1440,7 +1440,7 @@
         rgba(255, 255, 255, 0.34) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
   }
 
@@ -1452,7 +1452,7 @@
         rgba(255, 255, 255, 0.5) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 40%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0) 46%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.74) 0%,
@@ -1468,8 +1468,8 @@
     background-image:
       radial-gradient(
         520px circle at var(--mx, 50%) var(--my, -20%),
-        rgba(206, 224, 255, 0.42) 0%,
-        rgba(206, 224, 255, 0.10) 38%,
+        rgba(206, 224, 255, 0.22) 0%,
+        rgba(206, 224, 255, 0.05) 38%,
         rgba(206, 224, 255, 0) 66%
       ),
       radial-gradient(
@@ -1477,14 +1477,14 @@
         rgba(255, 255, 255, 0.95) 0%,
         rgba(255, 255, 255, 0) 70%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 44%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 50%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.24));
   }
   .app-stage.light :is(button, [role="tab"], a[class*="rounded"]):not(.btn-plain) {
     background-image:
       radial-gradient(
         110px circle at var(--mx, 50%) var(--my, -40%),
-        rgba(206, 224, 255, 0.45) 0%,
+        rgba(206, 224, 255, 0.24) 0%,
         rgba(206, 224, 255, 0) 70%
       ),
       radial-gradient(
@@ -1492,7 +1492,7 @@
         rgba(255, 255, 255, 1) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.72) 0%,
@@ -1511,7 +1511,7 @@
     background-image:
       radial-gradient(
         130px circle at var(--mx, 50%) var(--my, -40%),
-        rgba(186, 212, 255, 0.58) 0%,
+        rgba(186, 212, 255, 0.32) 0%,
         rgba(186, 212, 255, 0) 72%
       ),
       radial-gradient(
@@ -1530,7 +1530,7 @@
         rgba(255, 255, 255, 0.22) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 40%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0) 46%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.3) 0%,
@@ -1552,7 +1552,7 @@
         rgba(255, 255, 255, 0.24) 0%,
         rgba(255, 255, 255, 0) 72%
       ),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 44%),
       linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.17) 0%,
