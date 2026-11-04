@@ -123,10 +123,10 @@ function Metric({
 }) {
   const shown = useCountUp(value);
   const bar: Record<MetricTone, string> = {
-    brand: "bg-brand",
-    accent: "bg-accent",
-    violet: "bg-violet",
-    sand: "bg-sand",
+    brand: "bg-gradient-to-r from-[#7aa7e0] to-[#2f6bb5]",
+    accent: "bg-gradient-to-r from-[#7ed4c6] to-[#0f8f81]",
+    violet: "bg-gradient-to-r from-[#b9aaee] to-[#6d5bd0]",
+    sand: "bg-gradient-to-r from-[#f0cf9a] to-[#b4761f]",
   };
   const val: Record<MetricTone, string> = {
     brand: "text-[#12457f]",
@@ -134,9 +134,17 @@ function Metric({
     violet: "text-[#4b3ea3]",
     sand: "text-[#8a5a12]",
   };
+  const glow: Record<MetricTone, string> = {
+    brand: "from-[#eaf2fe]/90",
+    accent: "from-[#e6faf6]/90",
+    violet: "from-[#f2eefd]/90",
+    sand: "from-[#fdf5e7]/90",
+  };
   return (
-    <div className="relative px-4 pb-4 pt-4 sm:px-5">
-      <span aria-hidden className={`absolute left-0 top-4 h-[18px] w-[2px] rounded-full ${bar[tone]}`} />
+    <div
+      className={`group relative overflow-hidden rounded-xl2 border border-white/70 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 shadow-soft backdrop-blur-xl transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
+    >
+      <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${bar[tone]}`} />
       <div className="label-caps">{label}</div>
       <div className={`num mt-2 text-[30px] font-bold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
       {hint && <div className="mt-2 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
@@ -529,7 +537,7 @@ export default function Home() {
 
       {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡 · 进入视口时渐显） */}
       <Reveal className="mt-6">
-      <section className="grid grid-cols-2 divide-y divide-line border-y border-line sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Metric
           tone="brand"
           label={tr("home.kpiResult")}
@@ -639,7 +647,7 @@ export default function Home() {
         </span>
       </div>
 
-      <div className="card mt-3 overflow-hidden">
+      <div className="card-solid mt-3 overflow-hidden">
         <div className="hscroll max-h-[calc(100vh-230px)] overflow-y-auto">
           <table className="table-booktabs w-full border-collapse text-[13px]">
             <thead className="sticky top-0 z-10">

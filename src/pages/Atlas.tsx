@@ -253,7 +253,7 @@ export default function Atlas() {
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shown.map((f, i) => (
-              <figure key={f.file} className="card card-hover group m-0 overflow-hidden">
+              <figure key={f.file} className="card-solid card-hover group m-0 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setZoom(f)}

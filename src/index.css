@@ -36,15 +36,17 @@
     outline-offset: 2px;
   }
   body {
-    @apply bg-[#f5f8fd] text-ink font-sans text-[14px] leading-relaxed;
-    /* ★ 2026-11-04 视觉升级：三层背景（顶部冷蓝渐隐 + 右上光斑 + 极淡网格），
-       让「白卡堆白卡」有底纹层次；网格透明度 0.04，不抢正文。 */
+    @apply bg-[#f7f5f8] text-ink font-sans text-[14px] leading-relaxed;
+    /* ★ 2026-11-04 v9「ins 氛围」：四角柔和光斑（奶油 → 淡紫 → 薄荷）+ 5% 纸张颗粒。
+       颗粒用内联 SVG 噪声（无外网依赖、可打印时自动忽略）。 */
     background-image:
-      linear-gradient(180deg, #e9f1fd 0%, rgba(233, 241, 253, 0) 480px),
-      radial-gradient(820px 340px at 92% -8%, #e7f3fc 0%, rgba(231, 243, 252, 0) 68%),
-      linear-gradient(rgba(30, 91, 168, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(30, 91, 168, 0.04) 1px, transparent 1px);
-    background-size: auto, auto, 34px 34px, 34px 34px;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+      radial-gradient(1100px 700px at 4% -8%, #fff1e8 0%, rgba(255, 241, 232, 0) 62%),
+      radial-gradient(900px 620px at 98% -4%, #efe9fb 0%, rgba(239, 233, 251, 0) 58%),
+      radial-gradient(900px 700px at 50% 112%, #e6f5f0 0%, rgba(230, 245, 240, 0) 60%),
+      linear-gradient(180deg, #fbf8f5 0%, #f7f7fb 100%);
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-size: 160px 160px, auto, auto, auto, auto;
     background-attachment: fixed;
   }
   ::selection {
@@ -78,8 +80,16 @@
     @apply mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8;
   }
   .card {
-    @apply rounded-md2 border border-[#e8edf5] bg-white;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(15, 23, 42, 0.03);
+    @apply rounded-xl2 border border-white/70 bg-white/70 shadow-soft;
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    backdrop-filter: blur(14px) saturate(1.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 1px 2px rgba(15, 23, 42, 0.03),
+      0 10px 28px -14px rgba(15, 23, 42, 0.12);
+  }
+  /* 数据卡（含表格 / 图表）：**纯白不透明** —— 玻璃卡会让表格读数变糊，也会毁掉打印 */
+  .card-solid {
+    @apply rounded-xl2 border border-[#e9eef6] bg-white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 10px 28px -16px rgba(15, 23, 42, 0.10);
   }
 
   /* ── 期刊版式（2026-11-04 v8）─────────
@@ -193,8 +203,8 @@
       font-medium transition-all duration-150;
   }
   .chip-off {
-    @apply border-[#dfe8f6] bg-[#f4f8fe] text-ink-2 shadow-s1 hover:-translate-y-px hover:border-[#b9d0e9]
-      hover:text-ink hover:shadow-s2;
+    @apply border-white/70 bg-white/80 text-ink-2 shadow-soft hover:-translate-y-px hover:border-white
+      hover:text-ink hover:shadow-float;
   }
   .chip-on {
     @apply border-brand bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.6)];
@@ -221,7 +231,10 @@
     @apply rounded-md2 border border-[#e3e9f4] bg-white shadow-s2;
   }
   .card-tint {
-    @apply rounded-md2 border border-[#dce7f7] bg-gradient-to-b from-white to-[#f7fafe] shadow-s1;
+    @apply rounded-xl2 border border-white/70 shadow-soft;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(246, 250, 255, 0.72) 100%);
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    backdrop-filter: blur(14px) saturate(1.05);
   }
   .eyebrow {
     @apply inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2.5 py-[3px]
@@ -322,6 +335,6 @@
   .sec-h::before {
     content: "";
     @apply absolute left-0 top-1/2 h-[15px] w-[3px] -translate-y-1/2 rounded-full;
-    background: linear-gradient(180deg, #1e5ba8 0%, #0d9488 100%);
+    background: linear-gradient(180deg, #8fb6ea 0%, #7ed4c6 100%);
   }
 }

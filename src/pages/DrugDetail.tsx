@@ -927,7 +927,7 @@ export default function DrugDetail() {
             <DrugCurve pts={mine} />
           </div>
         )}
-        <div className="card mt-3 overflow-hidden">
+        <div className="card-solid mt-3 overflow-hidden">
           <div className="hscroll">
             <table className="table-booktabs w-full border-collapse text-[13px]">
               <thead>

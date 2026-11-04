@@ -35,9 +35,9 @@ function Nav() {
   const tr = useT();
   const { lang, setLang } = useLang();
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-xl backdrop-saturate-150">
+    <header className="sticky top-0 z-50 border-b border-white/60 bg-white/65 shadow-soft backdrop-blur-2xl backdrop-saturate-150">
       {/* 顶部渐变细带（2026-11-04 视觉升级）：给固定导航一个品牌锚点，不占高度 */}
-      <span aria-hidden className="block h-[3px] w-full bg-gradient-to-r from-[#1e5ba8] via-[#4a8ee0] to-[#0d9488]" />
+      <span aria-hidden className="block h-[3px] w-full bg-gradient-to-r from-[#f0b8a8] via-[#8fb6ea] to-[#8fd6c8]" />
       <div className="wrap flex h-16 items-center gap-3 sm:gap-7">
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
@@ -51,7 +51,7 @@ function Nav() {
           </span>
         </NavLink>
 
-        <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1 shadow-[inset_0_1px_2px_rgba(15,23,42,.04)]">
+        <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-white/60 bg-white/45 p-1 shadow-ceil backdrop-blur-xl">
           {TABS.map((tab) => (
             <NavLink
               key={tab.to}
@@ -169,18 +169,8 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
   return (
     /* 报头（masthead · 2026-11-04 v8）：衬线大标题 + 一行元信息（版本/sha/许可）+ 底部 2px 墨线
        —— 取代原来的"工具栏式"细带，视觉上从"SaaS 面板"转成"出版物"。 */
-    <div className="relative border-b-2 border-[#0f172a]/80 bg-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(30,91,168,.035) 1px, transparent 1px)," +
-            "linear-gradient(90deg, rgba(30,91,168,.035) 1px, transparent 1px)",
-          backgroundSize: "26px 26px, 26px 26px",
-        }}
-      />
-      <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-3.5 pt-4">
+    <div className="relative overflow-hidden rounded-b-[26px] border-b border-white/60 bg-[linear-gradient(120deg,#fff7f0_0%,#fdfbf8_44%,#f1ecfb_100%)] shadow-soft">
+      <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-4 pt-4">
         <div className="min-w-0">
           <h1 className="text-[25px] font-bold leading-none tracking-tight text-ink sm:text-[28px]">{tr(page.title)}</h1>
           <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-ink-3">

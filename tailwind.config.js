@@ -14,17 +14,27 @@ export default {
         accent: { DEFAULT: "#0d9488", deep: "#0a7d6f", soft: "#e6f7f4" },
         violet: { DEFAULT: "#6d5bd0", soft: "#efecfc" },
         sand: { DEFAULT: "#b4761f", soft: "#fdf4e6" },
+        /* ★ 2026-11-04 v9「ins 氛围」：低饱和暖/冷底色，只用于背景与玻璃卡 */
+        cream: "#fff7f0",
+        blush: "#ffe9e4",
+        lilac: "#efeafb",
+        mint: "#e6f5f0",
+        sky: "#e8f1fb",
       },
       fontFamily: {
         sans: ['Inter', '"Noto Sans SC"', "system-ui", "sans-serif"],
         mono: ['"SFMono-Regular"', "Consolas", "monospace"],
       },
-      borderRadius: { lg2: "16px", md2: "12px", sm2: "8px" },
+      borderRadius: { lg2: "16px", md2: "12px", sm2: "8px", xl2: "20px", xl3: "26px" },
       boxShadow: {
         s1: "0 1px 2px rgba(15,23,42,.04)",
         s2: "0 1px 2px rgba(15,23,42,.04), 0 8px 24px -8px rgba(15,23,42,.10)",
         s3: "0 2px 6px rgba(15,23,42,.05), 0 20px 44px -20px rgba(15,23,42,.22)",
         glow: "0 0 0 1px rgba(30,91,168,.10), 0 18px 40px -18px rgba(30,91,168,.40)",
+        /* ★ v9：ins 风的大扩散柔光（低不透明度、大位移、无硬边） */
+        soft: "0 1px 2px rgba(15,23,42,.03), 0 10px 28px -14px rgba(15,23,42,.12)",
+        float: "0 2px 6px rgba(15,23,42,.04), 0 24px 60px -28px rgba(15,23,42,.22)",
+        ceil: "inset 0 1px 0 rgba(255,255,255,.75)",
       },
       keyframes: {
         fadeUp: {
