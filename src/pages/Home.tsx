@@ -194,9 +194,13 @@ export default function Home() {
   const [page, setPage] = useState(() => Number(sp.get("p") ?? 0) || 0);
   const [onlyPts, setOnlyPts] = useState(() => sp.get("pts") === "1");
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
+  /** ★ 研发阶段筛选（2026-11-04 owner 要求）：把原来只读的阶段徽标改成可点选（多选，与其它维度叠加）。 */
+  const [stages, setStages] = useState<string[]>(() => arr("stage"));
   /** 筛选卡默认折叠（2026-11-04 owner：太臃肿）；URL 里带筛选时默认展开，避免「筛选生效但面板看不见」。 */
   const [fOpen, setFOpen] = useState(
-    () => arr("type").length + arr("nuc").length + arr("tgt").length + arr("dis").length > 0
+    () =>
+      arr("type").length + arr("nuc").length + arr("tgt").length + arr("dis").length + arr("stage").length >
+      0
   );
   // ★ 筛选区：核素默认 Top12 + 可展开栏；三个维度各有搜索框
   const [nucAll, setNucAll] = useState(false);
@@ -216,6 +220,7 @@ export default function Home() {
         put("nuc", nucs.join(","));
         put("tgt", targets.join(","));
         put("dis", diseases.join(","));
+        put("stage", stages.join(","));
         put("sort", sort === "阶段优先" ? "" : sort);
         put("p", page > 0 ? String(page) : "");
         put("pts", onlyPts ? "1" : "");
@@ -224,7 +229,7 @@ export default function Home() {
       },
       { replace: true }
     );
-  }, [types, nucs, targets, diseases, sort, page, onlyPts, hideBad, setSp]);
+  }, [types, nucs, targets, diseases, stages, sort, page, onlyPts, hideBad, setSp]);
 
   const allTypes = useMemo(
     () => [...new Set((drugs ?? []).map((d) => d.drug_type || "未分类"))].sort(),
@@ -247,7 +252,7 @@ export default function Home() {
     const uniq = [...new Set([...diseases, ...pool])];
     return { items: uniq.slice(0, 30), total: uniq.length };
   }, [allDiseases, diseases, qDis]);
-  const nSel = types.length + nucs.length + targets.length + diseases.length;
+  const nSel = types.length + nucs.length + targets.length + diseases.length + stages.length;
 
   /** ★ facet：除「核素」外的所有筛选条件 → 用于计算核素的动态 Top（选别的维度时，核素 Top 跟着变） */
   const facetBase = useMemo(() => {
@@ -298,22 +303,34 @@ export default function Home() {
     if (targets.length) v = v.filter((d) => hit(d.targets_zh, targets));
     if (diseases.length) v = v.filter((d) => hit(d.diseases_zh, diseases));
     const withStage = v.map((d) => ({ ...d, stage: stageOf(d.status) }));
-    if (sort === "名称 A→Z") withStage.sort((a, b) => a.name_en.localeCompare(b.name_en));
-    else if (sort === "名称 Z→A") withStage.sort((a, b) => b.name_en.localeCompare(a.name_en));
+    const afterStage = stages.length ? withStage.filter((d) => stages.includes(d.stage)) : withStage;
+    if (sort === "名称 A→Z") afterStage.sort((a, b) => a.name_en.localeCompare(b.name_en));
+    else if (sort === "名称 Z→A") afterStage.sort((a, b) => b.name_en.localeCompare(a.name_en));
     else
-      withStage.sort(
+      afterStage.sort(
         (a, b) =>
           STAGE_ORDER.indexOf(a.stage) - STAGE_ORDER.indexOf(b.stage) ||
           a.name_en.localeCompare(b.name_en)
       );
-    return withStage;
-  }, [drugs, kw, types, nucs, targets, diseases, sort]);
+    return afterStage;
+  }, [drugs, kw, types, nucs, targets, diseases, stages, sort]);
 
   const stageCount = useMemo(() => {
     const m: Record<string, number> = {};
     for (const d of view) m[d.stage] = (m[d.stage] ?? 0) + 1;
     return m;
   }, [view]);
+
+  /** 阶段徽标的分面计数：基于「排除阶段自身」的 facetBase ⇒
+   *  选中某阶段后，其它阶段仍显示「切过去会有多少」，而不是塌成 0。 */
+  const stageFacet = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const d of facetBase) {
+      const s = stageOf(d.status);
+      m[s] = (m[s] ?? 0) + 1;
+    }
+    return m;
+  }, [facetBase]);
 
   const nStruct = useMemo(() => view.filter((d) => d.has_struct).length, [view]);
   const pages = Math.max(1, Math.ceil(view.length / PAGE));
@@ -326,6 +343,7 @@ export default function Home() {
     setNucs([]);
     setTargets([]);
     setDiseases([]);
+    setStages([]);
     setPage(0);
   };
 
@@ -551,14 +569,37 @@ export default function Home() {
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-[12px] text-ink-3">{tr("home.stage")}</span>
-          {STAGE_ORDER.filter((s) => stageCount[s]).map((s) => (
-            <span
-              key={s}
-              className={`rounded-full border px-2 py-0.5 text-[11.5px] font-medium ${STAGE_TONE[s]}`}
+          {STAGE_ORDER.filter((s) => stageFacet[s]).map((s) => {
+            const on = stages.includes(s);
+            return (
+              <button
+                key={s}
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  setStages((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+                  setPage(0);
+                }}
+                className={`rounded-full border px-2 py-0.5 text-[11.5px] font-medium transition ${
+                  on
+                    ? "border-brand bg-brand text-white shadow-[0_2px_8px_-2px_rgba(30,91,168,.55)]"
+                    : `${STAGE_TONE[s]} hover:-translate-y-px hover:shadow-s1`
+                }`}
+              >
+                {stageLabel(lang, s)}{" "}
+                <span className="tabular-nums opacity-80">{fmt(stageFacet[s])}</span>
+              </button>
+            );
+          })}
+          {stages.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setStages([])}
+              className="text-[11.5px] font-medium text-brand-deep transition hover:underline"
             >
-              {stageLabel(lang, s)} {fmt(stageCount[s])}
-            </span>
-          ))}
+              {tr("home.stageClear")}
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[12px] text-ink-3">{tr("home.sort")}</span>
