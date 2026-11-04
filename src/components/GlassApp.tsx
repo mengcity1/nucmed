@@ -18,17 +18,15 @@ import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
 
-/** 背景壁纸：**整片柔和的浅色**（不是四角上色、中间发白），再整层糊掉。
- *  ① 先铺一条覆盖全幅的浅色斜向渐变（暖 → 冷 → 薄荷 → 藕），保证任何位置都有色；
- *  ② 再叠 5 团大半径柔光打散均匀；
- *  ③ 最后 `blur(≈4.5vw)` 抹平边界 + 7% 白纱压淡。
- *  ⇒ 观感 = 一整张浅色雾面，组件浮在上面；文字区仍近白，不影响对比度。 */
+/** 背景壁纸：**极简中性色**（v20.7）——
+ *  去掉暖橙/薄荷/藕粉的彩色倾向，只保留一层几乎无彩的冷灰白，
+ *  加两团极淡的中性灰罩（一冷一暖，chroma 很低）制造一点纵深，再整层虚化。
+ *  ⇒ 观感 = 一张干净的浅灰白纸，玻璃与文字是唯一的主角。 */
 function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: { width: number; height: number }) {
   const base = ctx.createLinearGradient(0, 0, w, h);
-  base.addColorStop(0, "#f8e3d2");
-  base.addColorStop(0.42, "#e3eaff");
-  base.addColorStop(0.72, "#dcf4ea");
-  base.addColorStop(1, "#f9e0ee");
+  base.addColorStop(0, "#fcfcfd");
+  base.addColorStop(0.5, "#f5f6f9");
+  base.addColorStop(1, "#fafbfc");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
 
@@ -41,14 +39,11 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
   };
   ctx.save();
   ctx.filter = `blur(${Math.max(36, Math.round(w * 0.045))}px)`;
-  // v20.5：加深一档 —— 指针高光（着色器 glint）在浅底上几乎看不出来，只能靠背景有"色"来承接
-  blob(0.05, 0.08, 0.5, "rgba(255,170,118,.62)"); // 暖橙
-  blob(0.5, -0.05, 0.55, "rgba(132,164,255,.6)"); // 冷蓝
-  blob(0.97, 0.18, 0.5, "rgba(110,224,200,.52)"); // 薄荷
-  blob(0.22, 0.95, 0.5, "rgba(246,150,206,.5)"); // 藕粉
-  blob(0.78, 0.88, 0.5, "rgba(150,186,255,.52)"); // 天蓝
+  // 只有两团：冷灰蓝（右上）+ 中性暖灰（左下）；chroma 压到 ~10，几乎看不出色相
+  blob(0.84, 0.02, 0.55, "rgba(176,188,210,.34)");
+  blob(0.08, 0.92, 0.55, "rgba(203,201,205,.26)");
   ctx.restore();
-  ctx.fillStyle = "rgba(253,254,255,.02)";
+  ctx.fillStyle = "rgba(253,254,255,.10)";
   ctx.fillRect(0, 0, w, h);
 }
 
