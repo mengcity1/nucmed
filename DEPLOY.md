@@ -164,3 +164,26 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM+AHCrcm8uHk39BCRnLvYDXhQGOpgDhuK/fYjLETWgK
 ### 7.6 一句话总结
 
 **"build 成功 + commit 成功 + 工作区干净" ≠ "已发布"。** 唯一判据是 §7.3 第 2 步。
+
+### 7.7 ★ 真正的坑：**Git 自带的 OpenSSH 10.6 被 GitHub 拒**（2026-11-04 定位）
+
+| 客户端 | 结果 |
+|---|---|
+| `C:\Windows\System32\OpenSSH\ssh.exe`（Windows 自带） | ✅ `Hi mengcity1! You've successfully authenticated` |
+| `C:\Program Files\Git\usr\bin\ssh.exe`（**OpenSSH_10.6p1**，git 默认用它） | ❌ `Permission denied (publickey)` |
+
+**症状极具误导性**：`ssh -T git@github.com` 手动能过，`git push` 却报 `Permission denied` / `Please make sure you have the correct access rights` —— 会让人误判成"key 过期 / 没权限 / 仓库不存在"。
+
+**修法（本仓已设置）**：
+```powershell
+cd c:\nucmed\web
+git config core.sshCommand 'C:/Windows/System32/OpenSSH/ssh.exe'
+git push
+```
+
+**判据**：`git push` 必须看到 `xxxx..yyyy  main -> main`；若只有 `Please make sure you have the correct access rights`，先查 `core.sshCommand`，再看 key。
+
+> 2026-11-04 当天还发生过一次"账号里的旧 key 被移除"（指纹 `SHA256:PUXCaDkg…`），
+> 于是换用了新的 `~/.ssh/id_ed25519_nucmed_gh`（指纹 `SHA256:Y2GEIXuWjeR8Hu5/Vfw9dYvlU8LRMHis4MvTmiyantE`，无口令，已加入账号）。
+> `~/.ssh/config` 里两把 key 都列着，新钥优先。
+
