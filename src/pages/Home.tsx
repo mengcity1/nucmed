@@ -366,7 +366,7 @@ export default function Home() {
 
       {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选
           v18：外层再套一层真折射玻璃（1 舞台 / 1 面片）；chip 的描边由 index.css 还原 */}
-      <GlassStage strength={0.5} className="mt-6">
+      <GlassStage variant="veil" className="mt-6">
       <section data-glass="panel" className="card-tint lg-surface px-5 py-4">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <b className="text-[14px] tracking-tight">{tr("home.filters")}</b>
@@ -525,7 +525,7 @@ export default function Home() {
       {/* 结果带：4 个指标（2026-11-04 v18：外套一层**真折射**玻璃舞台 ——
           背景由 WebGL 采样并弯折，指标本身仍是排版 + 发丝线，不加底色） */}
       <Reveal className="mt-6">
-        <GlassStage>
+        <GlassStage variant="shell" radius={20}>
           <section
             data-glass="panel"
             className="lg-surface grid grid-cols-2 gap-y-1 px-1.5 py-1.5 sm:grid-cols-4 sm:gap-0"
@@ -640,7 +640,10 @@ export default function Home() {
         </span>
       </div>
 
-      <div className="card-solid mt-3 overflow-hidden">
+      {/* v19：主表也进玻璃 —— "边光型"背景（中间压白，四边彩光）⇒ 数字仍落在白纸上，
+          但表框与四角是强折射 + 色散；行背景是白 `tr`，不受玻璃化影响 */}
+      <GlassStage variant="edge">
+      <div data-glass="panel" className="card-solid lg-surface mt-3 overflow-hidden">
         <div className="hscroll max-h-[calc(100vh-230px)] overflow-y-auto">
           <table className="table-booktabs w-full border-collapse text-[13px]">
             <thead className="sticky top-0 z-10">
@@ -757,6 +760,7 @@ export default function Home() {
           </table>
         </div>
       </div>
+      </GlassStage>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12.5px] text-ink-3">
         <div>{tr("home.pageInfo", { n: fmt(view.length), a: cur + 1, b: pages })}</div>

@@ -209,7 +209,7 @@
     .glass-tile {
       -webkit-backdrop-filter: blur(10px) saturate(1.3);
       backdrop-filter: blur(10px) saturate(1.3);
-      background: rgba(255, 255, 255, 0.86);
+      background: rgba(255, 255, 255, 0.70);
     }
   }
 
@@ -461,7 +461,7 @@
     font: inherit;
   }
   .glass-stage .lg-surface {
-    border-radius: 14px;
+    border-radius: var(--glass-r, 14px);
     border: 1px solid rgba(15, 23, 42, 0.06);
   }
   /* WebGL 就绪后它把 surface 背景置透明（玻璃像素由 canvas 画）；
@@ -501,6 +501,26 @@
   }
   .glass-bar.webgl-ready .lg-surface {
     box-shadow: none;
+  }
+
+  /* ── v19 数据表玻璃档（`.glass-edge`）────────────────────────────────
+     表格行/表头原本是**不透明纯白** ⇒ 玻璃只在 1px 边框处露不出来（实测 chr=1–4）。
+     改为半透明白：玻璃画在 canvas 上、行让色透出来 ⇒ 表格中心仍压白（artwork 内芯），
+     四边/四角呈强折射与色散。打印强制回纯白，保证 PDF 质量。 */
+  .glass-edge .table-booktabs thead th {
+    background: rgba(255, 255, 255, 0.70);
+  }
+  .glass-edge .table-booktabs tbody tr {
+    background: rgba(255, 255, 255, 0.62);
+  }
+  .glass-edge .table-booktabs tbody tr:hover {
+    background: rgba(240, 246, 255, 0.82);
+  }
+  @media print {
+    .glass-edge .table-booktabs thead th,
+    .glass-edge .table-booktabs tbody tr {
+      background: #fff !important;
+    }
   }
 
   /* 区块标题左侧色条：给长页面制造「段落节奏」 */

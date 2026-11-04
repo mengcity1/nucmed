@@ -670,7 +670,7 @@ export default function DrugDetail() {
       {/* 详情页页头（2026-11-04 v4）：结构缩略 + 药名 + 编号 + 一行关键指标 + 渐变细条
           v18：首屏三张"说明性卡"（页头 / 事实 / 组成）套一层真折射玻璃 —— 1 舞台 / 3 面片；
           下面的**数据面板（表格/分布图/剂量表）保持纯白**，不进舞台（读数与打印优先）。 */}
-      <GlassStage strength={0.5}>
+      <GlassStage variant="veil">
       <section data-glass="panel" className="card lg-surface mt-3 flex flex-wrap items-center gap-4 p-4">
         <div className="hidden h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-line bg-white sm:flex">
           {hasRealStruct && !imgErr.struct ? (
@@ -932,7 +932,9 @@ export default function DrugDetail() {
             <DrugCurve pts={mine} />
           </div>
         )}
-        <div className="card-solid mt-3 overflow-hidden">
+        {/* v19：数据表进玻璃（边光型背景）—— 中间压白保证读数，四边是折射/色散 */}
+        <GlassStage variant="edge">
+        <div data-glass="panel" className="card-solid lg-surface mt-3 overflow-hidden">
           <div className="hscroll">
             <table className="table-booktabs w-full border-collapse text-[13px]">
               <thead>
@@ -1047,6 +1049,7 @@ export default function DrugDetail() {
             </table>
           </div>
         </div>
+        </GlassStage>
       </section>
       )}
 

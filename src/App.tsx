@@ -11,6 +11,8 @@ import Overview from "./pages/Home";
 const DrugDetail = lazy(() => import("./pages/DrugDetail"));
 import About from "./pages/About";
 import Atlas from "./pages/Atlas";
+/** 临时：液态玻璃选型对照页（选完删除） */
+const GlassLab = lazy(() => import("./pages/GlassLab"));
 
 /** 全站 4 页（3 页 + 2026-10-28 新增「文献影像图集」）· 标签文案走 i18n 表 */
 const TABS: { to: string; key: StrKey; icon: IconName; end: boolean }[] = [
@@ -40,7 +42,7 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)]">
       {/* 导航条（2026-11-04 v18）：整条交给 WebGL 玻璃 —— 满宽、直角；
           WebGL2 不可用 / ≤640px ⇒ `.fallback` 自动退回 CSS 毛玻璃，视觉仍成立。 */}
-      <GlassStage className="glass-bar">
+      <GlassStage variant="shell" radius={0} className="glass-bar">
         <div data-glass="panel" className="lg-surface">
           <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
             <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
@@ -294,6 +296,7 @@ export default function App() {
             {/* 兼容旧链接 /drugs/:id */}
             <Route path="/drugs/:id" element={<DrugDetail />} />
             <Route path="/about" element={<About />} />
+            <Route path="/lab/glass" element={<GlassLab />} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />
             ))}
