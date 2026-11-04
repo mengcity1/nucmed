@@ -79,8 +79,8 @@ function Nav() {
             <button
               type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              title={theme === "dark" ? "浅色模式（米白）" : "深色模式"}
+              aria-label={theme === "dark" ? tr("theme.toLight") : tr("theme.toDark")}
+              title={theme === "dark" ? tr("theme.toLight") : tr("theme.toDark")}
               className="ml-1 grid h-8 w-8 shrink-0 place-items-center rounded-[10px] text-[14px] text-ink-2"
             >
               {theme === "dark" ? "☀" : "☾"}
