@@ -15,6 +15,7 @@ const LIST: { k: BgVariant; label: string; note: string }[] = [
   { k: "grain", label: "③ grain", note: "细噪点 · 像纸/毛玻璃底 · 透明感最自然" },
   { k: "waves", label: "④ waves", note: "45° 白色宽光带 · 绸缎感 · 可能显条纹" },
   { k: "none", label: "⑤ none", note: "只有中性渐变 · 最极简 · 玻璃几乎看不出透明" },
+  { k: "dark", label: "⑥ dark（深色渐变）", note: "深底 + 冷蓝/青/紫柔光 · 文字与表格整体翻深色 · **玻璃折射在深底上最明显**" },
 ];
 
 function Strip({ k, label, note }: { k: BgVariant; label: string; note: string }) {
@@ -38,7 +39,7 @@ function Strip({ k, label, note }: { k: BgVariant; label: string; note: string }
       <div className="text-[13px] font-medium">
         {label} <span className="font-normal text-ink-3">— {note}</span>
       </div>
-      <div ref={ref} className="lg-stage app-stage lab-stage mt-2">
+      <div ref={ref} className={`lg-stage app-stage lab-stage ${k === "dark" ? "dark" : ""} mt-2`}>
         <div className="flex h-full items-center gap-5 px-6">
           <div data-glass="panel" className="lg-surface p-4" style={{ borderRadius: 18 }}>
             <div className="label-caps">玻璃面板</div>

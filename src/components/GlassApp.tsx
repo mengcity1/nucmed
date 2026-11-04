@@ -20,9 +20,9 @@ import "../vendor/lens/components.css";
 
 /** 背景结构变体（地址栏 `?bg=` 切换，默认 mesh）——四种"给玻璃可折射的结构"的极简做法。
  *  共同点：**全部无色相**（灰白），只靠明暗与微小纹理制造层次；底色仍是同一条中性纵向渐变。 */
-export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none";
+export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none" | "dark";
 
-const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none"];
+const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none", "dark"];
 
 /** 背景壁纸：中性纵向渐变（共同底）+ 按变体叠结构。
  *  - mesh  ：多层超大柔光交织（云雾感，**无线条**，最不抢眼）
@@ -50,6 +50,23 @@ export function paintWallpaper(
     ctx.fillStyle = rg;
     ctx.fillRect(0, 0, w, h);
   };
+
+  if (variant === "dark") {
+    // v20.9：深色渐变（**深底才让玻璃的折射/高光显形**）
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, "#0f1828");
+    g.addColorStop(0.5, "#131e33");
+    g.addColorStop(1, "#0a111c");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.filter = `blur(${Math.max(30, Math.round(w * 0.04))}px)`;
+    blob(0.14, 0.06, 0.6, "rgba(64,120,255,.34)"); // 冷蓝
+    blob(0.9, 0.2, 0.5, "rgba(0,196,186,.20)"); // 青
+    blob(0.5, 0.92, 0.62, "rgba(124,92,255,.24)"); // 紫
+    ctx.restore();
+    return;
+  }
 
   if (variant === "mesh") {
     ctx.save();
@@ -146,6 +163,8 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     const bgRaw = (qs.get("bg") ?? "mesh").toLowerCase();
     const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw) ? (bgRaw as BgVariant) : "mesh";
     const material = MATERIALS[g] ?? MATERIALS.mid;
+    // 深色变体：给舞台加 `.dark`，由 index.css 里的深色令牌把文字/表格/按钮一并翻过去
+    if (bg === "dark") el.classList.add("dark");
     const sys = createGlassSystem(el, {
       material,
       scene: "aurora",

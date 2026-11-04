@@ -711,6 +711,7 @@
 
   /* 仅 /lab/bg 对照页使用：把"全屏固定舞台"改成一条横向长条
      （放在文件最后 ⇒ 同特异性下覆盖前面的 `.app-stage.lg-stage`） */
+  /* 仅 /lab/bg 对照页使用：把"全屏固定舞台"改成一条横向长条 */
   .app-stage.lab-stage {
     position: relative;
     inset: auto;
@@ -718,5 +719,132 @@
     border-radius: 16px;
     overflow: hidden;
     background: linear-gradient(180deg, #fdfeff 0%, #f4f6fa 55%, #e9edf4 100%);
+  }
+  /* ── v20.9 深色预览（`?bg=dark`）──────────────────────────────────────
+     深底才让玻璃的折射/高光"有东西可折"。深色必须**连带**把文字/表格/按钮翻过去，
+     否则深底黑字直接不可读 —— 下面这一组就是那套翻转令牌（用 (0,2,0)+ 压过 Tailwind 工具类）。 */
+  .app-stage.dark.lg-stage {
+    color: #e8eef7;
+    background: linear-gradient(160deg, #0f1828 0%, #131e33 52%, #0a111c 100%);
+  }
+  .app-stage.dark .text-ink {
+    color: #eef3fa;
+  }
+  .app-stage.dark .text-ink-2 {
+    color: #cfd9e8;
+  }
+  .app-stage.dark .text-ink-3 {
+    color: #9fb0c8;
+  }
+  .app-stage.dark .text-brand {
+    color: #9cc7ff;
+  }
+  .app-stage.dark .text-brand-deep {
+    color: #a9d0ff;
+  }
+  /* KPI 的四个彩色数字（Tailwind 任意值类）—— 用属性选择器统一提亮 */
+  .app-stage.dark [class*="#12457f"] {
+    color: #9dc2ff;
+  }
+  .app-stage.dark [class*="#0a6f66"] {
+    color: #7fe2d6;
+  }
+  .app-stage.dark [class*="#4b3ea3"] {
+    color: #b9b0ff;
+  }
+  .app-stage.dark [class*="#8a5a12"] {
+    color: #f0c07a;
+  }
+  /* 卡片 / 表格 */
+  .app-stage.dark .card {
+    background: rgba(20, 30, 48, 0.55);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .app-stage.dark .card-solid {
+    background: rgba(18, 27, 44, 0.62);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+  }
+  .app-stage.dark .table-booktabs thead th {
+    background: rgba(255, 255, 255, 0.06);
+    color: #c3d0e2;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .app-stage.dark .table-booktabs tbody tr {
+    background: rgba(255, 255, 255, 0.025);
+  }
+  .app-stage.dark .table-booktabs tbody tr:hover {
+    background: rgba(120, 170, 255, 0.12);
+  }
+  .app-stage.dark .table-booktabs tbody tr:last-child td,
+  .app-stage.dark .table-booktabs thead th {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .app-stage.dark.glass-edge .table-booktabs tbody tr,
+  .app-stage.dark .glass-edge .table-booktabs tbody tr {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .app-stage.dark .border-line,
+  .app-stage.dark .divide-\[\#f1f4f9\] > * + * {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  /* 玻璃面板：深色版的边光（白色高光压到 .16，投影转纯黑） */
+  .app-stage.dark.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+      inset 0 -20px 28px -26px rgba(0, 0, 0, 0.6),
+      0 14px 36px -26px rgba(0, 0, 0, 0.8);
+  }
+  .app-stage.dark.webgl-ready .lg-surface {
+    background-image: radial-gradient(
+      520px circle at var(--mx, 50%) var(--my, -20%),
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.07) 34%,
+      rgba(255, 255, 255, 0) 64%
+    );
+  }
+  /* 按钮 / tab / chip 的深色玻璃 */
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
+    border-color: rgba(255, 255, 255, 0.2);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 1px 2px rgba(0, 0, 0, 0.35);
+    color: #dfe8f5;
+  }
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
+  .app-stage.dark .tab-on {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+  }
+  .app-stage.dark .chip-off {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #dbe5f3;
+  }
+  .app-stage.dark .chip-on {
+    background: rgba(120, 170, 255, 0.22);
+    border-color: rgba(140, 185, 255, 0.45);
+    color: #e8f1ff;
+  }
+  /* 输入框 / 搜索 */
+  .app-stage.dark input {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #eef3fa !important;
+  }
+  .app-stage.dark input::placeholder {
+    color: #93a3ba;
+  }
+  /* 页脚/说明文字（在背景上的）已由 .text-ink-3 覆盖；再压一下 hr 与分隔线 */
+  .app-stage.dark .bg-gradient-to-r {
+    opacity: 0.5;
   }
 }
