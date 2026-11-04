@@ -37,10 +37,10 @@ function Nav() {
   const tr = useT();
   const { lang, setLang } = useLang();
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)]">
-      {/* 导航条（2026-11-04 v18）：整条交给 WebGL 玻璃 —— 满宽、直角；
-          WebGL2 不可用 / ≤640px ⇒ `.fallback` 自动退回 CSS 毛玻璃，视觉仍成立。 */}
-        <div data-glass="panel" className="lg-surface glass-bar">
+    <header className="sticky top-0 z-50 nav-sheet border-b border-[rgba(15,23,42,.08)]">
+      {/* v20.2：导航**容器条不挂玻璃**（否则"容器玻璃 + 每个按钮玻璃"两层相接 = 缝隙），
+          容器只用 CSS 半透明 + 模糊；**每个 tab 自己才是那块液态玻璃**（data-glass="small"）。 */}
+        <div>
           <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
             <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
               <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
@@ -60,8 +60,9 @@ function Nav() {
                   key={tab.to}
                   to={tab.to}
                   end={tab.end}
+                  data-glass="small"
                   className={({ isActive }) =>
-                    `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
+                    `tab lg-surface shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
                   }
                 >
                   <span className="hidden sm:inline-flex">

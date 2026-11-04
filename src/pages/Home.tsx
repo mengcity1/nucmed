@@ -81,7 +81,7 @@ function Chip({
   sm?: boolean;
 }) {
   return (
-    <button onClick={onClick} className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"}`}>
+    <button onClick={onClick} data-glass="small" className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"} lg-surface`}>
       {on && <span className="text-[10.5px] leading-none">✓</span>}
       {children}
     </button>

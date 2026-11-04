@@ -65,7 +65,7 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     }
     const sys = createGlassSystem(el, {
       // 背景是虚化的雾 ⇒ 玻璃要"宽而柔"：折射带大、雾化高、只留少量色散
-      material: { refraction: 0.70, blur: 0.12, dispersion: 0.38 },
+      material: { refraction: 0.78, blur: 0.16, dispersion: 0.40 },
       scene: "aurora",
       motion: !calm,
       audio: { enabled: false },

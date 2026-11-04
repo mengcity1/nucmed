@@ -583,7 +583,31 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.7),
       0 1px 2px rgba(15, 23, 42, 0.04);
   }
-  /* 玻璃上的小件（chip / tab）：同层高光，不参与折射 ⇒ 已由 .tab / .chip 承担 */
+  /* ── v20.2 导航：容器条只做 CSS 半透明+模糊，**玻璃在按钮上** ──────────────
+     两层 canvas 玻璃相接会显缝；容器改用 CSS（均匀一层，不会和按钮的折射打架）。 */
+  .nav-sheet {
+    background: rgba(255, 255, 255, 0.42);
+    -webkit-backdrop-filter: blur(20px) saturate(1.25);
+    backdrop-filter: blur(20px) saturate(1.25);
+  }
+  /* 小件（tab / chip）自己就是玻璃；状态用"多半透明白"表达，(0,3,0) 压过 vendor 的 (0,2,0) */
+  .app-stage .tab.lg-surface:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #0f172a;
+  }
+  .app-stage .tab-on.lg-surface {
+    background: rgba(255, 255, 255, 0.5);
+    color: #164a8a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+  .app-stage .chip-off.lg-surface {
+    background: rgba(255, 255, 255, 0.42);
+  }
+  .app-stage .chip-on.lg-surface {
+    background: rgba(30, 91, 168, 0.16);
+  }
   @media print {
     .app-stage {
       position: static;
