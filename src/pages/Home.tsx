@@ -162,6 +162,34 @@ function Metric({
   );
 }
 
+/** 首页顶部的宽搜索框（2026-11-04）：接手原来导航里的小搜索框 ——
+ *  与大标题同处一条细带，宽度 420px（小屏整行）。真值仍是 URL 的 `?q=`，与筛选/快捷键共用同一参数。 */
+function HeroSearch({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const tr = useT();
+  return (
+    <div className="relative w-full sm:w-[420px]">
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-white/55">🔍</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={tr("nav.searchPh")}
+        aria-label={tr("nav.searchPh")}
+        className="h-10 w-full rounded-[10px] border border-white/25 bg-white/[0.12] pl-9 pr-9 text-[13.5px] text-white outline-none backdrop-blur-sm transition placeholder:text-white/50 focus:border-white/45 focus:bg-white/[0.18]"
+      />
+      {value ? (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label={tr("drug.clearKw")}
+          className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-white/60 transition hover:bg-white/15 hover:text-white"
+        >
+          ✕
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Home() {
   const { data: drugs, error, reload } = useJSON<Drug[]>("drugs.json");
   const { data: st } = useJSON<Stats>("stats.json");
@@ -332,7 +360,11 @@ export default function Home() {
 
   return (
     <div className="pb-4">
-      <PageHero title={tr("home.title")} lead={tr("home.lead")} />
+      <PageHero
+        title={tr("home.title")}
+        lead={tr("home.lead")}
+        right={<HeroSearch value={kw} onChange={setKw} />}
+      />
 
       {error && (
         <div className="mt-4">

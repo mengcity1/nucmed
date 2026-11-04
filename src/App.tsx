@@ -1,4 +1,4 @@
-import { NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
@@ -33,6 +33,9 @@ const LEGACY = [
 function Nav() {
   const [sp, setSp] = useSearchParams();
   const nav = useNavigate();
+  const loc = useLocation();
+  /** ★ 2026-11-04：首页自己有一条「细带 + 宽搜索框」，导航里的搜索在本页隐藏（避免两个输入框同步同一参数）。 */
+  const onHome = loc.pathname === "/";
   const q = sp.get("q") ?? "";
   const tr = useT();
   const { lang, setLang } = useLang();
@@ -67,6 +70,7 @@ function Nav() {
           </span>
         </NavLink>
 
+        {!onHome && (
         <div className="relative hidden min-w-0 flex-1 max-w-[360px] md:block">
           <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#9aa8bd]">
             🔍
@@ -78,7 +82,9 @@ function Nav() {
             className="h-[38px] w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[13.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
           />
         </div>
+        )}
 
+        {!onHome && (
         <button
           type="button"
           onClick={() => setMOpen((v) => !v)}
@@ -88,6 +94,7 @@ function Nav() {
         >
           {mOpen ? "✕" : "🔍"}
         </button>
+        )}
 
         <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1">
           {TABS.map((tab) => (
@@ -143,7 +150,7 @@ function Nav() {
       </div>
 
       {/* 小屏展开式搜索：整行铺满，Esc 或 ✕ 收起 */}
-      {mOpen && (
+      {!onHome && mOpen && (
         <div className="wrap pb-3 md:hidden">
           <div className="relative">
             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#9aa8bd]">

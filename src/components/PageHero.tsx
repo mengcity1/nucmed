@@ -35,13 +35,17 @@ export default function PageHero({
         className="pointer-events-none absolute -bottom-32 left-1/4 h-64 w-64 rounded-full"
         style={{ background: "radial-gradient(circle at center, rgba(78,205,196,.34) 0%, rgba(78,205,196,0) 70%)" }}
       />
-      <div className="relative flex flex-wrap items-end justify-between gap-x-8 gap-y-4 px-6 py-7 sm:px-9 sm:py-9">
-        <div className="min-w-0">
+      <div className="relative flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-3.5 sm:px-7 sm:py-4">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="hero-title">{title}</h1>
-          <span className="hero-rule block" />
-          {lead ? <p className="mt-3 max-w-[720px] text-[13px] leading-relaxed text-white/70">{lead}</p> : null}
+          {lead ? (
+            <>
+              <span aria-hidden className="hidden h-4 w-px bg-white/20 sm:block" />
+              <p className="hidden min-w-0 flex-1 truncate text-[12.5px] text-white/65 sm:block">{lead}</p>
+            </>
+          ) : null}
         </div>
-        {right ? <div className="shrink-0">{right}</div> : null}
+        {right ? <div className="w-full shrink-0 sm:w-auto">{right}</div> : null}
       </div>
     </section>
   );

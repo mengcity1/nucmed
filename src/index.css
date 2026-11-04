@@ -129,17 +129,17 @@
   .table-zebra tbody tr:hover {
     background-color: #f3f8ff;
   }
-  /* 页头标题：深色带上是白字（2026-11-04 v2）。不用 gradient text —— 标题含 emoji，
+  /* 页头标题：深色带上是白字（2026-11-04 v2 · 细带版）。不用 gradient text —— 标题含 emoji，
      background-clip:text 在部分浏览器会把 emoji 一起 clip 成透明。 */
   .hero-title {
     @apply font-bold text-white;
-    font-size: 29px;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    font-size: 21px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
   @media (min-width: 640px) {
     .hero-title {
-      font-size: 33px;
+      font-size: 23px;
     }
   }
   .hero-rule {
