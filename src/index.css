@@ -1239,4 +1239,37 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       0 1px 3px rgba(0, 0, 0, 0.4);
   }
+
+  /* ── v25 筛选区的"常驻滚动条"（owner：滑块要一直看得见）─────────────
+     Chrome/Edge 里自定义 `::-webkit-scrollbar` 是**常显**的（不是 overlay 那种滚动才出现）；
+     Firefox 用 `scrollbar-width / scrollbar-color`；`scrollbar-gutter` 预留槽位，内容不跳。 */
+  .filter-scroll {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 140, 175, 0.55) rgba(120, 140, 175, 0.1);
+    overscroll-behavior: contain;
+  }
+  .filter-scroll::-webkit-scrollbar {
+    width: 9px;
+  }
+  .filter-scroll::-webkit-scrollbar-track {
+    background: rgba(120, 140, 175, 0.12);
+    border-radius: 999px;
+  }
+  .filter-scroll::-webkit-scrollbar-thumb {
+    background: rgba(120, 140, 175, 0.6);
+    border-radius: 999px;
+  }
+  .filter-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 140, 175, 0.8);
+  }
+  .app-stage.dark .filter-scroll {
+    scrollbar-color: rgba(190, 205, 226, 0.5) rgba(255, 255, 255, 0.06);
+  }
+  .app-stage.dark .filter-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .app-stage.dark .filter-scroll::-webkit-scrollbar-thumb {
+    background: rgba(190, 205, 226, 0.45);
+  }
 }

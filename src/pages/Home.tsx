@@ -203,7 +203,6 @@ export default function Home() {
       { replace: true }
     );
   // ★ 筛选区：核素默认 Top12 + 可展开栏；三个维度各有搜索框
-  const [nucAll, setNucAll] = useState(false);
   const [qNuc, setQNuc] = useState("");
   const [qTgt, setQTgt] = useState("");
   const [qDis, setQDis] = useState("");
@@ -244,13 +243,13 @@ export default function Home() {
     const q = qTgt.trim().toLowerCase();
     const pool = q ? allTargets.filter((t) => t.toLowerCase().includes(q)) : allTargets;
     const uniq = [...new Set([...targets, ...pool])];
-    return { items: uniq.slice(0, 30), total: uniq.length };
+    return { items: uniq, total: uniq.length };
   }, [allTargets, targets, qTgt]);
   const disList = useMemo(() => {
     const q = qDis.trim().toLowerCase();
     const pool = q ? allDiseases.filter((t) => t.toLowerCase().includes(q)) : allDiseases;
     const uniq = [...new Set([...diseases, ...pool])];
-    return { items: uniq.slice(0, 30), total: uniq.length };
+    return { items: uniq, total: uniq.length };
   }, [allDiseases, diseases, qDis]);
   const nSel = types.length + nucs.length + targets.length + diseases.length + stages.length;
 
@@ -289,7 +288,6 @@ export default function Home() {
     return [...missing, ...all];
   }, [nucFreq, qNuc, nucs]);
 
-  const shownNucs = nucAll || qNuc.trim() ? nucOrdered : nucOrdered.slice(0, 12);
 
   const view = useMemo(() => {
     let v = drugs ?? [];
@@ -471,9 +469,10 @@ export default function Home() {
               placeholder={tr("home.searchIsotope", { n: nucOrdered.length })}
               className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
             />
-            <div className={nucAll && !qNuc.trim() ? "max-h-[104px] overflow-y-auto pr-1" : ""}>
+            {/* v25：核素不再"展开/收起"，全部放进常驻滚动区（去掉原来的 nucAll 切换） */}
+            <div className="filter-scroll max-h-[148px] overflow-y-auto pr-1.5">
               <div className="flex flex-wrap gap-1.5">
-                {shownNucs.map((n) => (
+                {nucOrdered.map((n) => (
                   <Chip
                     key={n}
                     sm
@@ -489,18 +488,6 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            {!qNuc.trim() && nucOrdered.length > 12 && (
-              <button
-                type="button"
-                onClick={() => setNucAll((v) => !v)}
-                className="mt-1.5 text-[11.5px] font-medium text-brand-deep transition hover:underline"
-              >
-                <span>
-                  {nucAll ? tr("home.collapse") : tr("home.expand", { n: nucOrdered.length })}
-                </span>
-                <span className="text-ink-3">{nucAll ? "▲" : "▼"}</span>
-              </button>
-            )}
           </div>
 
           <div>
@@ -511,7 +498,7 @@ export default function Home() {
               placeholder={tr("home.searchTargets", { n: allTargets.length })}
               className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
             />
-            <div className="flex max-h-[104px] flex-wrap gap-1.5 overflow-y-auto pr-1">
+            <div className="filter-scroll flex max-h-[148px] flex-wrap gap-1.5 overflow-y-auto pr-1.5">
               {tgtList.items.map((t) => (
                 <Chip
                   key={t}
@@ -542,7 +529,7 @@ export default function Home() {
                 placeholder={tr("home.searchDiseases", { n: allDiseases.length })}
                 className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
               />
-              <div className="flex max-h-[104px] flex-wrap gap-1.5 overflow-y-auto pr-1">
+              <div className="filter-scroll flex max-h-[148px] flex-wrap gap-1.5 overflow-y-auto pr-1.5">
                 {disList.items.map((t) => (
                   <Chip
                     key={t}
