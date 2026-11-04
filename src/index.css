@@ -50,6 +50,27 @@
   ::selection {
     background: #cfe1f7;
   }
+
+  /* ★ 2026-11-04 学术风排版：h1/h2 用衬线（思源宋体）—— 正文仍无衬线。
+     英文标题自动落到 Georgia（系统衬线），即使 Google Fonts 取不到也有"出版感"。
+     注意：药名之类需要无衬线的标题，用 Tailwind 的 font-sans 覆盖即可（utilities 层优先）。 */
+  h1,
+  h2 {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+    letter-spacing: -0.005em;
+  }
+
+  /* ★ 可访问性硬约束：用户开了「减少动态效果」⇒ 全站动效近似关闭 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
@@ -173,6 +194,13 @@
   }
 
   /* 表格：斑马纹 + 行悬停（只加在显式使用 .table-zebra 的表上，避免误伤紧凑表） */
+  .table-zebra tbody tr {
+    transition: opacity 150ms cubic-bezier(0.2, 0, 0.38, 0.9), background-color 150ms ease;
+  }
+  /* 行聚焦（2026-11-04）：悬停某行时，其余行降到 85% —— 30 行表里"跟读"更容易 */
+  .table-zebra tbody:hover tr:not(:hover) {
+    opacity: 0.85;
+  }
   .table-zebra tbody tr:nth-child(odd) {
     background-color: #fbfcfe;
   }

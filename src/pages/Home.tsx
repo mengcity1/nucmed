@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
+import Reveal from "../components/Reveal";
+import { useCountUp } from "../lib/useCountUp";
 import { ErrorState } from "../components/States";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 
@@ -114,11 +116,13 @@ function Metric({
   icon = "grid",
 }: {
   label: string;
-  value: string;
+  /** ★ 2026-11-04 改为数值：卡片内部自己做 600ms 计数动画（`useCountUp`） */
+  value: number;
   hint?: string;
   tone?: MetricTone;
   icon?: IconName;
 }) {
+  const shown = useCountUp(value);
   const bar: Record<MetricTone, string> = {
     brand: "bg-gradient-to-r from-[#1e5ba8] to-[#4a8ee0]",
     accent: "bg-gradient-to-r from-[#0d9488] to-[#4ecdc4]",
@@ -150,7 +154,7 @@ function Metric({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[12px] font-medium text-ink-2">{label}</div>
-          <div className={`num mt-1.5 text-[27px] font-bold leading-none tracking-tight ${val[tone]}`}>{value}</div>
+          <div className={`num mt-1.5 text-[27px] font-bold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
           {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
         </div>
         <span className={`stat-ico ${ico[tone]}`}>
@@ -524,13 +528,14 @@ export default function Home() {
         )}
       </section>
 
-      {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡） */}
-      <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡 · 进入视口时渐显） */}
+      <Reveal className="mt-6">
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Metric
           tone="brand"
           icon="grid"
           label={tr("home.kpiResult")}
-          value={fmt(view.length)}
+          value={view.length}
           hint={tr("home.kpiResultHint", {
             a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
             b: st ? fmt(st.drugs) : "…",
@@ -540,14 +545,14 @@ export default function Home() {
           tone="accent"
           icon="shield"
           label={tr("home.kpiApproved")}
-          value={fmt(stageCount["已上市"] ?? 0)}
+          value={stageCount["已上市"] ?? 0}
           hint={tr("home.kpiApprovedHint")}
         />
         <Metric
           tone="violet"
           icon="layers"
           label={tr("home.kpiStruct")}
-          value={fmt(nStruct)}
+          value={nStruct}
           hint={tr("home.kpiStructHint", {
             p: view.length ? ((nStruct / view.length) * 100).toFixed(1) : "0.0",
           })}
@@ -556,7 +561,7 @@ export default function Home() {
           tone="sand"
           icon="heart"
           label={tr("home.kpiDosim")}
-          value={fmt(st?.dosimetry?.total ?? 0)}
+          value={st?.dosimetry?.total ?? 0}
           hint={
             st?.dosimetry
               ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
@@ -564,6 +569,7 @@ export default function Home() {
           }
         />
       </section>
+      </Reveal>
 
       {/* 研发阶段徽章 + 排序 */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

@@ -31,9 +31,30 @@ export default {
           "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "none" },
         },
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         fadeUp: "fadeUp .38s cubic-bezier(.22,.61,.36,1) both",
+        fadeIn: "fadeIn .24s cubic-bezier(.22,.61,.36,1) both",
+      },
+      /* ★ 2026-11-04 动效令牌（对齐 IBM Carbon 的 productive/expressive 分档）：
+         - standard/entrance/exit 三条曲线覆盖 90% 场景
+         - 时长只用 120/160/240/320/600 五档，禁止随手写 0.3s */
+      transitionDuration: {
+        120: "120ms",
+        160: "160ms",
+        240: "240ms",
+        320: "320ms",
+        600: "600ms",
+      },
+      transitionTimingFunction: {
+        standard: "cubic-bezier(0.2, 0, 0.38, 0.9)",
+        entrance: "cubic-bezier(0, 0, 0.38, 0.9)",
+        exit: "cubic-bezier(0.2, 0, 1, 0.9)",
+        emphasis: "cubic-bezier(0.2, 0, 0, 1)",
       },
     },
   },

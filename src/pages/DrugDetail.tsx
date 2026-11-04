@@ -126,6 +126,10 @@ function DrugCurve({ pts }: { pts: Point[] }) {
 
     return {
       color: PALETTE,
+      /* 动效：先出坐标轴、再错峰落点（600ms / cubicOut / 每系列 +40ms） */
+      animationDuration: 600,
+      animationEasing: "cubicOut" as const,
+      animationDelay: (idx: number) => idx * 40,
       tooltip: {
         trigger: "item" as const,
         formatter: (q: {
@@ -179,6 +183,11 @@ function DrugCurve({ pts }: { pts: Point[] }) {
     });
     return {
       color: PALETTE,
+      /* 动效：曲线同样 600ms 生长；换视图时用 300ms 过渡，不闪 */
+      animationDuration: 600,
+      animationDurationUpdate: 300,
+      animationEasing: "cubicOut" as const,
+      animationEasingUpdate: "cubicOut" as const,
       tooltip: {
         trigger: "item" as const,
         formatter: (q: { seriesName: string; data: { value: [number, number]; pmid: string | null } | null }) => {
@@ -668,7 +677,7 @@ export default function DrugDetail() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-2.5">
-            <h1 className="text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
+            <h1 className="font-sans text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
             <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
               # {drug.drug_id}
             </span>
@@ -811,7 +820,7 @@ export default function DrugDetail() {
                       alt: tr("drug.structAlt", { d: drug.name_en }),
                     })
                   }
-                  className="cursor-zoom-in rounded-lg transition hover:opacity-90"
+                  className="cursor-zoom-in rounded-lg transition duration-200 ease-out hover:scale-[1.015] hover:shadow-s2"
                   title={tr("drug.clickZoom")}
                 >
                   <img
