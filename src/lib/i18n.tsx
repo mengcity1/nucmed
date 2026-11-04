@@ -48,6 +48,7 @@ export const STR = {
   "home.filters": { zh: "筛选条件", en: "Filters" },
   "home.filtered": { zh: "已筛选", en: "filtered" },
   "home.allLib": { zh: "全库", en: "all" },
+  "home.stageClick": { zh: "点击筛选该阶段（可多选）", en: "Click to filter by this stage (multi-select)" },
   "home.stageClear": { zh: "清除阶段", en: "Clear stage" },
   "home.selectedN": { zh: "已选 {n} 项", en: "{n} selected" },
   "home.expandFilters": { zh: "展开筛选", en: "Show filters" },

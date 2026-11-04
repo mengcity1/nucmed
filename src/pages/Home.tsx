@@ -580,11 +580,12 @@ export default function Home() {
                   setStages((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
                   setPage(0);
                 }}
-                className={`rounded-full border px-2 py-0.5 text-[11.5px] font-medium transition ${
+                className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition hover:ring-1 hover:ring-brand/30 ${
                   on
                     ? "border-brand bg-brand text-white shadow-[0_2px_8px_-2px_rgba(30,91,168,.55)]"
                     : `${STAGE_TONE[s]} hover:-translate-y-px hover:shadow-s1`
                 }`}
+                title={tr("home.stageClick")}
               >
                 {stageLabel(lang, s)}{" "}
                 <span className="tabular-nums opacity-80">{fmt(stageFacet[s])}</span>
