@@ -18,13 +18,24 @@ import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
 
-/** 背景壁纸：**极简中性 + 可被玻璃模糊的结构**（v20.8）
- *  上一版（v20.7）纯中性灰白 ⇒ 玻璃背后没有任何细节 ⇒ 看起来就是"白卡片"，没有透明感。
- *  这一版仍保持单一中性色（不加彩色），但补两样"结构"：
- *   ① 从顶到底的**轻微明暗渐变**（#fcfdff → #eceff5）：玻璃面板在深浅交界处能看出透过关系；
- *   ② **极淡细网格**（28px、alpha .045）—— 在纸上是清晰的，透过玻璃被模糊/扭曲 ⇒ 一眼看出透明。
- *  ⇒ 既不花，又有透明感。 */
-function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: { width: number; height: number }) {
+/** 背景结构变体（地址栏 `?bg=` 切换，默认 mesh）——四种"给玻璃可折射的结构"的极简做法。
+ *  共同点：**全部无色相**（灰白），只靠明暗与微小纹理制造层次；底色仍是同一条中性纵向渐变。 */
+export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none";
+
+const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none"];
+
+/** 背景壁纸：中性纵向渐变（共同底）+ 按变体叠结构。
+ *  - mesh  ：多层超大柔光交织（云雾感，**无线条**，最不抢眼）
+ *  - dots  ：极淡点阵（间距 22px、直径 2px、alpha .06）
+ *  - grain ：细噪点（像纸张/毛玻璃底，无方向感）
+ *  - waves ：极淡斜向宽光带（绸缎感，最"有质感"但最容易被看出"有条纹"）
+ *  - none  ：只有渐变（最极简，但玻璃几乎看不出透明） */
+function paintWallpaper(
+  ctx: CanvasRenderingContext2D,
+  { width: w, height: h }: { width: number; height: number },
+  variant: BgVariant = "mesh"
+) {
+  // ① 共同底：中性纵向明暗
   const base = ctx.createLinearGradient(0, 0, 0, h);
   base.addColorStop(0, "#fdfeff");
   base.addColorStop(0.55, "#f4f6fa");
@@ -39,30 +50,74 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
     ctx.fillStyle = rg;
     ctx.fillRect(0, 0, w, h);
   };
-  ctx.save();
-  ctx.filter = `blur(${Math.max(30, Math.round(w * 0.035))}px)`;
-  blob(0.18, 0.02, 0.6, "rgba(255,255,255,.55)"); // 上方一团白光（提亮、出层次）
-  blob(0.92, 0.95, 0.55, "rgba(196,204,218,.30)"); // 右下压一点冷灰
-  ctx.restore();
 
-  // 极淡细网格（**不过 blur**）：纸上清晰、玻璃后模糊 ⇒ 透明感的来源
-  ctx.save();
-  ctx.strokeStyle = "rgba(15,23,42,.075)";
-  ctx.lineWidth = 1;
-  const step = 28;
-  for (let x = 0; x <= w; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, h);
-    ctx.stroke();
+  if (variant === "mesh") {
+    ctx.save();
+    ctx.filter = `blur(${Math.max(24, Math.round(w * 0.03))}px)`;
+    blob(0.16, 0.04, 0.62, "rgba(255,255,255,.75)");
+    blob(0.86, 0.22, 0.55, "rgba(203,210,222,.34)");
+    blob(0.52, 0.58, 0.6, "rgba(255,255,255,.55)");
+    blob(0.1, 0.96, 0.5, "rgba(198,205,218,.3)");
+    blob(0.94, 0.88, 0.45, "rgba(255,255,255,.6)");
+    ctx.restore();
+    return;
   }
-  for (let y = 0; y <= h; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(w, y + 0.5);
-    ctx.stroke();
+
+  if (variant === "dots") {
+    ctx.save();
+    ctx.fillStyle = "rgba(15,23,42,.06)";
+    const step = 22;
+    for (let y = step / 2; y < h; y += step) {
+      for (let x = step / 2; x < w; x += step) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+    return;
   }
-  ctx.restore();
+
+  if (variant === "grain") {
+    // 细噪点：先画 96×96 随机噪点，再当 pattern 平铺（低 alpha ⇒ 只是一层"毛面"）
+    const tile = document.createElement("canvas");
+    tile.width = 96;
+    tile.height = 96;
+    const tctx = tile.getContext("2d");
+    if (tctx) {
+      const img = tctx.createImageData(96, 96);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 120 + Math.random() * 135; // 亮噪点为主，避免"脏"
+        img.data[i] = v;
+        img.data[i + 1] = v;
+        img.data[i + 2] = v;
+        img.data[i + 3] = 16;
+      }
+      tctx.putImageData(img, 0, 0);
+      const pat = ctx.createPattern(tile, "repeat");
+      if (pat) {
+        ctx.fillStyle = pat;
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+    return;
+  }
+
+  if (variant === "waves") {
+    // 极淡斜向宽光带（方向 45°，间距 110px，宽 46px，白色 alpha .5）
+    ctx.save();
+    ctx.lineWidth = 46;
+    ctx.strokeStyle = "rgba(255,255,255,.5)";
+    for (let i = -h; i < w + h; i += 110) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i - h, h);
+      ctx.stroke();
+    }
+    ctx.restore();
+    return;
+  }
+  // none：只剩渐变
 }
 
 /** 三档强度：地址栏加 `?g=soft|mid|strong` 即可在线切换（默认 mid）。
@@ -85,15 +140,18 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       el.classList.add("fallback");
       return;
     }
-    // ?g=soft|mid|strong —— 只在浏览器地址栏生效，不写进构建
-    const g = (new URLSearchParams(window.location.search).get("g") ?? "mid").toLowerCase();
+    // ?g=soft|mid|strong —— 玻璃强度；?bg=mesh|dots|grain|waves|none —— 背景结构（都只在浏览器地址栏生效）
+    const qs = new URLSearchParams(window.location.search);
+    const g = (qs.get("g") ?? "mid").toLowerCase();
+    const bgRaw = (qs.get("bg") ?? "mesh").toLowerCase();
+    const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw) ? (bgRaw as BgVariant) : "mesh";
     const material = MATERIALS[g] ?? MATERIALS.mid;
     const sys = createGlassSystem(el, {
       material,
       scene: "aurora",
       motion: !calm,
       audio: { enabled: false },
-      artwork: paintWallpaper,
+      artwork: (ctx, info) => paintWallpaper(ctx, info, bg),
     });
     sys.renderer?.set({ brightness: 1.0 });
 
