@@ -32,27 +32,8 @@ const LEGACY = [
 
 function Nav() {
   const [sp, setSp] = useSearchParams();
-  const nav = useNavigate();
-  const loc = useLocation();
-  /** ★ 2026-11-04：首页自己有一条「细带 + 宽搜索框」，导航里的搜索在本页隐藏（避免两个输入框同步同一参数）。 */
-  const onHome = loc.pathname === "/";
-  const q = sp.get("q") ?? "";
   const tr = useT();
   const { lang, setLang } = useLang();
-  /** 小屏搜索：<md 时把搜索框折叠成图标，点开后在第二行铺满（2026-11-01 小屏适配） */
-  const [mOpen, setMOpen] = useState(false);
-  useEffect(() => {
-    if (!mOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [mOpen]);
-  const onSearch = (v: string) => {
-    const next = new URLSearchParams(sp);
-    if (v) next.set("q", v);
-    else next.delete("q");
-    nav({ pathname: "/", search: next.toString() }, { replace: true });
-  };
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-xl backdrop-saturate-150">
       {/* 顶部渐变细带（2026-11-04 视觉升级）：给固定导航一个品牌锚点，不占高度 */}
@@ -69,32 +50,6 @@ function Nav() {
             </span>
           </span>
         </NavLink>
-
-        {!onHome && (
-        <div className="relative hidden min-w-0 flex-1 max-w-[360px] md:block">
-          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#9aa8bd]">
-            🔍
-          </span>
-          <input
-            value={q}
-            onChange={(e) => onSearch(e.target.value)}
-            placeholder={tr("nav.searchPh")}
-            className="h-[38px] w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[13.5px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
-          />
-        </div>
-        )}
-
-        {!onHome && (
-        <button
-          type="button"
-          onClick={() => setMOpen((v) => !v)}
-          aria-label={mOpen ? tr("nav.searchClose") : tr("nav.searchOpen")}
-          aria-expanded={mOpen}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-line bg-white text-[15px] text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink md:hidden"
-        >
-          {mOpen ? "✕" : "🔍"}
-        </button>
-        )}
 
         <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1">
           {TABS.map((tab) => (
@@ -148,24 +103,6 @@ function Nav() {
           })}
         </div>
       </div>
-
-      {/* 小屏展开式搜索：整行铺满，Esc 或 ✕ 收起 */}
-      {!onHome && mOpen && (
-        <div className="wrap pb-3 md:hidden">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-[#9aa8bd]">
-              🔍
-            </span>
-            <input
-              autoFocus
-              value={q}
-              onChange={(e) => onSearch(e.target.value)}
-              placeholder={tr("nav.searchPh")}
-              className="h-11 w-full rounded-[10px] border border-line bg-white pl-9 pr-3.5 text-[14px] outline-none transition focus:border-[#9dc0ea] focus:ring-[3px] focus:ring-brand/10"
-            />
-          </div>
-        </div>
-      )}
     </header>
   );
 }
@@ -200,7 +137,68 @@ function Footer() {
  *  总览 / 影像图集 / 单药画像 / 关于 四页英文全部实装，
  *  英文模式由 `App` 的 DOM 汉字自检（下方 useEffect）兜底。 */
 
+/** 页面标题条（2026-11-04 v3）：与顶部导航**连成同一块**（同底色 / 通栏 / 无圆角 / 无间距），
+ *  左边标题、右边搜索框。原「深色大横幅」已删除（owner：大标签没什么用，和顶部搜索合并）。
+ *  ★ 标题与搜索框同处一条带：搜索的真值仍是 URL 的 `?q=`，在任何页输入都回首页并带上该参数。 */
+const PAGE_META: { match: (p: string) => boolean; title: StrKey; lead?: StrKey }[] = [
+  { match: (p) => p === "/", title: "home.title", lead: "home.lead" },
+  { match: (p) => p.startsWith("/drug"), title: "drug.title" },
+  { match: (p) => p.startsWith("/atlas"), title: "atlas.title", lead: "atlas.lead" },
+  { match: (p) => p.startsWith("/about"), title: "about.title", lead: "about.lead" },
+];
+
+function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSearch: (v: string) => void }) {
+  const tr = useT();
+  const meta = PAGE_META.find((m) => m.match(pathname)) ?? PAGE_META[0];
+  return (
+    <div className="border-b border-line bg-white">
+      <div className="wrap flex flex-wrap items-center gap-x-3.5 gap-y-2 py-2.5">
+        <span aria-hidden className="h-5 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-brand to-accent" />
+        <h1 className="shrink-0 text-[19px] font-bold tracking-tight text-ink sm:text-[20px]">{tr(meta.title)}</h1>
+        {meta.lead ? (
+          <>
+            <span aria-hidden className="hidden h-4 w-px shrink-0 bg-line lg:block" />
+            <p className="hidden min-w-0 flex-1 truncate text-[12.5px] text-ink-3 lg:block">{tr(meta.lead)}</p>
+          </>
+        ) : (
+          <span className="hidden flex-1 lg:block" />
+        )}
+        <div className="relative ml-auto w-full sm:w-[380px] lg:w-[420px]">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-ink-3">🔍</span>
+          <input
+            value={q}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder={tr("nav.searchPh")}
+            aria-label={tr("nav.searchPh")}
+            className="h-9 w-full rounded-[10px] border border-line bg-[#f5f8fd] pl-9 pr-9 text-[13.5px] outline-none transition placeholder:text-ink-3 focus:border-[#9dc0ea] focus:bg-white focus:ring-[3px] focus:ring-brand/10"
+          />
+          {q ? (
+            <button
+              type="button"
+              onClick={() => onSearch("")}
+              aria-label={tr("drug.clearKw")}
+              className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-ink-3 transition hover:bg-[#eef2f8] hover:text-ink"
+            >
+              ✕
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [sp] = useSearchParams();
+  const nav = useNavigate();
+  const loc = useLocation();
+  const q = sp.get("q") ?? "";
+  const onSearch = (v: string) => {
+    const next = new URLSearchParams(sp);
+    if (v) next.set("q", v);
+    else next.delete("q");
+    nav({ pathname: "/", search: next.toString() }, { replace: true });
+  };
   /** 语言：URL `?lang=en` 优先，其次上次选择（localStorage），默认中文 */
   const [lang, setLang] = useState<Lang>(() => {
     const q = new URLSearchParams(window.location.search).get("lang");
@@ -235,7 +233,8 @@ export default function App() {
     <LangCtx.Provider value={{ lang, setLang }}>
     <div className="min-h-screen">
       <Nav />
-      <main className="wrap pt-12">
+      <PageBar pathname={loc.pathname} q={q} onSearch={onSearch} />
+      <main className="wrap pt-6">
         <Suspense
           fallback={
             <div className="mt-6 space-y-4" aria-busy="true" aria-label="页面加载中">

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
 import ImageViewer from "../components/ImageViewer";
-import PageHero from "../components/PageHero";
 import { fmt, loadFigManifest, refLink, type Fig } from "../lib/data";
 import { useT, type StrKey } from "../lib/i18n";
 
@@ -121,8 +120,6 @@ export default function Atlas() {
 
   return (
     <div className="pb-4">
-      <PageHero title={tr("atlas.title")} lead={tr("atlas.lead")} />
-
       <div className="mt-4 rounded-[10px] border border-[#fde68a] bg-[#fffbeb] px-4 py-3 text-[12.5px] leading-relaxed text-[#92400e]">
         <b>{tr("atlas.howto")}</b>
         <span className="mx-1 rounded bg-[#dcfce7] px-1.5 py-0.5 text-[#166534]">{tr("atlas.attr.target")}</span>
