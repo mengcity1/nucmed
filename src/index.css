@@ -1460,6 +1460,68 @@
         rgba(255, 255, 255, 0.44) 100%
       ) !important;
   }
+  /* ── v32 浅色"光影不够"的两处根因修复 ─────────────────────────────────
+     ① 光标光斑：浅底上叠**纯白**等于看不见 ⇒ 改成「冷色光泽(偏蓝) + 一点白色热点」，
+        冷色在米白上比白更"有存在感"，读起来像玻璃折射的光。
+     ② 覆盖范围：之前只选 `button`，而「查看→」「返回」这类是 `<Link>` ⇒ 补 `a[class*="rounded"]`。 */
+  .app-stage.light.webgl-ready .lg-surface {
+    background-image:
+      radial-gradient(
+        520px circle at var(--mx, 50%) var(--my, -20%),
+        rgba(206, 224, 255, 0.75) 0%,
+        rgba(206, 224, 255, 0.22) 38%,
+        rgba(206, 224, 255, 0) 66%
+      ),
+      radial-gradient(
+        150px circle at var(--mx, 50%) var(--my, -20%),
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0) 70%
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.24));
+  }
+  .app-stage.light :is(button, [role="tab"], a[class*="rounded"]):not(.btn-plain) {
+    background-image:
+      radial-gradient(
+        110px circle at var(--mx, 50%) var(--my, -40%),
+        rgba(206, 224, 255, 0.85) 0%,
+        rgba(206, 224, 255, 0) 70%
+      ),
+      radial-gradient(
+        46px circle at var(--mx, 50%) var(--my, -40%),
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0) 72%
+      ),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 34%),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.72) 0%,
+        rgba(255, 255, 255, 0.36) 55%,
+        rgba(255, 255, 255, 0.48) 100%
+      ) !important;
+    border-color: rgba(255, 255, 255, 0.85) !important;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -10px 14px -12px rgba(15, 23, 42, 0.22),
+      0 1px 2px rgba(15, 23, 42, 0.08),
+      0 8px 18px -12px rgba(15, 23, 42, 0.32);
+  }
+  .app-stage.light :is(button, [role="tab"], a[class*="rounded"]):not(.btn-plain):hover {
+    background-image:
+      radial-gradient(
+        130px circle at var(--mx, 50%) var(--my, -40%),
+        rgba(186, 212, 255, 0.95) 0%,
+        rgba(186, 212, 255, 0) 72%
+      ),
+      radial-gradient(
+        52px circle at var(--mx, 50%) var(--my, -40%),
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0) 72%
+      ),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.52) 100%) !important;
+  }
+  /* 深色 chip：保留三段渐变 + 镜面 + 斜向光泽（v31 的数值，别丢） */
   .app-stage.dark :is(.chip, .chip-sm) {
     background-image:
       radial-gradient(
@@ -1474,5 +1536,34 @@
         rgba(255, 255, 255, 0.12) 55%,
         rgba(255, 255, 255, 0.18) 100%
       ) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -8px 12px -10px rgba(0, 0, 0, 0.55),
+      0 2px 6px -2px rgba(0, 0, 0, 0.55);
+    color: #eef4fc !important;
+  }
+  .app-stage.dark :is(a[class*="rounded"]):not(.btn-plain) {
+    background-color: transparent !important;
+    background-image:
+      radial-gradient(
+        120px circle at var(--mx, 50%) var(--my, -40%),
+        rgba(255, 255, 255, 0.24) 0%,
+        rgba(255, 255, 255, 0) 72%
+      ),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 34%),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.17) 0%,
+        rgba(255, 255, 255, 0.06) 55%,
+        rgba(255, 255, 255, 0.1) 100%
+      ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -10px 14px -12px rgba(0, 0, 0, 0.55),
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 8px 18px -12px rgba(0, 0, 0, 0.7);
   }
 }
