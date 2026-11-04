@@ -22,9 +22,9 @@ import "../vendor/lens/components.css";
 
 /** 背景结构变体（地址栏 `?bg=` 切换，默认 mesh）——四种"给玻璃可折射的结构"的极简做法。
  *  共同点：**全部无色相**（灰白），只靠明暗与微小纹理制造层次；底色仍是同一条中性纵向渐变。 */
-export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none" | "dark" | "cream";
+export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none" | "dark" | "cream" | "platinum";
 
-const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none", "dark", "cream"];
+const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none", "dark", "cream", "platinum"];
 
 /** 背景壁纸：中性纵向渐变（共同底）+ 按变体叠结构。
  *  - mesh  ：多层超大柔光交织（云雾感，**无线条**，最不抢眼）
@@ -73,7 +73,33 @@ export function paintWallpaper(
     return;
   }
 
+  if (variant === "platinum") {
+    // 亮铂金（2026-11-04）：比米白更"中性偏冷"、略暗一点点 ⇒ 玻璃（白 42% 叠加）能明显浮起来；
+    // 再拉一道 115° 的金属斜光，做出"拉丝铂金"的质感。
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, "#f3f1ea");
+    g.addColorStop(0.5, "#e4e0d7");
+    g.addColorStop(1, "#f5f3ec");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // 金属斜光（拉丝的那道亮带 + 右下一点冷灰）
+    const sheen = ctx.createLinearGradient(0, 0, w * 0.95, h);
+    sheen.addColorStop(0, "rgba(255,255,255,.55)");
+    sheen.addColorStop(0.42, "rgba(255,255,255,.10)");
+    sheen.addColorStop(0.62, "rgba(255,255,255,0)");
+    sheen.addColorStop(1, "rgba(204,204,196,.22)");
+    ctx.fillStyle = sheen;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.filter = `blur(${Math.max(28, Math.round(w * 0.038))}px)`;
+    blob(0.5, 0.4, 0.55, "rgba(255,255,255,.45)");
+    blob(0.86, 0.92, 0.55, "rgba(208,210,214,.3)");
+    ctx.restore();
+    return;
+  }
+
   if (variant === "cream") {
+    // 浅色模式：米白（暖白纸张感）
     // 浅色模式：**米白**（暖白纸张感），不加任何彩度
     const g = ctx.createLinearGradient(0, 0, 0, h);
     g.addColorStop(0, "#fdfaf3");
@@ -213,7 +239,8 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     // ★ `.dark` 必须**在**窄屏早退之前加上：手机端不建 WebGL，靠 CSS 深色令牌渲染；
     //   若放在后面，手机就会退回"浅底 + 浅字"（不可读）。
     el.classList.toggle("dark", bg === "dark");
-    el.classList.toggle("light", bg === "cream");
+    el.classList.toggle("light", bg === "cream" || bg === "platinum");
+    el.classList.toggle("platinum", bg === "platinum");
 
     // 浅色模式"跟随光标的光泽"配色（`?glow=cool|cyan|champagne|violet|blue|mono`，默认 cool）
     // 说明：米白偏暖 ⇒ 光泽越"无色"越像真玻璃；带色只是为了气质，不是必须。
