@@ -310,18 +310,31 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     };
     if (!calm) el.addEventListener("pointermove", onMove, { passive: true });
 
-    // v36 滚动期降级（owner：「拖到底原来的玻璃框会留在原地」）：
-    // 滚动中给舞台打 `is-scrolling`，CSS 侧关掉小件（按钮/chip/Link）的 backdrop-filter ——
-    // 它们每帧都要重新采样，是滚动时主要的合成开销；停手 140ms 后撤掉恢复。
-    // ⚠ 吸顶导航的毛玻璃**不在降级范围**（否则正文会从导航框里透出来）。
+    // v36b 滚动期降级（owner：「不止顶部框，下面每个框都有这现象」）：
+    // 真正的根因 —— 页面滚动由**合成器线程**完成（DOM 面板每帧即时移动），
+    // 而 canvas 玻璃必须由**主线程**重读矩形再画 ⇒ 永远慢 1–2 帧，
+    // 拖动时每个面板的玻璃都会"拖在原地"（旧框留在画布上）。
+    // ⇒ 滚动一开始就 `set({opaque:true})`：**跳过透镜 pass**，画布重绘一帧干净背景
+    //    （旧框被整幅覆盖 ⇒ 不可能再残留），面板改由 `.is-scrolling` 的 CSS 毛玻璃顶上；
+    // 停手 140ms 后恢复 `opaque:false`，静止时仍是真折射。
     const scroller = el.querySelector<HTMLElement>(".app-scroll");
+    const renderer = sys.renderer;
     let scrollTimer = 0;
+    let lensPaused = false;
     const onScroll = () => {
       el.classList.add("is-scrolling");
+      if (renderer && !lensPaused) {
+        lensPaused = true;
+        renderer.set({ opaque: true });
+      }
       if (scrollTimer) window.clearTimeout(scrollTimer);
       scrollTimer = window.setTimeout(() => {
         scrollTimer = 0;
         el.classList.remove("is-scrolling");
+        if (renderer && lensPaused) {
+          lensPaused = false;
+          renderer.set({ opaque: false });
+        }
       }, 140);
     };
     scroller?.addEventListener("scroll", onScroll, { passive: true });

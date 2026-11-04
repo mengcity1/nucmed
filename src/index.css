@@ -622,12 +622,23 @@
     background-color: rgba(255, 255, 255, 0.52);
     border-color: rgba(255, 255, 255, 0.9);
   }
-  /* 滚动期降级：滚动中关掉小件的 backdrop-filter（每帧重新采样 = 掉帧），停手 140ms 恢复；
-     吸顶导航**始终保留**（否则正文会从框里透出来）。 */
-  .app-stage.is-scrolling :is(button, [role="tab"], a[class*="rounded"], .chip, .chip-sm) {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+    /* v36b 滚动期把透镜 pass 暂停（见 GlassApp 注释），面板由 CSS 顶上：
+       用**合成器**的 backdrop-filter 代替主线程画的 canvas 玻璃 ⇒ 跟手、不拖影。 */
+    .app-stage.is-scrolling .lg-surface {
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      backdrop-filter: blur(16px) saturate(1.2);
+    }
+    .app-stage.dark.is-scrolling .lg-surface {
+      background-color: rgba(24, 26, 38, 0.5);
+    }
+    .app-stage.light.is-scrolling .lg-surface {
+      background-color: rgba(255, 255, 255, 0.46);
+    }
+    /* 小件（按钮/chip/Link）滚动中直接关掉 backdrop-filter：它们数量多、每帧重采样最费合成资源 */
+    .app-stage.is-scrolling :is(button, [role="tab"], a[class*="rounded"], .chip, .chip-sm) {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
 
 
   /* ── v20.3 玻璃归属（实测驱动）────────────────────────────────────
