@@ -54,16 +54,16 @@ export function paintWallpaper(
   if (variant === "dark") {
     // v20.9：深色渐变（**深底才让玻璃的折射/高光显形**）
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#0f1828");
-    g.addColorStop(0.5, "#131e33");
-    g.addColorStop(1, "#0a111c");
+    g.addColorStop(0, "#2a3648");
+    g.addColorStop(0.5, "#33445c");
+    g.addColorStop(1, "#232d3d");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
     ctx.save();
     ctx.filter = `blur(${Math.max(30, Math.round(w * 0.04))}px)`;
-    blob(0.14, 0.06, 0.6, "rgba(64,120,255,.34)"); // 冷蓝
-    blob(0.9, 0.2, 0.5, "rgba(0,196,186,.20)"); // 青
-    blob(0.5, 0.92, 0.62, "rgba(124,92,255,.24)"); // 紫
+    blob(0.14, 0.06, 0.6, "rgba(96,150,255,.18)"); // 冷蓝
+    blob(0.9, 0.2, 0.5, "rgba(0,196,186,.10)"); // 青
+    blob(0.5, 0.92, 0.62, "rgba(124,92,255,.12)"); // 紫
     ctx.restore();
     return;
   }

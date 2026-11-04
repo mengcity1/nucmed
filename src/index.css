@@ -725,16 +725,116 @@
      否则深底黑字直接不可读 —— 下面这一组就是那套翻转令牌（用 (0,2,0)+ 压过 Tailwind 工具类）。 */
   .app-stage.dark.lg-stage {
     color: #e8eef7;
-    background: linear-gradient(160deg, #0f1828 0%, #131e33 52%, #0a111c 100%);
+    background: linear-gradient(160deg, #2a3648 0%, #33445c 52%, #232d3d 100%);
+  }
+  /* ⚠ 深色下最大的坑：源码里 `bg-white`(32 处) 与一堆写死的浅底仍是**白块**，
+     而文字已被转浅 ⇒ 浅字压白块 = 不可读。这里把它们统一压成半透明白/淡色。 */
+  .app-stage.dark [class~="bg-white"] {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+  }
+  .app-stage.dark [class*="bg-[#eef2f8]"],
+  .app-stage.dark [class*="bg-[#e9eef6]"],
+  .app-stage.dark [class*="bg-[#f0f3f9]"],
+  .app-stage.dark [class*="bg-[#f2f5fa]"],
+  .app-stage.dark [class*="bg-[#fafbfe]"],
+  .app-stage.dark [class*="bg-[#f7f9fd]"],
+  .app-stage.dark [class*="bg-[#f9fbfe]"],
+  .app-stage.dark [class*="bg-[#f2f6fc]"],
+  .app-stage.dark [class*="bg-[#f3e8fb]"],
+  .app-stage.dark [class*="bg-[#f1f4f9]"] {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+  }
+  /* 语义色底（绿/黄/红）：保留色相，压成深色版，避免"白里发亮"的地块 */
+  .app-stage.dark [class*="bg-[#dcfce7]"] {
+    background-color: rgba(52, 211, 153, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-[#fef3c7]"] {
+    background-color: rgba(251, 191, 36, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-[#fee2e2]"] {
+    background-color: rgba(248, 113, 113, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-brand-soft"] {
+    background-color: rgba(120, 170, 255, 0.16) !important;
+  }
+  /* 写死的深色字（`text-[#0…]`~`text-[#8…]`）统一提亮；KPI 四色在后面单独覆盖回来 */
+  .app-stage.dark [class*="text-[#0"],
+  .app-stage.dark [class*="text-[#1"],
+  .app-stage.dark [class*="text-[#2"],
+  .app-stage.dark [class*="text-[#3"],
+  .app-stage.dark [class*="text-[#4"],
+  .app-stage.dark [class*="text-[#5"],
+  .app-stage.dark [class*="text-[#6"],
+  .app-stage.dark [class*="text-[#7"],
+  .app-stage.dark [class*="text-[#8"] {
+    color: #dbe6f4 !important;
+  }
+  /* KPI 四色（盖在统一提亮之后，保留色相但用暗底友好的亮度） */
+  .app-stage.dark [class*="#12457f"] {
+    color: #a8c8ff !important;
+  }
+  .app-stage.dark [class*="#0a6f66"] {
+    color: #8fe7db !important;
+  }
+  .app-stage.dark [class*="#4b3ea3"] {
+    color: #c3baff !important;
+  }
+  .app-stage.dark [class*="#8a5a12"] {
+    color: #f3c98a !important;
+  }
+  /* 降高光：玻璃边光/按钮/输入框的白色量都调低一档（owner：有的地方太白高亮了） */
+  .app-stage.dark.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.13),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 -20px 28px -26px rgba(0, 0, 0, 0.5),
+      0 14px 36px -26px rgba(0, 0, 0, 0.7);
+  }
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+    color: #dbe5f2;
+  }
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+  }
+  .app-stage.dark .tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .app-stage.dark .tab-on {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #eef4ff;
+  }
+  .app-stage.dark .chip-off {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #d5e0ef;
+  }
+  .app-stage.dark .chip-on {
+    background: rgba(120, 170, 255, 0.16);
+    border-color: rgba(140, 185, 255, 0.32);
+    color: #eaf2ff;
+  }
+  .app-stage.dark.webgl-ready .lg-surface {
+    background-image: radial-gradient(
+      520px circle at var(--mx, 50%) var(--my, -20%),
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 34%,
+      rgba(255, 255, 255, 0) 64%
+    );
   }
   .app-stage.dark .text-ink {
-    color: #eef3fa;
+    color: #e3ebf6;
   }
   .app-stage.dark .text-ink-2 {
-    color: #cfd9e8;
+    color: #c2cfe0;
   }
   .app-stage.dark .text-ink-3 {
-    color: #9fb0c8;
+    color: #93a3ba;
   }
   .app-stage.dark .text-brand {
     color: #9cc7ff;
@@ -757,14 +857,14 @@
   }
   /* 卡片 / 表格 */
   .app-stage.dark .card {
-    background: rgba(20, 30, 48, 0.55);
+    background: rgba(46, 60, 82, 0.55);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
   .app-stage.dark .card-solid {
-    background: rgba(18, 27, 44, 0.62);
+    background: rgba(42, 55, 76, 0.6);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
   }
@@ -774,7 +874,7 @@
     border-color: rgba(255, 255, 255, 0.18);
   }
   .app-stage.dark .table-booktabs tbody tr {
-    background: rgba(255, 255, 255, 0.025);
+    background: rgba(255, 255, 255, 0.05);
   }
   .app-stage.dark .table-booktabs tbody tr:hover {
     background: rgba(120, 170, 255, 0.12);
