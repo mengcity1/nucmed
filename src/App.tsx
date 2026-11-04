@@ -51,7 +51,7 @@ function Nav() {
           </span>
         </NavLink>
 
-        <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1">
+        <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-line bg-[#f5f8fc] p-1 shadow-[inset_0_1px_2px_rgba(15,23,42,.04)]">
           {TABS.map((tab) => (
             <NavLink
               key={tab.to}
@@ -111,7 +111,9 @@ function Footer() {
   const { data: meta } = useJSON<Meta>("meta.json");
   const tr = useT();
   return (
-    <footer className="wrap mt-12 border-t border-line pb-14 pt-6 text-[12px] text-ink-3">
+    <>
+    <div aria-hidden className="mt-12 h-px w-full bg-gradient-to-r from-transparent via-[#d9e5f6] to-transparent" />
+    <footer className="wrap pb-14 pt-6 text-[12px] text-ink-3">
       <div className="flex flex-wrap justify-between gap-4 pt-1">
         <div>
           {meta ? (
@@ -130,6 +132,7 @@ function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }
 
@@ -151,8 +154,22 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
   const tr = useT();
   const meta = PAGE_META.find((m) => m.match(pathname)) ?? PAGE_META[0];
   return (
-    <div className="border-b border-line bg-white">
-      <div className="wrap flex flex-wrap items-center gap-x-3.5 gap-y-2 py-2.5">
+    <div className="relative border-b border-line bg-white">
+      {/* 轻纹理（2026-11-04 v4）：右上蓝光 + 左下青光 + 26px 极淡网格 ——
+          代替原深色横幅的作用（有底纹、不空），但不压过内容。 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(620px 120px at 90% -10%, rgba(74,142,224,.13) 0%, rgba(74,142,224,0) 70%)," +
+            "radial-gradient(420px 120px at 6% 140%, rgba(13,148,136,.10) 0%, rgba(13,148,136,0) 70%)," +
+            "linear-gradient(rgba(30,91,168,.045) 1px, transparent 1px)," +
+            "linear-gradient(90deg, rgba(30,91,168,.045) 1px, transparent 1px)",
+          backgroundSize: "auto, auto, 26px 26px, 26px 26px",
+        }}
+      />
+      <div className="wrap relative flex flex-wrap items-center gap-x-3.5 gap-y-2 py-2.5">
         <span aria-hidden className="h-5 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-brand to-accent" />
         <h1 className="shrink-0 text-[19px] font-bold tracking-tight text-ink sm:text-[20px]">{tr(meta.title)}</h1>
         {meta.lead ? (
