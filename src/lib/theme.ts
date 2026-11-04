@@ -24,6 +24,16 @@ export function writeTheme(t: Theme) {
   try {
     localStorage.setItem(KEY, t);
   } catch {
+    /* 隐私模式禁用 storage，忽略 */
+  }
+  // ★ 2026-11-04 修：`readTheme()` 里 **URL 优先**，所以只写 localStorage 时，
+  //   带 `?theme=light` 打开的页面上点切换会"没反应"（被 URL 压住）。
+  //   这里把选择**同步写进 URL**（replaceState，不产生历史、不触发路由跳转）。
+  try {
+    const u = new URL(window.location.href);
+    u.searchParams.set("theme", t);
+    window.history.replaceState(window.history.state, "", u.toString());
+  } catch {
     /* 忽略 */
   }
   window.dispatchEvent(new Event(THEME_EVENT));
