@@ -166,6 +166,16 @@ export const STR = {
   "drug.partVector": { zh: "④ 载体", en: "④ Vector" },
   "drug.partTarget": { zh: "⑤ 靶点", en: "⑤ Target" },
   "drug.structFull": { zh: "完整结构图（点击放大）", en: "Full structure (click to zoom)" },
+  /* ★ 2026-11-04：标题按「图片来源」区分 —— ligand_only 不是完整分子，原来的「完整结构图」属错标 */
+  "drug.structTitleLigand": {
+    zh: "配体结构（外部来源 · 仅配体部分，不含连接子 / 载体）",
+    en: "Ligand structure (external source · ligand only; linker and vector not included)",
+  },
+  "drug.structTitleSmiles": {
+    zh: "结构图（由库内 SMILES 经 RDKit 绘制）",
+    en: "Structure (rendered from in-database SMILES via RDKit)",
+  },
+  "drug.structTitlePeptide": { zh: "肽段 2D 结构", en: "Peptide 2D structure" },
   "drug.structSchematic": { zh: "分子组成示意（非精确结构）", en: "Composition schematic (not exact structure)" },
   "drug.structSrcLigand": { zh: "radiopharm.idrblab.cn · 外部来源（ligand_only）", en: "radiopharm.idrblab.cn · external source (ligand_only)" },
   "drug.structSrcSchematic": { zh: "抗体/多肽示意图 · 本库绘制（非精确结构）", en: "Antibody/peptide schematic · drawn here (not exact)" },

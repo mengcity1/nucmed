@@ -795,7 +795,13 @@ export default function DrugDetail() {
           <div className="mt-5 border-t border-line pt-4">
             <div className="mb-3 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-ink">
-                {structSrc === "schematic" ? tr("drug.structSchematic") : tr("drug.structFull")}
+                {structSrc === "schematic"
+                  ? tr("drug.structSchematic")
+                  : structSrc === "ligand"
+                  ? tr("drug.structTitleLigand")
+                  : structSrc === "peptide2d"
+                  ? tr("drug.structTitlePeptide")
+                  : tr("drug.structTitleSmiles")}
               </span>
               <span className="text-[11.5px] text-ink-3">
                 {structSrc === "ligand" && tr("drug.structSrcLigand")}
