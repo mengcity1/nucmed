@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLiquidGlass } from "../lib/liquidGlass";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
@@ -123,6 +124,8 @@ function Metric({
 }) {
   const shown = useCountUp(value);
   const ref = useRef<HTMLDivElement>(null);
+  /* 真折射（Chromium）；其它浏览器保持 CSS 玻璃 */
+  useLiquidGlass(ref, { radius: 20, strength: 8 });
   /** 高光跟随鼠标：把指针坐标写进 CSS 变量（仅 4 张卡，开销可忽略） */
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;

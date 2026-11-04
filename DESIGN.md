@@ -127,7 +127,7 @@
 |---|---|
 | 2026-11-04 | v6：字阶/令牌落表；h1/h2 改衬线；动效 1–5 上线；图表色板换 Okabe–Ito；`prefers-reduced-motion` 全站兜底 |
 | 2026-11-04 | **v7 学术版式**：三线表（`.table-booktabs`）上首页目录与单药分布表；卡片 1px 内高光；目录标题加「表 1 / Table 1」；数值列右对齐 |
-| 2026-11-04 | **v14 更透更柔**：玻璃白度 0.66→**0.46**、模糊 24→**38px**、饱和 1.72→**1.95**；投影改为 `0 34px 80px -44px`（大扩散、更低不透明度）；外环亮线 0.98→**0.78**、内环 0.6→**0.42**；背后柔光增强到 5 团（新增玫红/天蓝）并提高透明度到 0.55–0.68；chip / 搜索框 / 筛选卡同步玻璃化；KPI 底色 α 0.9→**0.55** |
+| 2026-11-04 | **v15 真折射液态玻璃**：新增 `src/lib/liquidGlass.ts` —— 运行时用 canvas 按圆角矩形 SDF 生成位移图，编码进 R/G 通道，配 `<filter><feImage/><feDisplacementMap/></filter>`，通过 **`backdrop-filter: url(#id) blur(.6px) saturate(1.7)`** 让**背景在元素边缘真实弯曲**（与 `shuding/liquid-glass` 同源，MIT）。**仅 Chromium**；Safari/Firefox 与小屏自动回退到 CSS 玻璃。应用于悬浮导航（strength 13px）与 4 张 KPI 卡（8px） |
 
 ## 10. 版式骨架（v8 起）
 

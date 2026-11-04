@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
+import { useLiquidGlass } from "./lib/liquidGlass";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
@@ -34,9 +35,12 @@ function Nav() {
   const [sp, setSp] = useSearchParams();
   const tr = useT();
   const { lang, setLang } = useLang();
+  /* ★ 2026-11-04 v15：真折射液态玻璃（Chromium 专属，其余浏览器自动走 CSS 兜底） */
+  const navRef = useRef<HTMLDivElement>(null);
+  useLiquidGlass(navRef, { radius: 22, strength: 13 });
   return (
     <header className="sticky top-0 z-50 px-3 pt-2.5 sm:px-5">
-      <div className="glass-nav mx-auto flex h-14 max-w-[1240px] items-center gap-2.5 rounded-[22px] px-3 sm:gap-6 sm:px-5">
+      <div ref={navRef} className="glass-nav mx-auto flex h-14 max-w-[1240px] items-center gap-2.5 rounded-[22px] px-3 sm:gap-6 sm:px-5">
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
             ⚛
