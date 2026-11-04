@@ -54,22 +54,21 @@ export function paintWallpaper(
   };
 
   if (variant === "dark") {
-    // v28（按 owner 提供的参考图重做）：底 #1C1E24 中性深灰 + **极淡蓝微光**；
-    // 玻璃的配方（白 13% / blur 16px / 白 19% 描边）在 index.css 的 .app-stage.dark 里。
+    // v30（owner）：底再加深一点 + 带一点**蓝紫**（不是中性灰了）；
+    // 配方仍是参考图那套：深底 + 极淡冷光 + 玻璃白 13%/blur16/白 19% 描边。
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#1b1d23");
-    g.addColorStop(0.5, "#1c1e24");
-    g.addColorStop(1, "#171920");
+    g.addColorStop(0, "#15161f");
+    g.addColorStop(0.5, "#191a28");
+    g.addColorStop(1, "#101118");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
     ctx.save();
     ctx.filter = `blur(${Math.max(34, Math.round(w * 0.045))}px)`;
-    // 极淡蓝微光（参考图中间那团放射状）：冷蓝主光 + 中心提亮
-    blob(0.52, 0.42, 0.58, "rgba(120,170,255,.20)");
-    blob(0.5, 0.45, 0.24, "rgba(205,228,255,.14)");
-    // 四角极淡的明暗，避免"纯色平板"
-    blob(0.12, 0.04, 0.5, "rgba(255,255,255,.05)");
-    blob(0.88, 0.92, 0.55, "rgba(74,104,164,.12)");
+    // 蓝紫微光：主光偏蓝紫，中心稍亮；右下角一点紫，避免整片发灰
+    blob(0.52, 0.42, 0.58, "rgba(110,130,255,.22)");
+    blob(0.5, 0.45, 0.24, "rgba(196,204,255,.16)");
+    blob(0.14, 0.05, 0.5, "rgba(255,255,255,.04)");
+    blob(0.88, 0.92, 0.55, "rgba(124,92,200,.16)");
     ctx.restore();
     return;
   }

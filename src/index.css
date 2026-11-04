@@ -726,8 +726,8 @@
   .app-stage.dark.lg-stage {
     color: #e8eef7;
     background:
-      radial-gradient(60% 55% at 52% 42%, rgba(120, 170, 255, 0.18) 0%, rgba(120, 170, 255, 0) 70%),
-      linear-gradient(160deg, #1b1d23 0%, #1c1e24 52%, #171920 100%);
+      radial-gradient(60% 55% at 52% 42%, rgba(110, 130, 255, 0.22) 0%, rgba(110, 130, 255, 0) 70%),
+      linear-gradient(160deg, #15161f 0%, #191a28 52%, #101118 100%);
   }
   /* ⚠ 深色下最大的坑：源码里 `bg-white`(32 处) 与一堆写死的浅底仍是**白块**，
      而文字已被转浅 ⇒ 浅字压白块 = 不可读。这里把它们统一压成半透明白/淡色。 */
