@@ -84,6 +84,27 @@ export function paintWallpaper(
     blob(0.86, 0.28, 0.55, "rgba(224,211,186,.28)");
     blob(0.5, 0.94, 0.6, "rgba(255,255,255,.45)");
     ctx.restore();
+    // 纸面微颗粒（v24）：米白底太平，加一层很淡的噪点当"纸纹"，玻璃压上去更有质感
+    const tile = document.createElement("canvas");
+    tile.width = 96;
+    tile.height = 96;
+    const tctx = tile.getContext("2d");
+    if (tctx) {
+      const img = tctx.createImageData(96, 96);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 150 + Math.random() * 105;
+        img.data[i] = v;
+        img.data[i + 1] = v * 0.99;
+        img.data[i + 2] = v * 0.96;
+        img.data[i + 3] = 12;
+      }
+      tctx.putImageData(img, 0, 0);
+      const pat = ctx.createPattern(tile, "repeat");
+      if (pat) {
+        ctx.fillStyle = pat;
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
     return;
   }
 

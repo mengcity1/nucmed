@@ -1060,9 +1060,154 @@
     border-color: rgba(255, 255, 255, 0.22);
     color: #dbe6f4 !important;
   }
-  .app-stage.dark .badge-c {
-    background: rgba(169, 98, 13, 0.3);
-    border-color: rgba(240, 192, 122, 0.45);
-    color: #f7d6a6 !important;
+  /* ── v24 选项按钮（chip）的液态玻璃 ─────────────────────────────────
+     之前 chip 只有"半透明底"，缺**边缘高光/厚度**，所以看着是平的。
+     这里补：顶部亮边 + 亮轮廓 + 底部内阴影（厚度）+ 外投影 + 背景模糊 + 三段渐变。 */
+  .app-stage :is(.chip, .chip-sm) {
+    border: 1px solid rgba(255, 255, 255, 0.72) !important;
+    background-color: transparent !important;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.74) 0%,
+      rgba(255, 255, 255, 0.34) 55%,
+      rgba(255, 255, 255, 0.44) 100%
+    ) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.45);
+    backdrop-filter: blur(14px) saturate(1.45);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -8px 12px -10px rgba(15, 23, 42, 0.22),
+      0 2px 6px -2px rgba(15, 23, 42, 0.1);
+    transition:
+      background-image 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease,
+      border-color 180ms ease;
+  }
+  .app-stage :is(.chip, .chip-sm):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -8px 12px -10px rgba(15, 23, 42, 0.2),
+      0 4px 10px -4px rgba(15, 23, 42, 0.14);
+    transform: translateY(-0.5px);
+  }
+  .app-stage .chip-on {
+    border-color: rgba(120, 170, 255, 0.6) !important;
+    background-image: linear-gradient(180deg, rgba(186, 214, 255, 0.6) 0%, rgba(120, 170, 255, 0.3) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 2px 8px -3px rgba(30, 91, 168, 0.35);
+  }
+
+  /* ── v24 浅色（米白）模式质感 ───────────────────────────────────────
+     米白底上白色玻璃容易"糊成一片"：给更暖的玻璃色 + 柔边 + 暖投影，层次才出来。 */
+  .app-stage.light.lg-stage {
+    color: #3a332b;
+  }
+  .app-stage.light .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+      0 12px 30px -26px rgba(96, 74, 40, 0.3);
+  }
+  .app-stage.light.webgl-ready .lg-surface {
+    background-image: radial-gradient(
+      520px circle at var(--mx, 50%) var(--my, -20%),
+      rgba(255, 253, 246, 0.9) 0%,
+      rgba(255, 251, 238, 0.4) 34%,
+      rgba(255, 255, 255, 0) 64%
+    );
+  }
+  .app-stage.light :is(button, [role="tab"]):not(.btn-plain) {
+    border-color: rgba(255, 255, 255, 0.85);
+    background-image: linear-gradient(180deg, rgba(255, 253, 247, 0.88) 0%, rgba(255, 249, 236, 0.46) 100%);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 1px 2px rgba(120, 96, 60, 0.1);
+    color: #4a4234;
+  }
+  .app-stage.light .tab {
+    color: #4a4237;
+  }
+  .app-stage.light .tab-on {
+    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(255, 255, 255, 0.9);
+    color: #5a4a2e;
+  }
+  .app-stage.light :is(.chip, .chip-sm) {
+    border-color: rgba(255, 255, 255, 0.85) !important;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 253, 247, 0.9) 0%,
+      rgba(255, 249, 236, 0.5) 55%,
+      rgba(255, 252, 244, 0.6) 100%
+    ) !important;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -8px 12px -10px rgba(120, 96, 60, 0.18),
+      0 2px 6px -2px rgba(120, 96, 60, 0.12);
+    color: #4a4234;
+  }
+  .app-stage.light .chip-on {
+    border-color: rgba(30, 91, 168, 0.35) !important;
+    background-image: linear-gradient(180deg, rgba(196, 220, 250, 0.85) 0%, rgba(160, 196, 240, 0.55) 100%) !important;
+    color: #123a63;
+  }
+  /* 米白底上的文字对比（实测自检点名 116 处：ink-3 #94a3b8 只有 2.28:1）——
+     三档统一加深到暖墨色，保持暖调但达到 ≥4.5:1 */
+  .app-stage.light .text-ink {
+    color: #2f2a22 !important;
+  }
+  .app-stage.light .text-ink-2 {
+    color: #4c4335 !important;
+  }
+  .app-stage.light .text-ink-3 {
+    color: #6b5f4c !important;
+  }
+  .app-stage.light :is(.label-caps, .sec-no, .figcap, .sec-sub, .num) {
+    color: #6b5f4c !important;
+  }
+  .app-stage.light :is(.label, .kpi-val, .badge-c, .sec-title, .sec-h) {
+    color: #3a332b !important;
+  }
+  .app-stage.light .text-brand-deep {
+    color: #1c4f86 !important;
+  }
+  .app-stage.light .text-brand {
+    color: #1a63b8 !important;
+  }
+  /* 语义色在米白底上也要够深（text-ok #0d9488 只有 3.32:1） */
+  .app-stage.light .text-ok {
+    color: #0a6b60 !important;
+  }
+  .app-stage.light .text-bad {
+    color: #a52c2c !important;
+  }
+  .app-stage.light .text-good {
+    color: #1d6b3f !important;
+  }
+  /* 徽标 A 的 4.45 只差一点点（阈值 4.5），再压深一点 */
+  .app-stage.light .badge-a {
+    color: #08695e !important;
+  }
+
+  /* 深色下 chip 的玻璃要反过来（白度压到 16%） */
+  .app-stage.dark :is(.chip, .chip-sm) {
+    border-color: rgba(255, 255, 255, 0.22) !important;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    ) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 2px 6px -2px rgba(0, 0, 0, 0.5);
+    color: #dbe6f4;
+  }
+  .app-stage.dark .chip-on {
+    border-color: rgba(140, 185, 255, 0.5) !important;
+    background-image: linear-gradient(180deg, rgba(120, 170, 255, 0.34) 0%, rgba(90, 140, 230, 0.18) 100%) !important;
+    color: #eaf3ff;
   }
 }
