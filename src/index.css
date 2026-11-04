@@ -39,15 +39,10 @@
     outline-offset: 2px;
   }
   body {
-    @apply bg-[#f8f6f9] text-ink font-sans text-[14px] leading-relaxed;
-    /* ★ 2026-11-04 v10「丝绸」：**没有任何线条**，只有大面积柔光 + 5% 颗粒。
-       多层 radial 的色标刻意做成 3 段，避免渐变banding（条带）。 */
-    background-color: #f8f6f9;
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
-      linear-gradient(115deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.5) 62%, rgba(255, 255, 255, 0) 100%);
-    background-repeat: repeat, no-repeat;
-    background-size: 160px 160px, 100% 100%;
+    @apply text-ink font-sans text-[14px] leading-relaxed;
+    /* ★ v16 简约：近白底 + 一层极淡竖向渐变，**没有颗粒、没有网格** */
+    background-color: #fbfbfd;
+    background-image: linear-gradient(180deg, #fdfcfe 0%, #f7f8fb 100%);
     background-attachment: fixed;
   }
 
@@ -60,18 +55,15 @@
     pointer-events: none;
     will-change: transform;
   }
+  /* 三团极淡色温（v16）：只给玻璃一点"透上去的颜色"，不做流动动画 */
   .silk-layer {
     position: absolute;
-    inset: -18%;
+    inset: -10%;
     pointer-events: none;
     background-image:
-      radial-gradient(46% 40% at 8% 12%, rgba(255, 206, 176, 0.68) 0%, rgba(255, 206, 176, 0.2) 55%, rgba(255, 206, 176, 0) 76%),
-      radial-gradient(40% 42% at 90% 10%, rgba(198, 196, 255, 0.62) 0%, rgba(198, 196, 255, 0.18) 56%, rgba(198, 196, 255, 0) 78%),
-      radial-gradient(50% 44% at 62% 96%, rgba(178, 236, 220, 0.62) 0%, rgba(178, 236, 220, 0.17) 56%, rgba(178, 236, 220, 0) 80%),
-      radial-gradient(38% 36% at 96% 74%, rgba(190, 220, 255, 0.55) 0%, rgba(190, 220, 255, 0) 74%),
-      radial-gradient(30% 30% at 42% 54%, rgba(255, 214, 232, 0.42) 0%, rgba(255, 214, 232, 0) 72%);
-    animation: silkDrift 52s ease-in-out infinite alternate;
-    will-change: transform;
+      radial-gradient(46% 40% at 10% 0%, rgba(255, 214, 190, 0.3) 0%, rgba(255, 214, 190, 0) 70%),
+      radial-gradient(42% 38% at 92% 2%, rgba(208, 206, 255, 0.28) 0%, rgba(208, 206, 255, 0) 72%),
+      radial-gradient(50% 42% at 55% 100%, rgba(196, 238, 228, 0.26) 0%, rgba(196, 238, 228, 0) 74%);
   }
   @keyframes silkDrift {
     0% {
@@ -124,71 +116,48 @@
   .wrap {
     @apply mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8;
   }
-  /* ── 液态玻璃材质（2026-11-04 v12 · Apple Liquid Glass 取向）─────────
-     四个要素缺一不可：
-       ① 背景模糊 + 高饱和（背后色被"吸"进玻璃）
-       ② 1px 渐变描边（模拟边缘折射的亮线，不是纯白实线）
-       ③ 顶部镜面高光 + 底部反光 + 内发光（indent glow）
-       ④ 大扩散、低不透明度的外投影（浮起来）
-     ★ 数据区仍用 .card-solid（纯白），避免读数发糊与打印失真。 */
+  /* ── 透明简约（2026-11-04 v16）──────────────────────────────
+     设计取向：**一条发丝线 + 一点透明 + 近乎无阴影**。
+     刻意去掉：渐变折射环、内发光、彩色渐变底、跟手高光、大扩散投影。 */
   .card {
     position: relative;
-    @apply rounded-xl3;
-    background: linear-gradient(
-      152deg,
-      rgba(255, 255, 255, 0.46) 0%,
-      rgba(255, 255, 255, 0.24) 44%,
-      rgba(255, 255, 255, 0.38) 100%
-    );
-    /* 滚动越快 → 模糊更大、饱和更高（"玻璃在被推着走"） */
-    -webkit-backdrop-filter: blur(calc(38px + var(--scroll-v) * 12px))
-      saturate(calc(1.95 + var(--scroll-v) * 0.2)) brightness(calc(1.03 + var(--scroll-v) * 0.03));
-    backdrop-filter: blur(calc(38px + var(--scroll-v) * 12px)) saturate(calc(1.95 + var(--scroll-v) * 0.2))
-      brightness(calc(1.03 + var(--scroll-v) * 0.03));
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.32),
-      inset 0 -16px 26px -22px rgba(15, 23, 42, 0.16),
-      inset 0 0 30px rgba(255, 255, 255, 0.12),
-      0 2px 4px rgba(15, 23, 42, 0.03),
-      0 34px 80px -44px rgba(15, 23, 42, 0.22);
+    @apply rounded-[14px];
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    backdrop-filter: blur(18px) saturate(1.3);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   }
-  /* ③ 双层环：外环 = 折光亮线（::before），内环 = 上亮下暗（::after）
-     —— 这一层是"玻璃厚度"的关键，单环看起来只是一条白边。 */
-  .card::after,
-  .glass-nav::after {
-    content: "";
-    position: absolute;
-    inset: 1px;
-    border-radius: inherit;
-    pointer-events: none;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.42),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.07);
+  /* 悬浮导航条：与卡片同材质，只多一点高度感 */
+  .glass-nav {
+    position: relative;
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(22px) saturate(1.35);
+    backdrop-filter: blur(22px) saturate(1.35);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   }
-  /* ① 渐变描边：用 mask 抠出 1px 环，模拟玻璃边缘的折射亮线 */
-  .card::before,
-  .glass-nav::before,
-  .glass-tile::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      140deg,
-      rgba(255, 255, 255, 0.78) 0%,
-      rgba(255, 255, 255, 0.16) 36%,
-      rgba(255, 255, 255, 0.48) 70%,
-      rgba(255, 255, 255, 0.2) 100%
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
+  /* KPI 格：无底无框，只靠排版与细线分栏 */
+  .glass-tile {
+    position: relative;
   }
-  /* ② 悬浮玻璃条（导航）：比卡片更"厚"、更亮，带一点镜面扫光 */
+  /* 数据卡：纯白（保证读数与打印） */
+  .card-solid {
+    @apply rounded-[14px];
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  }
+  @media (max-width: 640px) {
+    .card,
+    .card-tint,
+    .glass-nav {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgba(255, 255, 255, 0.94);
+    }
+  }
+  /* ② 悬浮玻璃条（导航）：与卡片同材质 */
   .glass-nav {
     position: relative;
     background: linear-gradient(
@@ -294,7 +263,7 @@
       transition-all duration-150 hover:bg-[#eff3f9] hover:text-ink;
   }
   .tab-on {
-    @apply bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.55)] hover:bg-brand-deep hover:text-white;
+    @apply bg-white text-brand-deep shadow-[0_1px_2px_rgba(15,23,42,.06)];
   }
 
   /* 小屏横向滚动容器：惯性滚动 + 横向滑动不带动整页（2026-11-01 小屏适配） */
@@ -350,13 +319,11 @@
       font-medium transition-all duration-150;
   }
   .chip-off {
-    @apply border-white/70 bg-white/60 text-ink-2 shadow-soft hover:-translate-y-px hover:border-white
-      hover:bg-white/80 hover:text-ink hover:shadow-float;
-    -webkit-backdrop-filter: blur(12px) saturate(1.4);
-    backdrop-filter: blur(12px) saturate(1.4);
+    @apply rounded-full border-[rgba(15,23,42,.1)] bg-transparent text-ink-2 transition-colors
+      hover:border-[rgba(15,23,42,.2)] hover:bg-white/60 hover:text-ink;
   }
   .chip-on {
-    @apply border-brand bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.6)];
+    @apply rounded-full border-brand/25 bg-brand-soft/70 text-brand-deep;
   }
 
   /* 筛选区紧凑 chip（比主 chip 小一号，用于筛选卡四列） */
@@ -404,32 +371,6 @@
   .stat-ico {
     @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[15px];
   }
-  /* 卡片高光跟随鼠标（v11）：鼠标位置写入 --mx/--my，::after 用 radial 画一团柔光。
-     ★ 只在有 mouse 的设备启用；reduced-motion 关闭；不改布局、不挡点击。 */
-  .spotlight::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(
-      190px 190px at var(--mx, 50%) var(--my, 0%),
-      rgba(255, 255, 255, 0.62) 0%,
-      rgba(255, 255, 255, 0.18) 42%,
-      rgba(255, 255, 255, 0) 72%
-    );
-    opacity: 0;
-    transition: opacity 240ms cubic-bezier(0.2, 0, 0.38, 0.9);
-  }
-  .spotlight:hover::after {
-    opacity: 1;
-  }
-  @media (hover: none), (prefers-reduced-motion: reduce) {
-    .spotlight::after {
-      display: none;
-    }
-  }
-
   /* 骨架屏微光（2026-11-04）：比单纯的 pulse 更"有质地" */
   .shimmer {
     position: relative;

@@ -1,7 +1,6 @@
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
-import { useLiquidGlass } from "./lib/liquidGlass";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import Overview from "./pages/Home";
@@ -35,12 +34,9 @@ function Nav() {
   const [sp, setSp] = useSearchParams();
   const tr = useT();
   const { lang, setLang } = useLang();
-  /* ★ 2026-11-04 v15：真折射液态玻璃（Chromium 专属，其余浏览器自动走 CSS 兜底） */
-  const navRef = useRef<HTMLDivElement>(null);
-  useLiquidGlass(navRef, { radius: 22, strength: 13 });
   return (
-    <header className="sticky top-0 z-50 px-3 pt-2.5 sm:px-5">
-      <div ref={navRef} className="glass-nav mx-auto flex h-14 max-w-[1240px] items-center gap-2.5 rounded-[22px] px-3 sm:gap-6 sm:px-5">
+    <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)] bg-white/70 backdrop-blur-xl">
+      <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
             ⚛
@@ -254,45 +250,6 @@ export default function App() {
     }, 800);
     return () => window.clearTimeout(timer);
   }, [lang]);
-
-  /** 丝绸层滚动视差 + **液态玻璃联动**（2026-11-04 v13）：
-   *  - 视差：-4% 位移；
-   *  - 液感：把滚动速度写进 `--scroll-v`（0..1），CSS 用它放大 blur/saturate、抬高导航阴影；
-   *  - 静止 140ms 后自动回落到 0 ⇒ 停下时玻璃"恢复平静"；
-   *  - 只动 transform 与一个 CSS 变量；rAF 节流 + passive；reduced-motion 直接退出。 */
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const el = document.querySelector<HTMLElement>(".silk-parallax");
-    const root = document.documentElement;
-    let raf = 0;
-    let decay = 0;
-    let lastY = window.scrollY;
-    let lastT = performance.now();
-    const apply = () => {
-      raf = 0;
-      const y = window.scrollY;
-      const t = performance.now();
-      const dt = Math.max(16, t - lastT);
-      const v = Math.min(1, (Math.abs(y - lastY) / dt) * 6);
-      lastY = y;
-      lastT = t;
-      if (el) el.style.transform = `translate3d(0, ${Math.round(y * -0.04)}px, 0)`;
-      root.style.setProperty("--scroll-v", v.toFixed(3));
-      window.clearTimeout(decay);
-      decay = window.setTimeout(() => root.style.setProperty("--scroll-v", "0"), 140);
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
-    };
-    apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.clearTimeout(decay);
-      if (raf) cancelAnimationFrame(raf);
-      root.style.removeProperty("--scroll-v");
-    };
-  }, []);
 
   return (
     <LangCtx.Provider value={{ lang, setLang }}>

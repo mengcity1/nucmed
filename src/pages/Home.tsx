@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useLiquidGlass } from "../lib/liquidGlass";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
@@ -107,9 +106,8 @@ function GroupLabel({ icon, children, count }: {
 
 type MetricTone = "brand" | "accent" | "violet" | "sand";
 
-/** 指标（2026-11-04 v8 数据报头）：去掉彩色卡与图标块，改成**细线分隔的数值格** ——
- *  四格共用上下两条细线，像期刊的 data panel，而不是 SaaS 仪表盘。
- *  ★ 计数动画保留（`useCountUp`）；颜色只保留一条 2px 顶部色带做数据线标识。 */
+/** 指标（2026-11-04 v16 简约）：**无底、无框、无阴影**，只有排版 + 细线分栏。
+ *  计数动画保留；颜色只落在数字上（轻声量级，不抢视线）。 */
 function Metric({
   label,
   value,
@@ -117,51 +115,22 @@ function Metric({
   tone = "brand",
 }: {
   label: string;
-  /** ★ 2026-11-04 改为数值：卡片内部自己做 600ms 计数动画（`useCountUp`） */
   value: number;
   hint?: string;
   tone?: MetricTone;
 }) {
   const shown = useCountUp(value);
-  const ref = useRef<HTMLDivElement>(null);
-  /* 真折射（Chromium）；其它浏览器保持 CSS 玻璃 */
-  useLiquidGlass(ref, { radius: 20, strength: 8 });
-  /** 高光跟随鼠标：把指针坐标写进 CSS 变量（仅 4 张卡，开销可忽略） */
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    el.style.setProperty("--my", `${e.clientY - r.top}px`);
-  };
-  const bar: Record<MetricTone, string> = {
-    brand: "bg-gradient-to-r from-[#7aa7e0] to-[#2f6bb5]",
-    accent: "bg-gradient-to-r from-[#7ed4c6] to-[#0f8f81]",
-    violet: "bg-gradient-to-r from-[#b9aaee] to-[#6d5bd0]",
-    sand: "bg-gradient-to-r from-[#f0cf9a] to-[#b4761f]",
-  };
   const val: Record<MetricTone, string> = {
     brand: "text-[#12457f]",
     accent: "text-[#0a6f66]",
     violet: "text-[#4b3ea3]",
     sand: "text-[#8a5a12]",
   };
-  const glow: Record<MetricTone, string> = {
-    brand: "from-[#eaf2fe]/55",
-    accent: "from-[#e6faf6]/55",
-    violet: "from-[#f2eefd]/55",
-    sand: "from-[#fdf5e7]/55",
-  };
   return (
-    <div
-      ref={ref}
-      onPointerMove={onMove}
-      className={`spotlight glass-tile group relative overflow-hidden rounded-xl2 bg-gradient-to-br ${glow[tone]} to-white/40 p-4 transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
-    >
-      <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${bar[tone]}`} />
+    <div className="px-4 py-4 sm:border-l sm:border-[rgba(15,23,42,.08)] sm:first:border-l-0">
       <div className="label-caps">{label}</div>
-      <div className={`num mt-2 text-[30px] font-bold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
-      {hint && <div className="mt-2 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
+      <div className={`num mt-2 text-[28px] font-semibold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
+      {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
     </div>
   );
 }
@@ -551,7 +520,7 @@ export default function Home() {
 
       {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡 · 进入视口时渐显） */}
       <Reveal className="mt-6">
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-y-1 border-y border-[rgba(15,23,42,.08)] py-1 sm:grid-cols-4 sm:gap-0">
         <Metric
           tone="brand"
           label={tr("home.kpiResult")}
