@@ -637,9 +637,39 @@
     background: rgba(30, 91, 168, 0.16);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
-  /* 面板的"玻璃厚度"：顶沿 1px 亮边 + 亮轮廓 + **底部内阴影**（厚度感）+ 极淡外投影。
-     这一层是 CSS，不依赖 canvas —— 实测 canvas 折射在浅色背景上很轻（KPI 区 13.4% 像素差），
-     厚度感主要靠这三条边光，视觉上才"像玻璃"。 */
+  /* ── v20.6 全站按钮 = 液态玻璃（owner：只要是按钮都得是）────────────────
+     玻璃放在**按钮这一层**：多半透明白 + 顶部内高光 + 亮描边 + 背景模糊 + 轻投影。
+     用 `.app-stage :is(button,[role=tab])`（0,2,1）压过 Tailwind 的 bg/border 工具类 ⇒ 全站统一；
+     确实要保持原样的按钮加 `.btn-plain` 排除。 */
+  .app-stage :is(button, [role="tab"]):not(.btn-plain) {
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.36) 100%);
+    -webkit-backdrop-filter: blur(12px) saturate(1.25);
+    backdrop-filter: blur(12px) saturate(1.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 1px 2px rgba(15, 23, 42, 0.06);
+    transition:
+      background-image 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+  .app-stage :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.54) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 2px 8px rgba(15, 23, 42, 0.09);
+  }
+  .app-stage :is(button, [role="tab"]):not(.btn-plain):active {
+    transform: translateY(0.5px);
+  }
+  /* 选中态按钮（chip）保留品牌色，只在玻璃上叠一层淡色 */
+  .app-stage .chip-on {
+    background-image: linear-gradient(180deg, rgba(30, 91, 168, 0.2) 0%, rgba(30, 91, 168, 0.12) 100%);
+    border-color: rgba(30, 91, 168, 0.35);
+  }
+  /* 面板的玻璃厚度：顶沿亮边 + 亮轮廓 + 底部内阴影 + 淡外投影（CSS 层，弥补 WebGL 只在边缘可见） */
   .app-stage.webgl-ready .lg-surface {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 1),

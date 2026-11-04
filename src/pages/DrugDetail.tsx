@@ -521,8 +521,8 @@ export default function DrugDetail() {
   if (!did) {
     return (
       <div className="pb-4">
-        <h1 className="text-[26px] font-bold tracking-tight">{tr("drug.title")}</h1>
-        <p className="mt-1.5 text-[13px] text-ink-3 text-balance">{tr("drug.lead")}</p>
+        {/* v20.6：删掉重复标题 —— PageBar 已经渲染过「🔬 单药画像」，这里再放一个 h1 就是两遍 */}
+        <p className="text-[13px] text-ink-3 text-balance">{tr("drug.lead")}</p>
         <div className="card mt-5 p-6">
           <input
             value={pick}
