@@ -85,6 +85,12 @@
     @apply border-brand bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.6)];
   }
 
+  /* 筛选区紧凑 chip（比主 chip 小一号，用于筛选卡四列） */
+  .chip-sm {
+    @apply inline-flex select-none items-center gap-1 rounded-[9px] border px-2 py-[3px] text-[12px]
+      font-medium transition-all duration-150;
+  }
+
   /* 区块标题 */
   .sec-title {
     @apply text-[15px] font-semibold tracking-tight text-ink;

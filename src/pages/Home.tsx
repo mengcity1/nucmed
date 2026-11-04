@@ -68,10 +68,20 @@ function splitUniq(values: (string | null)[]): string[] {
   return [...set].sort();
 }
 
-function Chip({ on, children, onClick }: { on?: boolean; children: React.ReactNode; onClick: () => void }) {
+function Chip({
+  on,
+  children,
+  onClick,
+  sm,
+}: {
+  on?: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+  sm?: boolean;
+}) {
   return (
-    <button onClick={onClick} className={`chip ${on ? "chip-on" : "chip-off"}`}>
-      {on && <span className="text-[11px] leading-none">✓</span>}
+    <button onClick={onClick} className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"}`}>
+      {on && <span className="text-[10.5px] leading-none">✓</span>}
       {children}
     </button>
   );
@@ -185,6 +195,10 @@ export default function Home() {
   const [page, setPage] = useState(() => Number(sp.get("p") ?? 0) || 0);
   const [onlyPts, setOnlyPts] = useState(() => sp.get("pts") === "1");
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
+  /** 筛选卡默认折叠（2026-11-04 owner：太臃肿）；URL 里带筛选时默认展开，避免「筛选生效但面板看不见」。 */
+  const [fOpen, setFOpen] = useState(
+    () => arr("type").length + arr("nuc").length + arr("tgt").length + arr("dis").length > 0
+  );
   // ★ 筛选区：核素默认 Top12 + 可展开栏；三个维度各有搜索框
   const [nucAll, setNucAll] = useState(false);
   const [qNuc, setQNuc] = useState("");
@@ -219,6 +233,22 @@ export default function Home() {
   );
   const allTargets = useMemo(() => splitUniq((drugs ?? []).map((d) => d.targets_zh)), [drugs]);
   const allDiseases = useMemo(() => splitUniq((drugs ?? []).map((d) => d.diseases_zh)), [drugs]);
+
+  /** 筛选卡用 chip 多选代替原生 `<select multiple size=9>`（2026-11-04）：
+   *  只渲染「已选 + 前 30 个匹配」，其余靠搜索框缩小范围 —— 原来的两个 9 行列表框占 ~400px 高。 */
+  const tgtList = useMemo(() => {
+    const q = qTgt.trim().toLowerCase();
+    const pool = q ? allTargets.filter((t) => t.toLowerCase().includes(q)) : allTargets;
+    const uniq = [...new Set([...targets, ...pool])];
+    return { items: uniq.slice(0, 30), total: uniq.length };
+  }, [allTargets, targets, qTgt]);
+  const disList = useMemo(() => {
+    const q = qDis.trim().toLowerCase();
+    const pool = q ? allDiseases.filter((t) => t.toLowerCase().includes(q)) : allDiseases;
+    const uniq = [...new Set([...diseases, ...pool])];
+    return { items: uniq.slice(0, 30), total: uniq.length };
+  }, [allDiseases, diseases, qDis]);
+  const nSel = types.length + nucs.length + targets.length + diseases.length;
 
   /** ★ facet：除「核素」外的所有筛选条件 → 用于计算核素的动态 Top（选别的维度时，核素 Top 跟着变） */
   const facetBase = useMemo(() => {
@@ -324,29 +354,39 @@ export default function Home() {
         <Chip onClick={() => setNucs(["镓-68"])}>{tr("home.ga68")}</Chip>
       </div>
 
-      {/* 筛选卡（常驻展开 · 对齐原页「不要折叠」） */}
-      <section className="card-tint mt-6 p-6">
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <b className="text-[15px] tracking-tight">{tr("home.filters")}</b>
-            <span className="rounded-full bg-[#eef2f8] px-2 py-0.5 text-[11.5px] font-medium text-ink-3">
-              {view.length !== (drugs?.length ?? 0) ? tr("home.filtered") : tr("home.allLib")}
-            </span>
-          </div>
-          <button onClick={reset} className="text-[13px] text-ink-3 transition hover:text-brand">
+      {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选 */}
+      <section className="card-tint mt-6 px-5 py-4">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <b className="text-[14px] tracking-tight">{tr("home.filters")}</b>
+          <span className="rounded-full bg-white px-2 py-0.5 text-[11.5px] font-medium text-ink-3 ring-1 ring-[#e3e9f4]">
+            {view.length !== (drugs?.length ?? 0) ? tr("home.filtered") : tr("home.allLib")}
+          </span>
+          {nSel > 0 && <span className="text-[11.5px] text-ink-3">{tr("home.selectedN", { n: nSel })}</span>}
+          <button onClick={reset} className="ml-auto text-[12.5px] text-ink-3 transition hover:text-brand">
             {tr("home.reset")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFOpen((v) => !v)}
+            aria-expanded={fOpen}
+            className="inline-flex items-center gap-1 rounded-lg border border-[#e3e9f4] bg-white px-2.5 py-1 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink"
+          >
+            {fOpen ? tr("home.collapseFilters") : tr("home.expandFilters")}
+            <span className="text-[10px] text-ink-3">{fOpen ? "▲" : "▼"}</span>
           </button>
         </div>
 
-        <div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
+        {fOpen && (
+        <div className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <GroupLabel icon="layers" count={allTypes.length}>
               {tr("home.drugType")}
             </GroupLabel>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {allTypes.map((t) => (
                 <Chip
                   key={t}
+                  sm
                   on={types.includes(t)}
                   onClick={() => {
                     setTypes((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
@@ -360,27 +400,19 @@ export default function Home() {
           </div>
 
           <div>
-            <GroupLabel icon="atom" count={nucFreq.size}>
-              {tr("home.isotope")}{" "}
-              <span className="font-normal text-ink-3/60">· {tr("home.dynamicOrder")}</span>
-            </GroupLabel>
+            <GroupLabel icon="atom" count={nucFreq.size}>{tr("home.isotope")}</GroupLabel>
             <input
               value={qNuc}
               onChange={(e) => setQNuc(e.target.value)}
               placeholder={tr("home.searchIsotope", { n: nucOrdered.length })}
-              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+              className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
             />
-            <div
-              className={
-                nucAll && !qNuc.trim()
-                  ? "max-h-[210px] overflow-y-auto rounded-lg border border-line bg-white p-2"
-                  : ""
-              }
-            >
-              <div className="flex flex-wrap gap-2">
+            <div className={nucAll && !qNuc.trim() ? "max-h-[104px] overflow-y-auto pr-1" : ""}>
+              <div className="flex flex-wrap gap-1.5">
                 {shownNucs.map((n) => (
                   <Chip
                     key={n}
+                    sm
                     on={nucs.includes(n)}
                     onClick={() => {
                       setNucs((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
@@ -397,7 +429,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setNucAll((v) => !v)}
-                className="mt-2 flex w-full items-center justify-between rounded-lg border border-line bg-[#f7f9fd] px-2.5 py-1.5 text-[12px] text-ink-2 transition hover:border-[#b9d0e9] hover:bg-white"
+                className="mt-1.5 text-[11.5px] font-medium text-brand-deep transition hover:underline"
               >
                 <span>
                   {nucAll ? tr("home.collapse") : tr("home.expand", { n: nucOrdered.length })}
@@ -407,65 +439,74 @@ export default function Home() {
             )}
           </div>
 
-          <div className="md:col-span-2">
+          <div>
             <GroupLabel icon="target" count={allTargets.length}>{tr("home.targets")}</GroupLabel>
             <input
               value={qTgt}
               onChange={(e) => setQTgt(e.target.value)}
               placeholder={tr("home.searchTargets", { n: allTargets.length })}
-              className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+              className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
             />
-            <select
-              multiple
-              size={9}
-              value={targets}
-              onChange={(e) => {
-                setTargets([...e.target.selectedOptions].map((o) => o.value));
-                setPage(0);
-              }}
-              className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
-            >
-              {[...new Set([...targets, ...(qTgt.trim() ? allTargets.filter((t) => t.toLowerCase().includes(qTgt.trim().toLowerCase())) : allTargets)])].map((t) => (
-                <option key={t} value={t}>
+            <div className="flex max-h-[104px] flex-wrap gap-1.5 overflow-y-auto pr-1">
+              {tgtList.items.map((t) => (
+                <Chip
+                  key={t}
+                  sm
+                  on={targets.includes(t)}
+                  onClick={() => {
+                    setTargets((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+                    setPage(0);
+                  }}
+                >
                   {t}
-                </option>
+                </Chip>
               ))}
-            </select>
+            </div>
+            {tgtList.total > tgtList.items.length && (
+              <div className="mt-1.5 text-[11px] text-ink-3">
+                {tr("home.moreHint", { n: tgtList.total - tgtList.items.length })}
+              </div>
+            )}
           </div>
 
           {lang === "zh" ? (
-            <div className="md:col-span-2">
+            <div>
               <GroupLabel icon="heart" count={allDiseases.length}>{tr("home.diseases")}</GroupLabel>
               <input
                 value={qDis}
                 onChange={(e) => setQDis(e.target.value)}
                 placeholder={tr("home.searchDiseases", { n: allDiseases.length })}
-                className="mb-2 h-8 w-full rounded-lg border border-line bg-white px-2.5 text-[12.5px] outline-none focus:border-[#9dc0ea]"
+                className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
               />
-              <select
-                multiple
-                size={9}
-                value={diseases}
-                onChange={(e) => {
-                  setDiseases([...e.target.selectedOptions].map((o) => o.value));
-                  setPage(0);
-                }}
-                className="w-full rounded-lg border border-line bg-white px-2 text-[12.5px] leading-5 outline-none focus:border-[#9dc0ea]"
-              >
-                {[...new Set([...diseases, ...(qDis.trim() ? allDiseases.filter((t) => t.toLowerCase().includes(qDis.trim().toLowerCase())) : allDiseases)])].map((t) => (
-                  <option key={t} value={t}>
+              <div className="flex max-h-[104px] flex-wrap gap-1.5 overflow-y-auto pr-1">
+                {disList.items.map((t) => (
+                  <Chip
+                    key={t}
+                    sm
+                    on={diseases.includes(t)}
+                    onClick={() => {
+                      setDiseases((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+                      setPage(0);
+                    }}
+                  >
                     {t}
-                  </option>
+                  </Chip>
                 ))}
-              </select>
+              </div>
+              {disList.total > disList.items.length && (
+                <div className="mt-1.5 text-[11px] text-ink-3">
+                  {tr("home.moreHint", { n: disList.total - disList.items.length })}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="md:col-span-2">
+            <div>
               <GroupLabel icon="heart" count={0}>{tr("home.diseases")}</GroupLabel>
-              <p className="text-[12.5px] leading-relaxed text-ink-3">{tr("home.diseasesEnOnly")}</p>
+              <p className="text-[12px] leading-relaxed text-ink-3">{tr("home.diseasesEnOnly")}</p>
             </div>
           )}
         </div>
+        )}
       </section>
 
       {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡） */}
