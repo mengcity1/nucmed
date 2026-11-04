@@ -364,6 +364,131 @@ export const STR = {
     zh: "Vite + React + TypeScript + Tailwind CSS（纯静态，无后端）",
     en: "Vite + React + TypeScript + Tailwind CSS (static site, no backend)",
   },
+
+  /* ── 单药画像正文（2026-11-04 英文化：此前只迁了外壳，正文 104 行中文硬编码）── */
+  "drug.chartNoTime": { zh: "未标注时点", en: "Time not reported" },
+  "drug.chartSpecies": { zh: "物种：{s}", en: "Species: {s}" },
+  "drug.chartTime": { zh: "时间 (h)", en: "Time (h)" },
+  "drug.chartTimeLog": { zh: "时间 (h, 对数)", en: "Time (h, log)" },
+  "drug.chartEmpty": {
+    zh: "该药暂无可用于绘图的生物分布数值（当前单位 {u}）",
+    en: "No plottable biodistribution values for this drug in the current unit ({u})",
+  },
+  "drug.chartTitle": { zh: "生物分布可视化", en: "Biodistribution plot" },
+  "drug.chartOrgan": { zh: "器官对比", en: "Organ comparison" },
+  "drug.chartCurve": { zh: "时间曲线", en: "Time course" },
+  "drug.chartCurveHint": { zh: "按时间画曲线", en: "Plot values over time" },
+  "drug.chartCurveOff": {
+    zh: "该药没有「同一器官 ≥2 个时点」的记录",
+    en: "No organ of this drug has ≥2 time points",
+  },
+  "drug.unavailable": { zh: "（不可用）", en: " (unavailable)" },
+  "drug.axisLinear": { zh: "线性时间轴", en: "Linear time axis" },
+  "drug.axisLog": { zh: "对数时间轴", en: "Log time axis" },
+  "drug.chartNoteOrgan": {
+    zh: "每个点 = 一条原始记录，不取均值 · 横轴按最大值排序取前 12 个器官 · 颜色 = 时点 · 悬停看 SD / 物种 / PMID · 单位 {u}",
+    en: "Each point = one source record (no averaging) · x-axis: top 12 organs by maximum · colour = time point · hover for SD / species / PMID · unit {u}",
+  },
+  "drug.chartNoteCurve": {
+    zh: "每条线 = 一个器官（最多 6 个）· 换文献处断线，不把两篇论文连成一条趋势 · 该药有 {n} 个器官满足「≥2 个时点」",
+    en: "Each line = one organ (max 6) · lines break between papers, never joining two studies into one trend · {n} organs of this drug have ≥2 time points",
+  },
+
+  "drug.tbrGoBio": { zh: "去「生物分布」看正常器官对照 →", en: "See normal-organ controls in Biodistribution →" },
+  "drug.tbrEmptyTitle": { zh: "该药暂无靶本比记录", en: "No tumour-to-background record for this drug" },
+  "drug.tbrEmptyHint": {
+    zh: "库内只记录「该药是否存在 TBR 记录」，明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出 —— 这里不猜、也不自行重算比值。",
+    en: "The database only records whether a TBR record exists; the details (numerator / denominator / time point / units) are not part of the exported web data — nothing is guessed and no ratio is recomputed here.",
+  },
+  "drug.tbrBannerTitle": { zh: "库内标记该药有靶本比记录", en: "This drug is flagged as having a TBR record" },
+  "drug.tbrBannerBody": {
+    zh: "，但 TBR 明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出，因此这里不展示重算出的比值{extra}；分母（正常器官 / 血池）在「生物分布」Tab。",
+    en: ", but the details (numerator / denominator / time point / units) are not exported, so no recomputed ratio is shown{extra}; the denominator (normal organs / blood pool) is in the Biodistribution tab.",
+  },
+  "drug.tbrBannerExtra": { zh: "，只列原始肿瘤摄取点", en: ", only the raw tumour uptake points are listed" },
+  "drug.tbrTumourTitle": { zh: "肿瘤摄取点（TBR 的分子）", en: "Tumour uptake points (TBR numerator)" },
+  "drug.tbrTumourCount": { zh: "共 {n} 条 · 口径以原文为准", en: "{n} rows · definitions as reported" },
+  "drug.tbrNoTumour": {
+    zh: "库内有 TBR 记录，但该药的生物分布点里没有标记为 tumor 的摄取点 —— 分子端未导出",
+    en: "A TBR record exists, but none of this drug's biodistribution points is flagged as tumour — the numerator is not available",
+  },
+  "drug.thOrganModel": { zh: "器官 / 模型", en: "Organ / model" },
+  "drug.thOrgan": { zh: "器官", en: "Organ" },
+  "drug.thTime": { zh: "时点 (h)", en: "Time (h)" },
+  "drug.thValue": { zh: "值", en: "Value" },
+  "drug.thUnit": { zh: "单位", en: "Unit" },
+  "drug.thEvidence": { zh: "证据", en: "Evidence" },
+  "drug.thPmidRaw": { zh: "PMID / 原文", en: "PMID / source" },
+
+  "drug.partAlt": { zh: "{k} 结构", en: "{k} structure" },
+  "drug.partAltZoom": { zh: "{d} · {k} 结构（RDKit 现画）", en: "{d} · {k} structure (rendered with RDKit)" },
+  "drug.structAlt": { zh: "{d} · 完整结构图", en: "{d} · full structure" },
+
+  "drug.bioTitle": { zh: "生物分布记录", en: "Biodistribution records" },
+  "drug.bioCount": { zh: "共 {n} 条", en: "{n} rows" },
+  "drug.bioExpandable": { zh: "可展开原文 {n} 条", en: "{n} rows with source snippet" },
+  "drug.traceOnlyShort": { zh: "仅文献级追溯 {n} 条", en: "{n} rows literature-level only" },
+  "drug.bioClickRow": { zh: "点任意行查看原文", en: "Click any row to see the source snippet" },
+  "drug.rowNoRawTitle": {
+    zh: "该行没有原文片段，只能追到 PMID 指向的文献",
+    en: "No source snippet for this row — it can only be traced to the PMID",
+  },
+  "drug.onlyLit": { zh: "仅文献", en: "PMID only" },
+  "drug.traceOnly": { zh: "仅文献级追溯", en: "Literature-level only" },
+  "drug.rawSnippet": { zh: "原文片段：", en: "Source snippet: " },
+  "drug.noRawPlaceholder": { zh: "（该行无原文片段）", en: "(no source snippet for this row)" },
+  "drug.bioEmptyTitle": { zh: "该药在库内暂无生物分布记录", en: "No biodistribution records for this drug" },
+  "drug.bioEmptyHint": {
+    zh: "全库 {a} 个核药中，有分布数据的仅 {b} 个 —— 这是数据覆盖范围，不是本页故障",
+    en: "Of {a} drugs in the database, only {b} have biodistribution data — this reflects data coverage, not a page error",
+  },
+  "drug.bioEmptyCta": { zh: "回总览检索其他核药 →", en: "Search other drugs from the overview →" },
+
+  "drug.dosNote": { zh: "同一器官多口径并列，不跨单位合并", en: "Multiple units for the same organ are listed side by side, never merged" },
+  "drug.dosEmpty": { zh: "该药暂无剂量学记录", en: "No dosimetry records for this drug" },
+  "drug.tbrNote": { zh: "明细未随本站导出 · 以原文为准", en: "Details not exported · as reported" },
+  "drug.tbrNone": { zh: "库内无 TBR 记录", en: "No TBR record in the database" },
+
+  "drug.refsTitle": { zh: "相关文献", en: "Related literature" },
+  "drug.refsCount": { zh: "共 {a} 篇 = 分布来源 {b} + 其他 {c}", en: "{a} papers = {b} sources + {c} other" },
+  "drug.refsSrc": { zh: "生物分布来源", en: "Biodistribution sources" },
+  "drug.refsOther": { zh: "其他相关文献", en: "Other related literature" },
+  "drug.refsSrcHint": {
+    zh: "该药分布数值的出处 —— 能和「生物分布」Tab 里的 PMID 对上",
+    en: "Where this drug's biodistribution values come from — matches the PMIDs in the Biodistribution tab",
+  },
+  "drug.refsOtherHint": {
+    zh: "背景 / 方法 / 临床研究；未直接提供本站的分布数值",
+    en: "Background / methods / clinical studies; they do not provide the biodistribution values shown here",
+  },
+  "drug.badgeSrc": { zh: "来源", en: "Source" },
+  "drug.badgeBg": { zh: "背景", en: "Background" },
+  "drug.refsGroupCount": { zh: "· {n} 篇", en: "· {n} papers" },
+  "drug.refsTruncated": {
+    zh: "仅显示前 30 篇（共 {n} 篇）—— 按 PMID 升序。",
+    en: "Showing the first 30 of {n} papers — sorted by ascending PMID.",
+  },
+  "drug.refsEmptyTitle": { zh: "该药暂无关联文献", en: "No linked literature for this drug" },
+  "drug.refsEmptyHint": {
+    zh: "库内既没有它的生物分布来源文献，也没有药物级参考文献关联。",
+    en: "The database has neither biodistribution source papers nor drug-level reference links for it.",
+  },
+  "drug.refsGoBio": { zh: "去「生物分布」看原始记录 →", en: "See the raw records in Biodistribution →" },
+
+  "drug.figsLine": { zh: "共 {n} 张 · PET / PET-CT 原图（引自原文 Figure）", en: "{n} images · original PET / PET-CT figures" },
+  "drug.figsNone": { zh: "该药暂无收录影像图", en: "No figures collected for this drug" },
+  "drug.figsGroupCount": { zh: "· {n} 张", en: "· {n} images" },
+  "drug.figsNote": {
+    zh: "图引自原文 Figure（非本库生成、非重绘）；点击可放大；许可随图标注，使用前请回原文核对。",
+    en: "Figures are reproduced from the source papers (not generated or redrawn here); click to enlarge; each image carries its licence — check the original before reuse.",
+  },
+  "drug.figsEmptyTitle": { zh: "该药暂无收录的文献影像", en: "No published figures collected for this drug" },
+  "drug.figsEmptyHint": {
+    zh: "本库影像图集现收 {t} 张、覆盖 {d} 个药，该药尚未命中。图集只收「图注里能定位到药物、且能取到原文 Figure」的图，因此不是每个药都有。",
+    en: "The atlas currently holds {t} images covering {d} drugs; this drug is not among them. It only collects figures whose captions identify a drug and whose original file is retrievable, so not every drug has one.",
+  },
+  "drug.figsEmptyHintShort": { zh: "该药尚未命中文献影像。", en: "No figure has been matched to this drug yet." },
+  "drug.figsEmptyCta": { zh: "去影像图集看看 →", en: "Browse the imaging atlas →" },
 } as const;
 
 export type StrKey = keyof typeof STR;

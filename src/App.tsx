@@ -1,4 +1,4 @@
-import { Link, NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { setDataLang, useJSON, type Meta } from "./lib/data";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
@@ -187,27 +187,9 @@ function Footer() {
   );
 }
 
-/** 英文站占位：这些页面的文案尚未迁移完 ⇒ 英文模式下给英文说明，**绝不让中文漏出**。
- *  迁移完成后删掉对应路由上的 <EnGate> 包裹即可。 */
-function EnGate({ children }: { children: React.ReactNode }) {
-  const { lang } = useLang();
-  const tr = useT();
-  if (lang === "zh") return <>{children}</>;
-  return (
-    <div className="card mt-6 p-8 text-center">
-      <div className="text-[15px] font-semibold text-ink">{tr("en.pending.title")}</div>
-      <p className="mx-auto mt-2 max-w-[560px] text-[13px] leading-relaxed text-ink-3">
-        {tr("en.pending.body")}
-      </p>
-      <Link
-        to="/"
-        className="mt-4 inline-block rounded-lg border border-brand bg-brand-soft px-4 py-2 text-[13px] font-medium text-brand-deep transition hover:bg-brand/15"
-      >
-        {tr("en.pending.back")}
-      </Link>
-    </div>
-  );
-}
+/** ★ 2026-11-04：EnGate（「本页英文版正在翻译」占位门禁）已删除 ——
+ *  总览 / 影像图集 / 单药画像 / 关于 四页英文全部实装，
+ *  英文模式由 `App` 的 DOM 汉字自检（下方 useEffect）兜底。 */
 
 export default function App() {
   /** 语言：URL `?lang=en` 优先，其次上次选择（localStorage），默认中文 */
@@ -256,11 +238,11 @@ export default function App() {
         >
           <Routes>
             <Route path="/" element={<Overview />} />
-            <Route path="/drug" element={<EnGate><DrugDetail /></EnGate>} />
-            <Route path="/drug/:id" element={<EnGate><DrugDetail /></EnGate>} />
+            <Route path="/drug" element={<DrugDetail />} />
+            <Route path="/drug/:id" element={<DrugDetail />} />
             <Route path="/atlas" element={<Atlas />} />
             {/* 兼容旧链接 /drugs/:id */}
-            <Route path="/drugs/:id" element={<EnGate><DrugDetail /></EnGate>} />
+            <Route path="/drugs/:id" element={<DrugDetail />} />
             <Route path="/about" element={<About />} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />

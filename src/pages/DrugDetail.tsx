@@ -62,6 +62,8 @@ function DetailSkeleton() {
  *  ② 只有存在「同一器官 ≥2 个时点」时才提供「时间曲线」，按 PMID 分段断线、可切线性/对数；
  *  ③ 单位分开选：%ID/g 3,110 行 / %ID 256 行 / %ID/mL 25 行，混在一个轴上会失真。 */
 function DrugCurve({ pts }: { pts: Point[] }) {
+  const tr = useT();
+  const { lang } = useLang();
   const units = useMemo(() => {
     const m = new Map<string, number>();
     for (const p of pts) m.set(p.value_unit, (m.get(p.value_unit) ?? 0) + 1);
@@ -120,7 +122,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
         data: mk(rows.filter((p) => p.time_h === t && organs.includes(p.organ_norm))),
       }));
     const noT = rows.filter((p) => (p.time_h === null || p.time_h <= 0) && organs.includes(p.organ_norm));
-    if (noT.length) series.push({ name: "未标注时点", type: "scatter", symbolSize: 9, data: mk(noT) });
+    if (noT.length) series.push({ name: tr("drug.chartNoTime"), type: "scatter", symbolSize: 9, data: mk(noT) });
 
     return {
       color: PALETTE,
@@ -134,7 +136,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
           return [
             `<b>${d.name}</b>`,
             `${d.value}${sd} ${unit}`,
-            d.species ? `物种：${d.species}` : "",
+            d.species ? tr("drug.chartSpecies", { s: d.species }) : "",
             d.pmid ? `PMID ${d.pmid}` : "",
           ]
             .filter(Boolean)
@@ -153,7 +155,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       yAxis: { type: "value" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
       series,
     };
-  }, [rows, times, unit]);
+  }, [rows, times, unit, lang]);
 
   /** 「时间曲线」：每个器官一条线，按 PMID 分段（换文献处断线，不把两篇论文连成一条趋势） */
   const curveOption = useMemo(() => {
@@ -189,26 +191,26 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       grid: { left: 56, right: 18, top: 40, bottom: 40 },
       xAxis: {
         type: logX ? ("log" as const) : ("value" as const),
-        name: logX ? "时间 (h, 对数)" : "时间 (h)",
+        name: logX ? tr("drug.chartTimeLog") : tr("drug.chartTime"),
         nameTextStyle: { color: "#94a3b8", fontSize: 11 },
         ...AXIS,
       },
       yAxis: { type: "log" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
       series,
     };
-  }, [rows, curvable, unit, logX]);
+  }, [rows, curvable, unit, logX, lang]);
 
   if (!rows.length) {
     return (
       <div className="rounded-lg border border-dashed border-[#e8edf5] px-4 py-5 text-center text-[12.5px] text-ink-3">
-        该药暂无可用于绘图的生物分布数值（当前单位 {unit || "—"}）
+        {tr("drug.chartEmpty", { u: unit || "—" })}
       </div>
     );
   }
   return (
     <div>
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span className="text-[13px] font-medium text-ink">生物分布可视化</span>
+        <span className="text-[13px] font-medium text-ink">{tr("drug.chartTitle")}</span>
         {units.length > 1 && (
           <span className="flex flex-wrap items-center gap-1">
             {units.map(([u, n]) => (
@@ -233,18 +235,18 @@ function DrugCurve({ pts }: { pts: Point[] }) {
               view === "organ" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
             }`}
           >
-            器官对比
+            {tr("drug.chartOrgan")}
           </button>
           <button
             type="button"
             onClick={() => setView("curve")}
             disabled={!curvable.length}
-            title={curvable.length ? "按时间画曲线" : "该药没有「同一器官 ≥2 个时点」的记录"}
+            title={curvable.length ? tr("drug.chartCurveHint") : tr("drug.chartCurveOff")}
             className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
               view === "curve" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
             } ${curvable.length ? "" : "cursor-not-allowed opacity-45 hover:border-line"}`}
           >
-            时间曲线{curvable.length ? "" : "（不可用）"}
+            {tr("drug.chartCurve")}{curvable.length ? "" : tr("drug.unavailable")}
           </button>
           {view === "curve" && (
             <button
@@ -252,7 +254,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
               onClick={() => setLogX((v) => !v)}
               className="rounded-full border border-line bg-white px-2.5 py-0.5 text-[11.5px] text-ink-2 transition hover:border-[#b9d0e9]"
             >
-              {logX ? "线性时间轴" : "对数时间轴"}
+              {logX ? tr("drug.axisLinear") : tr("drug.axisLog")}
             </button>
           )}
         </span>
@@ -260,8 +262,8 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       <Chart option={view === "organ" ? organOption : curveOption} height={340} />
       <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-3">
         {view === "organ"
-          ? `每个点 = 一条原始记录，不取均值 · 横轴按最大值排序取前 12 个器官 · 颜色 = 时点 · 悬停看 SD / 物种 / PMID · 单位 ${unit}`
-          : `每条线 = 一个器官（最多 6 个）· 换文献处断线，不把两篇论文连成一条趋势 · 该药有 ${curvable.length} 个器官满足「≥2 个时点」`}
+          ? tr("drug.chartNoteOrgan", { u: unit })
+          : tr("drug.chartNoteCurve", { n: curvable.length })}
       </div>
     </div>
   );
@@ -272,6 +274,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
  *  这里**不自行重算比值**（分子/分母/时点口径各篇论文不同，前端重算会造出第二份口径），
  *  只把能看见的「分子」摊开 —— 该药的肿瘤摄取点，分母去「生物分布」Tab 对照。 */
 function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onGoBio: () => void }) {
+  const tr = useT();
   const tumor = useMemo(() => pts.filter((p) => p.is_tumor === 1), [pts]);
 
   const goBio = (
@@ -280,7 +283,7 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
       onClick={onGoBio}
       className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:-translate-y-px hover:border-[#b9d0e9] hover:shadow-s2"
     >
-      去「生物分布」看正常器官对照 →
+      {tr("drug.tbrGoBio")}
     </button>
   );
 
@@ -289,8 +292,8 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
     return (
       <div className="card p-5 sm:p-6">
         <EmptyState
-          title="该药暂无靶本比记录"
-          hint="库内只记录「该药是否存在 TBR 记录」，明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出 —— 这里不猜、也不自行重算比值。"
+          title={tr("drug.tbrEmptyTitle")}
+          hint={tr("drug.tbrEmptyHint")}
         >
           {goBio}
         </EmptyState>
@@ -301,28 +304,27 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
   return (
     <div className="card p-5 sm:p-6">
       <div className="rounded-[10px] border border-[#f6e3c8] bg-[#fdf3e7] px-3.5 py-3 text-[12.5px] leading-relaxed text-[#8a5310]">
-        <b>库内标记该药有靶本比记录</b>，但 TBR 明细（分子 / 分母 / 时点 / 单位口径）未随本站数据导出，
-        本轮不改导出脚本，因此这里<b>不展示重算出的比值</b>
-        {tumor.length > 0 ? "，只列原始肿瘤摄取点" : ""}；分母（正常器官 / 血池）在「生物分布」Tab。
+        <b>{tr("drug.tbrBannerTitle")}</b>
+        {tr("drug.tbrBannerBody", { extra: tumor.length > 0 ? tr("drug.tbrBannerExtra") : "" })}
       </div>
 
       {tumor.length > 0 ? (
         <>
           <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-[13px] font-medium text-ink">肿瘤摄取点（TBR 的分子）</span>
+            <span className="text-[13px] font-medium text-ink">{tr("drug.tbrTumourTitle")}</span>
             <span className="text-[11.5px] text-ink-3">
-              共 <b className="num text-ink-2">{fmt(tumor.length)}</b> 条 · 口径以原文为准
+              {tr("drug.tbrTumourCount", { n: fmt(tumor.length) })}
             </span>
           </div>
           <div className="mt-2 hscroll rounded-[10px] border border-line">
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
-                  <th className="px-4 py-2 text-left font-semibold">器官 / 模型</th>
-                  <th className="px-4 py-2 text-left font-semibold">时点 (h)</th>
-                  <th className="px-4 py-2 text-right font-semibold">值</th>
-                  <th className="px-4 py-2 text-left font-semibold">单位</th>
-                  <th className="px-4 py-2 text-left font-semibold">证据</th>
+                  <th className="px-4 py-2 text-left font-semibold">{tr("drug.thOrganModel")}</th>
+                  <th className="px-4 py-2 text-left font-semibold">{tr("drug.thTime")}</th>
+                  <th className="px-4 py-2 text-right font-semibold">{tr("drug.thValue")}</th>
+                  <th className="px-4 py-2 text-left font-semibold">{tr("drug.thUnit")}</th>
+                  <th className="px-4 py-2 text-left font-semibold">{tr("drug.thEvidence")}</th>
                   <th className="px-4 py-2 text-left font-semibold">PMID</th>
                 </tr>
               </thead>
@@ -367,7 +369,7 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
         </>
       ) : (
         <div className="mt-4 rounded-lg border border-dashed border-[#e8edf5] px-4 py-6 text-center text-[12.5px] text-ink-3">
-          库内有 TBR 记录，但该药的生物分布点里没有标记为 tumor 的摄取点 —— 分子端未导出
+          {tr("drug.tbrNoTumour")}
         </div>
       )}
 
@@ -678,19 +680,19 @@ export default function DrugDetail() {
       {/* 五段组成分解（数据来自 v_drug_overview；图只作辅助，点击可放大） */}
       <section className="card mt-5 p-6">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[16px] font-semibold">分子组成</h2>
-          <span className="text-[12px] text-ink-3">五段分解 · 缺失段显示「—」</span>
+          <h2 className="text-[16px] font-semibold">{tr("drug.parts")}</h2>
+          <span className="text-[12px] text-ink-3">{tr("drug.partsHint")}</span>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { k: "① 核素", v: drug.radionuclides_zh, part: null as string | null },
-            { k: "② 螯合剂", v: drug.chelators_zh, part: "chelator" },
-            { k: "③ 连接子", v: drug.linkers_zh, part: "linker" },
-            { k: "④ 载体", v: drug.vectors_zh, part: "vector" },
-            { k: "⑤ 靶点", v: drug.targets_zh, part: null },
+            { key: "isotope", k: tr("drug.partIsotope"), v: drug.radionuclides_zh, part: null as string | null },
+            { key: "chelator", k: tr("drug.partChelator"), v: drug.chelators_zh, part: "chelator" },
+            { key: "linker", k: tr("drug.partLinker"), v: drug.linkers_zh, part: "linker" },
+            { key: "vector", k: tr("drug.partVector"), v: drug.vectors_zh, part: "vector" },
+            { key: "target", k: tr("drug.partTarget"), v: drug.targets_zh, part: null },
           ].map((p) => (
             <div
-              key={p.k}
+              key={p.key}
               className={`rounded-[10px] border p-3 ${
                 p.v ? "border-line bg-[#fafbfe]" : "border-dashed border-[#e8edf5] bg-white"
               }`}
@@ -701,9 +703,15 @@ export default function DrugDetail() {
                   p.v ? "text-ink" : "text-ink-3"
                 }`}
               >
-                {p.v || "—"}
+                {p.v
+                  ? p.key === "isotope"
+                    ? lang === "en"
+                      ? nuclideEn(p.v)
+                      : p.v
+                    : enSafe(lang, p.v) || "—"
+                  : "—"}
               </div>
-              {p.k === "① 核素" && p.v && (
+              {p.key === "isotope" && p.v && (
                 <div className="mt-1 font-mono text-[12.5px] font-semibold text-brand">
                   {p.v
                     .split("、")
@@ -723,12 +731,12 @@ export default function DrugDetail() {
               {p.part && !imgErr[`part:${p.part}`] && (
                 <img
                   src={`${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`}
-                  alt={`${p.k} 结构`}
+                  alt={tr("drug.partAlt", { k: p.k })}
                   loading="lazy"
                   onClick={() =>
                     setZoom({
                       src: `${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`,
-                      alt: `${drug.name_en} · ${p.k} 结构（RDKit 现画）`,
+                      alt: tr("drug.partAltZoom", { d: drug.name_en, k: p.k }),
                     })
                   }
                   className="mt-2 w-full cursor-zoom-in rounded border border-[#eef2f8] bg-white transition hover:opacity-90"
@@ -743,20 +751,20 @@ export default function DrugDetail() {
           <div className="mt-5 border-t border-line pt-4">
             <div className="mb-3 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-ink">
-                {structSrc === "schematic" ? "分子组成示意（非精确结构）" : "完整结构图（点击放大）"}
+                {structSrc === "schematic" ? tr("drug.structSchematic") : tr("drug.structFull")}
               </span>
               <span className="text-[11.5px] text-ink-3">
-                {structSrc === "ligand" && "radiopharm.idrblab.cn · 外部来源（ligand_only）"}
-                {structSrc === "schematic" && "抗体/多肽示意图 · 本库绘制（非精确结构）"}
-                {structSrc === "peptide2d" && "肽段 2D 结构 · 本库整理"}
-                {structSrc === "rdkit" && "由库内 SMILES 经 RDKit 现画"}
-                {!structSrc && "来源未标注"}
+                {structSrc === "ligand" && tr("drug.structSrcLigand")}
+                {structSrc === "schematic" && tr("drug.structSrcSchematic")}
+                {structSrc === "peptide2d" && tr("drug.structSrcPeptide")}
+                {structSrc === "rdkit" && tr("drug.structSrcRdkit")}
+                {!structSrc && tr("drug.structSrcUnknown")}
               </span>
             </div>
             <div className="flex justify-center">
               {imgErr.struct ? (
                 <div className="w-full rounded-lg border border-dashed border-line bg-paper-2 px-4 py-8 text-center text-[12.5px] text-ink-3">
-                  结构图加载失败（该药标记为有结构，但图片未取到）
+                  {tr("drug.structLoadFail")}
                   <div className="mt-1 font-mono text-[11.5px]">/struct/{drug.drug_id}.webp</div>
                 </div>
               ) : (
@@ -765,11 +773,11 @@ export default function DrugDetail() {
                   onClick={() =>
                     setZoom({
                       src: `${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`,
-                      alt: `${drug.name_en} · 完整结构图`,
+                      alt: tr("drug.structAlt", { d: drug.name_en }),
                     })
                   }
                   className="cursor-zoom-in rounded-lg transition hover:opacity-90"
-                  title="点击放大"
+                  title={tr("drug.clickZoom")}
                 >
                   <img
                     src={`${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`}
@@ -790,7 +798,7 @@ export default function DrugDetail() {
       <div className="-mx-1 mt-5 px-1 pb-1">
         <div
           role="tablist"
-          aria-label="单药画像分区"
+          aria-label={tr("drug.tablist")}
           className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-[#f7f9fd] p-1 sm:inline-flex sm:shrink-0"
         >
           {tabs.map((t) => {
@@ -833,7 +841,7 @@ export default function DrugDetail() {
                 target="_blank"
                 rel="noreferrer"
               >
-                PMC 原图页 ↗
+                {tr("atlas.pmc")}
               </a>
             ) : undefined
           }
@@ -843,16 +851,18 @@ export default function DrugDetail() {
       {tab === "bio" && (
       <section className="mt-5">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[16px] font-semibold">生物分布记录</h2>
+          <h2 className="text-[16px] font-semibold">{tr("drug.bioTitle")}</h2>
           <span className="text-[12.5px] text-ink-3">
-            共 <b className="num text-ink-2">{fmt(mine.length)}</b> 条
+            {tr("drug.bioCount", { n: fmt(mine.length) })}
             {noRawCount > 0 ? (
               <>
-                {" · "}可展开原文 <b className="num text-ink-2">{fmt(mine.length - noRawCount)}</b> 条 · 仅文献级追溯{" "}
-                <b className="num text-ink-2">{fmt(noRawCount)}</b> 条
+                {" · "}
+                {tr("drug.bioExpandable", { n: fmt(mine.length - noRawCount) })}
+                {" · "}
+                {tr("drug.traceOnlyShort", { n: fmt(noRawCount) })}
               </>
             ) : (
-              <> · 点任意行查看原文</>
+              <> · {tr("drug.bioClickRow")}</>
             )}
           </span>
         </div>
@@ -867,12 +877,12 @@ export default function DrugDetail() {
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
-                  <th className="px-4 py-2.5 text-left font-semibold">器官</th>
-                  <th className="px-4 py-2.5 text-left font-semibold">时点 (h)</th>
-                  <th className="px-4 py-2.5 text-right font-semibold">值</th>
-                  <th className="px-4 py-2.5 text-left font-semibold">单位</th>
-                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">证据</th>
-                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">PMID / 原文</th>
+                  <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thOrgan")}</th>
+                  <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thTime")}</th>
+                  <th className="px-4 py-2.5 text-right font-semibold">{tr("drug.thValue")}</th>
+                  <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thUnit")}</th>
+                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">{tr("drug.thEvidence")}</th>
+                  <th className="hidden px-4 py-2.5 text-left font-semibold sm:table-cell">{tr("drug.thPmidRaw")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -880,7 +890,7 @@ export default function DrugDetail() {
                   <Fragment key={p.id}>
                     <tr
                       onClick={() => setOpenId(p.has_raw === 0 ? null : openId === p.id ? null : p.id)}
-                      title={p.has_raw === 0 ? "该行无原文片段，仅有 PMID 可追溯" : undefined}
+                      title={p.has_raw === 0 ? tr("drug.rowNoRawTitle") : undefined}
                       className={`border-b border-[#f1f4f9] transition ${
                         p.has_raw === 0
                           ? "cursor-default"
@@ -890,7 +900,7 @@ export default function DrugDetail() {
                       <td className="px-4 py-2 font-medium text-ink">
                         {p.organ_norm}
                         {p.has_raw === 0 && (
-                          <span className="ml-1.5 text-[10.5px] font-normal text-ink-3 sm:hidden">仅文献</span>
+                          <span className="ml-1.5 text-[10.5px] font-normal text-ink-3 sm:hidden">{tr("drug.onlyLit")}</span>
                         )}
                       </td>
                       <td className="num px-4 py-2">{p.time_h ?? "—"}</td>
@@ -926,9 +936,9 @@ export default function DrugDetail() {
                           {p.has_raw === 0 && (
                             <span
                               className="rounded border border-dashed border-[#cbd5e1] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
-                              title="该行没有原文片段，只能追到 PMID 指向的文献"
+                              title={tr("drug.rowNoRawTitle")}
                             >
-                              仅文献级追溯
+                              {tr("drug.traceOnly")}
                             </span>
                           )}
                         </div>
@@ -938,11 +948,11 @@ export default function DrugDetail() {
                       <tr className="border-b border-[#f1f4f9]">
                         <td colSpan={6} className="bg-[#fafbfe] px-4 py-3">
                           <div className="text-[12px] leading-relaxed text-ink-2">
-                            <span className="font-medium text-ink">原文片段：</span>
-                            {raw?.[String(p.id)] ?? "（该行无原文片段）"}
+                            <span className="font-medium text-ink">{tr("drug.rawSnippet")}</span>
+                            {raw?.[String(p.id)] ?? tr("drug.noRawPlaceholder")}
                           </div>
                           <div className="mt-1.5 text-[11.5px] text-ink-3">
-                            source_kind = {p.source_kind} · subject_key = {p.subject_key ?? "—"} · 行 id ={" "}
+                            source_kind = {p.source_kind} · subject_key = {p.subject_key ?? "—"} · row id ={" "}
                             {p.id}
                           </div>
                         </td>
@@ -954,18 +964,21 @@ export default function DrugDetail() {
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center">
                       <div className="text-[13.5px] font-medium text-ink-2">
-                        该药在库内暂无生物分布记录
+                        {tr("drug.bioEmptyTitle")}
                       </div>
                       <div className="mt-1.5 text-[12.5px] text-ink-3">
-                        全库 {drugs ? drugs.length.toLocaleString("en-US") : "…"} 个核药中，有分布数据的仅{" "}
-                        <b className="text-ink-2">{drugs ? drugs.filter((d) => (d.n_points ?? 0) > 0).length.toLocaleString("en-US") : "…"}</b>{" "}
-                        个 —— 这是数据覆盖范围，不是本页故障
+                        {tr("drug.bioEmptyHint", {
+                          a: drugs ? drugs.length.toLocaleString("en-US") : "…",
+                          b: drugs
+                            ? drugs.filter((d) => (d.n_points ?? 0) > 0).length.toLocaleString("en-US")
+                            : "…",
+                        })}
                       </div>
                       <Link
                         to="/"
                         className="mt-4 inline-block rounded-lg border border-brand bg-brand-soft px-4 py-2 text-[13px] font-medium text-brand-deep transition hover:bg-brand/15"
                       >
-                        回总览检索其他核药 →
+                        {tr("drug.bioEmptyCta")}
                       </Link>
                     </td>
                   </tr>
@@ -980,9 +993,9 @@ export default function DrugDetail() {
       {tab === "dos" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">剂量学</h2>
+            <h2 className="text-[16px] font-semibold">{tr("drug.tabDos")}</h2>
             <span className="text-[12.5px] text-ink-3">
-              {(drug.n_dosim ?? 0) > 0 ? "同一器官多口径并列，不跨单位合并" : "该药暂无剂量学记录"}
+              {(drug.n_dosim ?? 0) > 0 ? tr("drug.dosNote") : tr("drug.dosEmpty")}
             </span>
           </div>
           <div className="mt-3">
@@ -994,9 +1007,9 @@ export default function DrugDetail() {
       {tab === "tbr" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">靶本比</h2>
+            <h2 className="text-[16px] font-semibold">{tr("drug.tabTbr")}</h2>
             <span className="text-[12.5px] text-ink-3">
-              {(drug.has_tbr ?? 0) === 1 ? "明细未随本站导出 · 以原文为准" : "库内无 TBR 记录"}
+              {(drug.has_tbr ?? 0) === 1 ? tr("drug.tbrNote") : tr("drug.tbrNone")}
             </span>
           </div>
           <div className="mt-3">
@@ -1008,20 +1021,24 @@ export default function DrugDetail() {
       {tab === "refs" && (
       <section className="mt-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[16px] font-semibold">相关文献</h2>
+          <h2 className="text-[16px] font-semibold">{tr("drug.refsTitle")}</h2>
           <span className="text-[12.5px] text-ink-3">
             {drugRefs === null
-              ? "加载中…"
-              : `共 ${fmt(refList.length)} 篇 = 分布来源 ${fmt(srcRefs.length)} + 其他 ${fmt(otherRefs.length)}`}
+              ? tr("common.loading") + "…"
+              : tr("drug.refsCount", {
+                  a: fmt(refList.length),
+                  b: fmt(srcRefs.length),
+                  c: fmt(otherRefs.length),
+                })}
           </span>
         </div>
 
         {drugRefs !== null &&
           [
-            { key: "src", title: "生物分布来源", tone: "src", items: srcRefs,
-              hint: "该药分布数值的出处 —— 能和「生物分布」Tab 里的 PMID 对上" },
-            { key: "other", title: "其他相关文献", tone: "other", items: otherRefs,
-              hint: "背景 / 方法 / 临床研究；未直接提供本站的分布数值" },
+            { key: "src", title: tr("drug.refsSrc"), tone: "src", items: srcRefs,
+              hint: tr("drug.refsSrcHint") },
+            { key: "other", title: tr("drug.refsOther"), tone: "other", items: otherRefs,
+              hint: tr("drug.refsOtherHint") },
           ]
             .filter((g) => g.items.length > 0)
             .map((g) => (
@@ -1035,9 +1052,9 @@ export default function DrugDetail() {
                           : "rounded bg-[#eef2f8] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
                       }
                     >
-                      {g.tone === "src" ? "来源" : "背景"}
+                      {g.tone === "src" ? tr("drug.badgeSrc") : tr("drug.badgeBg")}
                     </span>
-                    {g.title} · {fmt(g.items.length)} 篇
+                    {g.title} {tr("drug.refsGroupCount", { n: fmt(g.items.length) })}
                   </h3>
                   <span className="text-[11.5px] text-ink-3">{g.hint}</span>
                 </div>
@@ -1075,7 +1092,7 @@ export default function DrugDetail() {
                   })}
                   {g.items.length > 30 && (
                     <div className="px-5 py-3 text-[12px] text-ink-3">
-                      仅显示前 30 篇（共 {fmt(g.items.length)} 篇）—— 按 PMID 升序。
+                      {tr("drug.refsTruncated", { n: fmt(g.items.length) })}
                     </div>
                   )}
                 </div>
@@ -1085,8 +1102,8 @@ export default function DrugDetail() {
         {drugRefs !== null && !refList.length && (
           <div className="card mt-3">
             <EmptyState
-              title="该药暂无关联文献"
-              hint="库内既没有它的生物分布来源文献，也没有药物级参考文献关联。"
+              title={tr("drug.refsEmptyTitle")}
+              hint={tr("drug.refsEmptyHint")}
             >
               {(drug.n_points ?? 0) > 0 && (
                 <button
@@ -1094,7 +1111,7 @@ export default function DrugDetail() {
                   onClick={() => setTab("bio")}
                   className="rounded-lg border border-line bg-white px-3.5 py-2 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:shadow-s2"
                 >
-                  去「生物分布」看原始记录 →
+                  {tr("drug.refsGoBio")}
                 </button>
               )}
             </EmptyState>
@@ -1106,28 +1123,28 @@ export default function DrugDetail() {
       {tab === "img" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">文献影像</h2>
+            <h2 className="text-[16px] font-semibold">{tr("drug.tabImg")}</h2>
             <span className="text-[12.5px] text-ink-3">
               {figs === null
-                ? "加载中…"
+                ? tr("common.loading") + "…"
                 : figs.length
-                ? `共 ${fmt(figs.length)} 张 · PET / PET-CT 原图（引自原文 Figure）`
-                : "该药暂无收录影像图"}
+                ? tr("drug.figsLine", { n: fmt(figs.length) })
+                : tr("drug.figsNone")}
             </span>
           </div>
           {figs && figs.length > 0 && (
             <>
               {[
-                { k: "target" as Fig["attrib"], t: "图注点名本药", cls: "bg-[#dcfce7] text-[#166534]" },
-                { k: "unclear" as Fig["attrib"], t: "图注未点名（需回原文核对）", cls: "bg-[#fef3c7] text-[#92400e]" },
-                { k: "comparator" as Fig["attrib"], t: "图注是别的药", cls: "bg-[#fee2e2] text-[#991b1b]" },
+                { k: "target" as Fig["attrib"], t: tr("atlas.attr.target"), cls: "bg-[#dcfce7] text-[#166534]" },
+                { k: "unclear" as Fig["attrib"], t: tr("atlas.attr.unclear"), cls: "bg-[#fef3c7] text-[#92400e]" },
+                { k: "comparator" as Fig["attrib"], t: tr("atlas.attr.comparator"), cls: "bg-[#fee2e2] text-[#991b1b]" },
               ].map((g) => {
                 const rows = figs.filter((f) => f.attrib === g.k);
                 if (!rows.length) return null;
                 return (
                   <div key={g.k} className="mt-4">
                     <div className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11.5px] font-medium ${g.cls}`}>
-                      {g.t} · {rows.length} 张
+                      {g.t} {tr("drug.figsGroupCount", { n: rows.length })}
                     </div>
                     <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {rows.map((f) => (
@@ -1142,7 +1159,7 @@ export default function DrugDetail() {
                               })
                             }
                             className="block w-full cursor-zoom-in"
-                            title="点击放大"
+                            title={tr("drug.clickZoom")}
                           >
                             <img
                               src={`${import.meta.env.BASE_URL}figs/${f.file}`}
@@ -1165,7 +1182,7 @@ export default function DrugDetail() {
                 );
               })}
               <div className="mt-3 text-[11.5px] text-ink-3">
-                图引自原文 Figure（非本库生成、非重绘）；点击可放大；许可随图标注，使用前请回原文核对。
+                {tr("drug.figsNote")}
               </div>
             </>
           )}
@@ -1173,18 +1190,21 @@ export default function DrugDetail() {
           {figs && figs.length === 0 && (
             <div className="card mt-4">
               <EmptyState
-                title="该药暂无收录的文献影像"
+                title={tr("drug.figsEmptyTitle")}
                 hint={
                   figStats
-                    ? `本库影像图集现收 ${fmt(figStats.total)} 张、覆盖 ${fmt(figStats.drugs)} 个药，该药尚未命中。图集只收「图注里能定位到药物、且能取到原文 Figure」的图，因此不是每个药都有。`
-                    : "该药尚未命中文献影像。"
+                    ? tr("drug.figsEmptyHint", {
+                        t: fmt(figStats.total),
+                        d: fmt(figStats.drugs),
+                      })
+                    : tr("drug.figsEmptyHintShort")
                 }
               >
                 <Link
                   to="/atlas"
                   className="rounded-lg border border-brand bg-brand-soft px-3.5 py-2 text-[12.5px] font-medium text-brand-deep transition hover:bg-brand/15"
                 >
-                  去影像图集看看 →
+                  {tr("drug.figsEmptyCta")}
                 </Link>
               </EmptyState>
             </div>
