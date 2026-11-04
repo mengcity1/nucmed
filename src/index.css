@@ -65,10 +65,11 @@
     inset: -18%;
     pointer-events: none;
     background-image:
-      radial-gradient(42% 38% at 18% 26%, rgba(255, 211, 186, 0.55) 0%, rgba(255, 211, 186, 0.18) 52%, rgba(255, 211, 186, 0) 74%),
-      radial-gradient(38% 40% at 84% 16%, rgba(206, 203, 255, 0.5) 0%, rgba(206, 203, 255, 0.16) 55%, rgba(206, 203, 255, 0) 76%),
-      radial-gradient(46% 42% at 58% 92%, rgba(184, 236, 222, 0.5) 0%, rgba(184, 236, 222, 0.15) 55%, rgba(184, 236, 222, 0) 78%),
-      radial-gradient(34% 34% at 92% 78%, rgba(198, 222, 255, 0.45) 0%, rgba(198, 222, 255, 0) 72%);
+      radial-gradient(46% 40% at 8% 12%, rgba(255, 206, 176, 0.68) 0%, rgba(255, 206, 176, 0.2) 55%, rgba(255, 206, 176, 0) 76%),
+      radial-gradient(40% 42% at 90% 10%, rgba(198, 196, 255, 0.62) 0%, rgba(198, 196, 255, 0.18) 56%, rgba(198, 196, 255, 0) 78%),
+      radial-gradient(50% 44% at 62% 96%, rgba(178, 236, 220, 0.62) 0%, rgba(178, 236, 220, 0.17) 56%, rgba(178, 236, 220, 0) 80%),
+      radial-gradient(38% 36% at 96% 74%, rgba(190, 220, 255, 0.55) 0%, rgba(190, 220, 255, 0) 74%),
+      radial-gradient(30% 30% at 42% 54%, rgba(255, 214, 232, 0.42) 0%, rgba(255, 214, 232, 0) 72%);
     animation: silkDrift 52s ease-in-out infinite alternate;
     will-change: transform;
   }
@@ -135,22 +136,22 @@
     @apply rounded-xl3;
     background: linear-gradient(
       152deg,
-      rgba(255, 255, 255, 0.66) 0%,
-      rgba(255, 255, 255, 0.42) 44%,
-      rgba(255, 255, 255, 0.56) 100%
+      rgba(255, 255, 255, 0.46) 0%,
+      rgba(255, 255, 255, 0.24) 44%,
+      rgba(255, 255, 255, 0.38) 100%
     );
     /* 滚动越快 → 模糊更大、饱和更高（"玻璃在被推着走"） */
-    -webkit-backdrop-filter: blur(calc(24px + var(--scroll-v) * 8px))
-      saturate(calc(1.72 + var(--scroll-v) * 0.18)) brightness(calc(1.02 + var(--scroll-v) * 0.03));
-    backdrop-filter: blur(calc(24px + var(--scroll-v) * 8px)) saturate(calc(1.72 + var(--scroll-v) * 0.18))
-      brightness(calc(1.02 + var(--scroll-v) * 0.03));
+    -webkit-backdrop-filter: blur(calc(38px + var(--scroll-v) * 12px))
+      saturate(calc(1.95 + var(--scroll-v) * 0.2)) brightness(calc(1.03 + var(--scroll-v) * 0.03));
+    backdrop-filter: blur(calc(38px + var(--scroll-v) * 12px)) saturate(calc(1.95 + var(--scroll-v) * 0.2))
+      brightness(calc(1.03 + var(--scroll-v) * 0.03));
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.98),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.45),
-      inset 0 -16px 24px -20px rgba(15, 23, 42, 0.22),
-      inset 0 0 26px rgba(255, 255, 255, 0.16),
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 26px 60px -30px rgba(15, 23, 42, 0.28);
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -16px 26px -22px rgba(15, 23, 42, 0.16),
+      inset 0 0 30px rgba(255, 255, 255, 0.12),
+      0 2px 4px rgba(15, 23, 42, 0.03),
+      0 34px 80px -44px rgba(15, 23, 42, 0.22);
   }
   /* ③ 双层环：外环 = 折光亮线（::before），内环 = 上亮下暗（::after）
      —— 这一层是"玻璃厚度"的关键，单环看起来只是一条白边。 */
@@ -162,8 +163,8 @@
     border-radius: inherit;
     pointer-events: none;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.1);
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.07);
   }
   /* ① 渐变描边：用 mask 抠出 1px 环，模拟玻璃边缘的折射亮线 */
   .card::before,
@@ -176,10 +177,10 @@
     padding: 1px;
     background: linear-gradient(
       140deg,
-      rgba(255, 255, 255, 0.98) 0%,
-      rgba(255, 255, 255, 0.28) 34%,
-      rgba(255, 255, 255, 0.72) 68%,
-      rgba(255, 255, 255, 0.34) 100%
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.16) 36%,
+      rgba(255, 255, 255, 0.48) 70%,
+      rgba(255, 255, 255, 0.2) 100%
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
@@ -192,35 +193,33 @@
     position: relative;
     background: linear-gradient(
       150deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(255, 255, 255, 0.46) 48%,
-      rgba(255, 255, 255, 0.62) 100%
+      rgba(255, 255, 255, 0.52) 0%,
+      rgba(255, 255, 255, 0.3) 48%,
+      rgba(255, 255, 255, 0.44) 100%
     );
-    -webkit-backdrop-filter: blur(calc(28px + var(--scroll-v) * 10px))
-      saturate(calc(1.85 + var(--scroll-v) * 0.2)) brightness(calc(1.04 + var(--scroll-v) * 0.03));
-    backdrop-filter: blur(calc(28px + var(--scroll-v) * 10px)) saturate(calc(1.85 + var(--scroll-v) * 0.2))
-      brightness(calc(1.04 + var(--scroll-v) * 0.03));
+    -webkit-backdrop-filter: blur(calc(46px + var(--scroll-v) * 12px))
+      saturate(calc(2 + var(--scroll-v) * 0.2)) brightness(calc(1.05 + var(--scroll-v) * 0.03));
+    backdrop-filter: blur(calc(46px + var(--scroll-v) * 12px)) saturate(calc(2 + var(--scroll-v) * 0.2))
+      brightness(calc(1.05 + var(--scroll-v) * 0.03));
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.5),
-      inset 0 -14px 22px -20px rgba(15, 23, 42, 0.18),
-      inset 0 0 30px rgba(255, 255, 255, 0.2),
-      0 calc(2px + var(--scroll-v) * 8px) calc(10px + var(--scroll-v) * 18px) -8px rgba(15, 23, 42, 0.14),
-      0 26px 60px -30px rgba(15, 23, 42, 0.32);
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -14px 24px -22px rgba(15, 23, 42, 0.16),
+      0 20px 40px -28px rgba(15, 23, 42, 0.14),
+      0 40px 90px -50px rgba(15, 23, 42, 0.26);
   }
   /* 玻璃小块（KPI 卡）：与卡片同一套高光/描边，但底由调用方的彩色渐变决定 */
   .glass-tile {
     position: relative;
-    -webkit-backdrop-filter: blur(calc(22px + var(--scroll-v) * 8px))
-      saturate(calc(1.7 + var(--scroll-v) * 0.2)) brightness(1.03);
-    backdrop-filter: blur(calc(22px + var(--scroll-v) * 8px)) saturate(calc(1.7 + var(--scroll-v) * 0.2))
-      brightness(1.03);
+    -webkit-backdrop-filter: blur(calc(34px + var(--scroll-v) * 10px))
+      saturate(calc(1.9 + var(--scroll-v) * 0.2)) brightness(1.04);
+    backdrop-filter: blur(calc(34px + var(--scroll-v) * 10px)) saturate(calc(1.9 + var(--scroll-v) * 0.2))
+      brightness(1.04);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -12px 20px -18px rgba(15, 23, 42, 0.18),
-      0 2px 6px rgba(15, 23, 42, 0.04),
-      0 22px 50px -28px rgba(15, 23, 42, 0.24);
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -12px 22px -20px rgba(15, 23, 42, 0.14),
+      0 24px 60px -38px rgba(15, 23, 42, 0.2);
   }
 
   /* 数据卡（含表格 / 图表）：**纯白不透明** —— 玻璃卡会让表格读数变糊，也会毁掉打印 */
@@ -351,8 +350,10 @@
       font-medium transition-all duration-150;
   }
   .chip-off {
-    @apply border-white/70 bg-white/80 text-ink-2 shadow-soft hover:-translate-y-px hover:border-white
-      hover:text-ink hover:shadow-float;
+    @apply border-white/70 bg-white/60 text-ink-2 shadow-soft hover:-translate-y-px hover:border-white
+      hover:bg-white/80 hover:text-ink hover:shadow-float;
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    backdrop-filter: blur(12px) saturate(1.4);
   }
   .chip-on {
     @apply border-brand bg-brand text-white shadow-[0_3px_10px_-3px_rgba(30,91,168,.6)];
@@ -380,9 +381,9 @@
   }
   .card-tint {
     @apply rounded-xl2 border border-white/70 shadow-soft;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(246, 250, 255, 0.72) 100%);
-    -webkit-backdrop-filter: blur(14px) saturate(1.05);
-    backdrop-filter: blur(14px) saturate(1.05);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(246, 250, 255, 0.44) 100%);
+    -webkit-backdrop-filter: blur(26px) saturate(1.7);
+    backdrop-filter: blur(26px) saturate(1.7);
   }
   .eyebrow {
     @apply inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2.5 py-[3px]

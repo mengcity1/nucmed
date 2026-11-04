@@ -144,16 +144,16 @@ function Metric({
     sand: "text-[#8a5a12]",
   };
   const glow: Record<MetricTone, string> = {
-    brand: "from-[#eaf2fe]/90",
-    accent: "from-[#e6faf6]/90",
-    violet: "from-[#f2eefd]/90",
-    sand: "from-[#fdf5e7]/90",
+    brand: "from-[#eaf2fe]/55",
+    accent: "from-[#e6faf6]/55",
+    violet: "from-[#f2eefd]/55",
+    sand: "from-[#fdf5e7]/55",
   };
   return (
     <div
       ref={ref}
       onPointerMove={onMove}
-      className={`spotlight glass-tile group relative overflow-hidden rounded-xl2 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
+      className={`spotlight glass-tile group relative overflow-hidden rounded-xl2 bg-gradient-to-br ${glow[tone]} to-white/40 p-4 transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
     >
       <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${bar[tone]}`} />
       <div className="label-caps">{label}</div>

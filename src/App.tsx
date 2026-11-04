@@ -192,7 +192,7 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
             onChange={(e) => onSearch(e.target.value)}
             placeholder={tr("nav.searchPh")}
             aria-label={tr("nav.searchPh")}
-            className="h-9 w-full rounded-[10px] border border-white/70 bg-white/60 pl-9 pr-9 text-[13.5px] shadow-ceil outline-none backdrop-blur-md transition placeholder:text-ink-3 focus:border-white focus:bg-white/85 focus:ring-[3px] focus:ring-white/60"
+            className="h-9 w-full rounded-[10px] border border-white/60 bg-white/45 pl-9 pr-9 text-[13.5px] shadow-ceil outline-none backdrop-blur-xl transition placeholder:text-ink-3 focus:border-white focus:bg-white/75 focus:ring-[3px] focus:ring-white/60"
           />
           {q ? (
             <button
