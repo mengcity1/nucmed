@@ -11,9 +11,15 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-[#f6f8fc] text-ink font-sans text-[14px] leading-relaxed;
-    background-image: radial-gradient(900px 400px at 8% -8%, #e9f0fb 0%, rgba(233, 240, 251, 0) 70%),
-      radial-gradient(700px 320px at 100% 0%, #eef4fd 0%, rgba(238, 244, 253, 0) 65%);
+    @apply bg-[#f5f8fd] text-ink font-sans text-[14px] leading-relaxed;
+    /* ★ 2026-11-04 视觉升级：三层背景（顶部冷蓝渐隐 + 右上光斑 + 极淡网格），
+       让「白卡堆白卡」有底纹层次；网格透明度 0.04，不抢正文。 */
+    background-image:
+      linear-gradient(180deg, #e9f1fd 0%, rgba(233, 241, 253, 0) 480px),
+      radial-gradient(820px 340px at 92% -8%, #e7f3fc 0%, rgba(231, 243, 252, 0) 68%),
+      linear-gradient(rgba(30, 91, 168, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 91, 168, 0.04) 1px, transparent 1px);
+    background-size: auto, auto, 34px 34px, 34px 34px;
     background-attachment: fixed;
   }
   ::selection {
@@ -85,5 +91,53 @@
   }
   .sec-sub {
     @apply mt-1 text-[12.5px] text-ink-3;
+  }
+
+  /* ───────── 2026-11-04 视觉升级（owner：界面太单调）─────────
+     原则：只加「层次 / 强调 / 节奏」，不改信息架构、不引入新依赖。
+     所有新色都来自 tailwind.config 的 accent / violet / sand 三组点缀色。 */
+  .card-elev {
+    @apply rounded-md2 border border-[#e3e9f4] bg-white shadow-s2;
+  }
+  .card-tint {
+    @apply rounded-md2 border border-[#dce7f7] bg-gradient-to-b from-white to-[#f7fafe] shadow-s1;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2.5 py-[3px]
+      text-[11px] font-semibold uppercase tracking-[.09em] text-brand-deep;
+  }
+  .stat-card {
+    @apply relative overflow-hidden rounded-md2 border border-[#e3e9f4] bg-white p-4 shadow-s1
+      transition-all duration-200 hover:-translate-y-0.5 hover:border-[#cfe0f5] hover:shadow-s2;
+  }
+  .stat-accent {
+    @apply absolute inset-x-0 top-0 h-[3px];
+  }
+  .stat-ico {
+    @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[15px];
+  }
+  /* 表格：斑马纹 + 行悬停（只加在显式使用 .table-zebra 的表上，避免误伤紧凑表） */
+  .table-zebra tbody tr:nth-child(odd) {
+    background-color: #fbfcfe;
+  }
+  .table-zebra tbody tr:hover {
+    background-color: #f3f8ff;
+  }
+  /* 页头标题：实色正文 + 渐变小横条（不用 gradient text —— 标题里有 emoji，
+     background-clip:text 在部分浏览器会把 emoji 一起 clip 掉） */
+  .hero-title {
+    @apply font-bold text-ink;
+    font-size: 29px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 640px) {
+    .hero-title {
+      font-size: 33px;
+    }
+  }
+  .hero-rule {
+    @apply mt-2 h-1 w-14 rounded-full;
+    background: linear-gradient(90deg, #1e5ba8 0%, #4a8ee0 55%, #0d9488 100%);
   }
 }

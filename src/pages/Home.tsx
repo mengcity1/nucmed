@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
+import PageHero from "../components/PageHero";
 import { ErrorState } from "../components/States";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 
@@ -92,12 +93,48 @@ function GroupLabel({ icon, children, count }: {
   );
 }
 
-function Metric({ label, value, hint }: { label: string; value: string; hint?: string }) {
+type MetricTone = "brand" | "accent" | "violet" | "sand";
+
+/** 指标卡（2026-11-04 视觉升级）：顶部彩带 + 图标块 + 大数字。
+ *  ★ 彩带只表达「这条指标属于哪条线」，**不做语义分级** —— 避免与证据徽标 A/B/C 的绿/灰/黄混淆。 */
+function Metric({
+  label,
+  value,
+  hint,
+  tone = "brand",
+  icon = "grid",
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: MetricTone;
+  icon?: IconName;
+}) {
+  const bar: Record<MetricTone, string> = {
+    brand: "bg-gradient-to-r from-[#1e5ba8] to-[#4a8ee0]",
+    accent: "bg-gradient-to-r from-[#0d9488] to-[#4ecdc4]",
+    violet: "bg-gradient-to-r from-[#6d5bd0] to-[#a99cf0]",
+    sand: "bg-gradient-to-r from-[#b4761f] to-[#e0b062]",
+  };
+  const ico: Record<MetricTone, string> = {
+    brand: "bg-brand-soft text-brand-deep",
+    accent: "bg-accent-soft text-accent-deep",
+    violet: "bg-violet-soft text-violet",
+    sand: "bg-sand-soft text-sand",
+  };
   return (
-    <div className="px-1">
-      <div className="text-[12.5px] font-medium text-ink-3">{label}</div>
-      <div className="num mt-1 text-[26px] font-semibold leading-none tracking-tight">{value}</div>
-      {hint && <div className="mt-1.5 text-[11.5px] text-ink-3">{hint}</div>}
+    <div className="stat-card">
+      <span className={`stat-accent ${bar[tone]}`} />
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[12px] font-medium text-ink-3">{label}</div>
+          <div className="num mt-1.5 text-[27px] font-semibold leading-none tracking-tight text-ink">{value}</div>
+          {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
+        </div>
+        <span className={`stat-ico ${ico[tone]}`}>
+          <Icon name={icon} />
+        </span>
+      </div>
     </div>
   );
 }
@@ -252,16 +289,19 @@ export default function Home() {
 
   return (
     <div className="pb-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-[26px] font-bold tracking-tight">{tr("home.title")}</h1>
-        <p className="text-[13px] text-ink-3">
-          {tr("home.countLine", {
-            a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
-            b: st ? fmt(st.drugs) : "…",
-          })}
-        </p>
-      </div>
-      <p className="mt-1.5 text-[13px] text-ink-3">{tr("home.lead")}</p>
+      <PageHero
+        eyebrow={tr("brand.sub")}
+        title={tr("home.title")}
+        lead={tr("home.lead")}
+        right={
+          <div className="rounded-[10px] border border-brand/15 bg-white/85 px-3.5 py-2 text-[12.5px] text-ink-2 shadow-s1">
+            {tr("home.countLine", {
+              a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+              b: st ? fmt(st.drugs) : "…",
+            })}
+          </div>
+        }
+      />
 
       {error && (
         <div className="mt-4">
@@ -284,7 +324,7 @@ export default function Home() {
       </div>
 
       {/* 筛选卡（常驻展开 · 对齐原页「不要折叠」） */}
-      <section className="card mt-5 p-6">
+      <section className="card-tint mt-6 p-6">
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <b className="text-[15px] tracking-tight">{tr("home.filters")}</b>
@@ -427,9 +467,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 结果带：4 个指标（对齐原页 st.metric 四格） */}
-      <section className="mt-5 grid grid-cols-2 gap-4 border-y border-line py-4 lg:grid-cols-4">
+      {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡） */}
+      <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Metric
+          tone="brand"
+          icon="grid"
           label={tr("home.kpiResult")}
           value={fmt(view.length)}
           hint={tr("home.kpiResultHint", {
@@ -438,11 +480,15 @@ export default function Home() {
           })}
         />
         <Metric
+          tone="accent"
+          icon="shield"
           label={tr("home.kpiApproved")}
           value={fmt(stageCount["已上市"] ?? 0)}
           hint={tr("home.kpiApprovedHint")}
         />
         <Metric
+          tone="violet"
+          icon="layers"
           label={tr("home.kpiStruct")}
           value={fmt(nStruct)}
           hint={tr("home.kpiStructHint", {
@@ -450,6 +496,8 @@ export default function Home() {
           })}
         />
         <Metric
+          tone="sand"
+          icon="heart"
           label={tr("home.kpiDosim")}
           value={fmt(st?.dosimetry?.total ?? 0)}
           hint={
@@ -500,7 +548,7 @@ export default function Home() {
 
       <div className="card mt-3 overflow-hidden">
         <div className="hscroll">
-          <table className="w-full border-collapse text-[13px]">
+          <table className="table-zebra w-full border-collapse text-[13px]">
             <thead>
               <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
                 <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thProfile")}</th>

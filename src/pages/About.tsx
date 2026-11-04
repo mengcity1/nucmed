@@ -1,5 +1,6 @@
 import { useJSON, fmt, type Meta, type Stats } from "../lib/data";
 import { useT } from "../lib/i18n";
+import PageHero from "../components/PageHero";
 
 const LIC = "CC BY-NC 4.0";
 // ★ 2026-10-28：原为 github.com/<TODO-OWNER> 占位（会显示成一个不存在的地址）。
@@ -25,10 +26,7 @@ export default function About() {
 
   return (
     <div className="pb-4">
-      <h1 className="text-[26px] font-bold tracking-tight">{tr("about.title")}</h1>
-      <p className="mt-1.5 max-w-[820px] text-[13px] leading-relaxed text-ink-3">
-        {tr("about.lead")}
-      </p>
+      <PageHero eyebrow={tr("brand.sub")} title={tr("about.title")} lead={tr("about.lead")} />
 
       <section className="card mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.verTitle")}</h2>

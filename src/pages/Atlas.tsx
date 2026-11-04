@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
 import ImageViewer from "../components/ImageViewer";
+import PageHero from "../components/PageHero";
 import { fmt, loadFigManifest, refLink, type Fig } from "../lib/data";
 import { useT, type StrKey } from "../lib/i18n";
 
@@ -120,8 +121,7 @@ export default function Atlas() {
 
   return (
     <div className="pb-4">
-      <h1 className="text-[26px] font-bold tracking-tight">{tr("atlas.title")}</h1>
-      <p className="mt-1.5 max-w-[860px] text-[13px] leading-relaxed text-ink-3">{tr("atlas.lead")}</p>
+      <PageHero eyebrow={tr("brand.sub")} title={tr("atlas.title")} lead={tr("atlas.lead")} />
 
       <div className="mt-4 rounded-[10px] border border-[#fde68a] bg-[#fffbeb] px-4 py-3 text-[12.5px] leading-relaxed text-[#92400e]">
         <b>{tr("atlas.howto")}</b>
@@ -256,7 +256,7 @@ export default function Atlas() {
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shown.map((f) => (
-              <figure key={f.file} className="card m-0 overflow-hidden">
+              <figure key={f.file} className="card card-hover m-0 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setZoom(f)}

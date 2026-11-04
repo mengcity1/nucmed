@@ -52,6 +52,8 @@ function Nav() {
   };
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-xl backdrop-saturate-150">
+      {/* 顶部渐变细带（2026-11-04 视觉升级）：给固定导航一个品牌锚点，不占高度 */}
+      <span aria-hidden className="block h-[3px] w-full bg-gradient-to-r from-[#1e5ba8] via-[#4a8ee0] to-[#0d9488]" />
       <div className="wrap flex h-16 items-center gap-3 sm:gap-7">
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">

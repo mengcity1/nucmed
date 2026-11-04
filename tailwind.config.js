@@ -4,12 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: "#1e5ba8", deep: "#164a8a", soft: "#e8f0fa" },
+        brand: { DEFAULT: "#1e5ba8", deep: "#164a8a", soft: "#e8f0fa", glow: "#4a8ee0" },
         ink: { DEFAULT: "#0f172a", 2: "#475569", 3: "#94a3b8" },
         line: "#e4e9f2",
         ok: "#0d9488",
         warn: "#d97706",
         bad: "#dc2626",
+        /* ★ 2026-11-04 视觉升级：数据用色（KPI 彩带 / 区块强调），只做点缀不改主色 */
+        accent: { DEFAULT: "#0d9488", deep: "#0a7d6f", soft: "#e6f7f4" },
+        violet: { DEFAULT: "#6d5bd0", soft: "#efecfc" },
+        sand: { DEFAULT: "#b4761f", soft: "#fdf4e6" },
       },
       fontFamily: {
         sans: ['Inter', '"Noto Sans SC"', "system-ui", "sans-serif"],
@@ -19,6 +23,17 @@ export default {
       boxShadow: {
         s1: "0 1px 2px rgba(15,23,42,.04)",
         s2: "0 1px 2px rgba(15,23,42,.04), 0 8px 24px -8px rgba(15,23,42,.10)",
+        s3: "0 2px 6px rgba(15,23,42,.05), 0 20px 44px -20px rgba(15,23,42,.22)",
+        glow: "0 0 0 1px rgba(30,91,168,.10), 0 18px 40px -18px rgba(30,91,168,.40)",
+      },
+      keyframes: {
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "100%": { opacity: "1", transform: "none" },
+        },
+      },
+      animation: {
+        fadeUp: "fadeUp .38s cubic-bezier(.22,.61,.36,1) both",
       },
     },
   },
