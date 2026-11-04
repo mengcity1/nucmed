@@ -78,7 +78,7 @@
       font-medium transition-all duration-150;
   }
   .chip-off {
-    @apply border-line bg-white text-ink-2 shadow-s1 hover:-translate-y-px hover:border-[#b9d0e9]
+    @apply border-[#dfe8f6] bg-[#f4f8fe] text-ink-2 shadow-s1 hover:-translate-y-px hover:border-[#b9d0e9]
       hover:text-ink hover:shadow-s2;
   }
   .chip-on {
@@ -123,10 +123,10 @@
   .table-zebra tbody tr:hover {
     background-color: #f3f8ff;
   }
-  /* 页头标题：实色正文 + 渐变小横条（不用 gradient text —— 标题里有 emoji，
-     background-clip:text 在部分浏览器会把 emoji 一起 clip 掉） */
+  /* 页头标题：深色带上是白字（2026-11-04 v2）。不用 gradient text —— 标题含 emoji，
+     background-clip:text 在部分浏览器会把 emoji 一起 clip 成透明。 */
   .hero-title {
-    @apply font-bold text-ink;
+    @apply font-bold text-white;
     font-size: 29px;
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -137,7 +137,16 @@
     }
   }
   .hero-rule {
-    @apply mt-2 h-1 w-14 rounded-full;
-    background: linear-gradient(90deg, #1e5ba8 0%, #4a8ee0 55%, #0d9488 100%);
+    @apply mt-2.5 h-1 w-16 rounded-full;
+    background: linear-gradient(90deg, #7dd3fc 0%, #4ecdc4 60%, rgba(78, 205, 196, 0) 100%);
+  }
+  /* 区块标题左侧色条：给长页面制造「段落节奏」 */
+  .sec-h {
+    @apply relative pl-3 text-[16px] font-semibold tracking-tight text-ink;
+  }
+  .sec-h::before {
+    content: "";
+    @apply absolute left-0 top-1/2 h-[15px] w-[3px] -translate-y-1/2 rounded-full;
+    background: linear-gradient(180deg, #1e5ba8 0%, #0d9488 100%);
   }
 }

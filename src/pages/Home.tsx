@@ -122,13 +122,26 @@ function Metric({
     violet: "bg-violet-soft text-violet",
     sand: "bg-sand-soft text-sand",
   };
+  /* 卡片底色：白→浅色渐变（解决「一片白，太清淡」）；数字用同色系深色，不刺眼但有分量 */
+  const fill: Record<MetricTone, string> = {
+    brand: "from-white to-[#e9f2fe] border-[#d3e3f8]",
+    accent: "from-white to-[#e6faf6] border-[#cdeee6]",
+    violet: "from-white to-[#f1eefc] border-[#ded6f7]",
+    sand: "from-white to-[#fdf5e7] border-[#f0e0c4]",
+  };
+  const val: Record<MetricTone, string> = {
+    brand: "text-[#12457f]",
+    accent: "text-[#0a6f66]",
+    violet: "text-[#4b3ea3]",
+    sand: "text-[#8a5a12]",
+  };
   return (
-    <div className="stat-card">
+    <div className={`stat-card bg-gradient-to-br ${fill[tone]}`}>
       <span className={`stat-accent ${bar[tone]}`} />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-[12px] font-medium text-ink-3">{label}</div>
-          <div className="num mt-1.5 text-[27px] font-semibold leading-none tracking-tight text-ink">{value}</div>
+          <div className="text-[12px] font-medium text-ink-2">{label}</div>
+          <div className={`num mt-1.5 text-[27px] font-bold leading-none tracking-tight ${val[tone]}`}>{value}</div>
           {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
         </div>
         <span className={`stat-ico ${ico[tone]}`}>
@@ -289,19 +302,7 @@ export default function Home() {
 
   return (
     <div className="pb-4">
-      <PageHero
-        eyebrow={tr("brand.sub")}
-        title={tr("home.title")}
-        lead={tr("home.lead")}
-        right={
-          <div className="rounded-[10px] border border-brand/15 bg-white/85 px-3.5 py-2 text-[12.5px] text-ink-2 shadow-s1">
-            {tr("home.countLine", {
-              a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
-              b: st ? fmt(st.drugs) : "…",
-            })}
-          </div>
-        }
-      />
+      <PageHero title={tr("home.title")} lead={tr("home.lead")} />
 
       {error && (
         <div className="mt-4">
@@ -544,7 +545,15 @@ export default function Home() {
         </div>
       </div>
 
-      <h2 className="mt-6 text-[16px] font-semibold">{tr("home.list")}</h2>
+      <div className="mt-7 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="sec-h">{tr("home.list")}</h2>
+        <span className="text-[12px] text-ink-3">
+          {tr("home.countLine", {
+            a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+            b: st ? fmt(st.drugs) : "…",
+          })}
+        </span>
+      </div>
 
       <div className="card mt-3 overflow-hidden">
         <div className="hscroll">

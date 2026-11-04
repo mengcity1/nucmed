@@ -26,7 +26,7 @@ export default function About() {
 
   return (
     <div className="pb-4">
-      <PageHero eyebrow={tr("brand.sub")} title={tr("about.title")} lead={tr("about.lead")} />
+      <PageHero title={tr("about.title")} lead={tr("about.lead")} />
 
       <section className="card mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.verTitle")}</h2>

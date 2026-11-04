@@ -121,7 +121,7 @@ export default function Atlas() {
 
   return (
     <div className="pb-4">
-      <PageHero eyebrow={tr("brand.sub")} title={tr("atlas.title")} lead={tr("atlas.lead")} />
+      <PageHero title={tr("atlas.title")} lead={tr("atlas.lead")} />
 
       <div className="mt-4 rounded-[10px] border border-[#fde68a] bg-[#fffbeb] px-4 py-3 text-[12.5px] leading-relaxed text-[#92400e]">
         <b>{tr("atlas.howto")}</b>
