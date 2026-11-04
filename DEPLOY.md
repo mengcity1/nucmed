@@ -117,3 +117,50 @@ Compress-Archive -Path 'dist\*' -DestinationPath 'D:\nucmed\logs\pk261_main\nucm
 3. **首屏要下 1.65 MB `drugs.json`** —— 4G 下 2–4 s，之后走浏览器缓存
 4. 药目录 5,159 个里**只有 861 个有生物分布数据**，页面按「有数据 / 目录」双口径显示
 5. Gitee 仓库仍是**主代码库**（`gitee.com/mengcity1/nucmed`）；GitHub 镜像暂不可用
+
+---
+
+## §7 推送与部署核对（2026-11-04 立 · 事故驱动 · **必读**）
+
+### 7.1 本机到 GitHub 是"半通"（实测）
+
+| 目标 | 结果 | 结论 |
+|---|---|---|
+| `github.com:443` | **超时 ≈21 s** | ❌ HTTPS 推送走不通 |
+| `ssh.github.com:443` | ✅ 能完成 SSH 握手 | **唯一可用通道**（靠 `~/.ssh/config` 把 github.com 指向它） |
+| `api.github.com` | ✅ 200 | 可用于核对部署状态（`scripts/deploy_status.mjs`） |
+
+### 7.2 认证：用**仓库级 Deploy Key**，不要用账号级 SSH key
+
+- 私钥：`~/.ssh/id_ed25519_nucmed`（ed25519 · 无口令）
+- 公钥指纹：`SHA256:PUXCaDkg3Q5RTMF9iou7tZRadJ+iy8tUJ0NK5OQxbaY`
+- **2026-11-04 事故**：该公钥从 GitHub 账号中被移除 ⇒ `git push` 报 `Permission denied (publickey)`；
+  而 `tsc && vite build`、`git commit` **全部成功、工作区干净** ⇒ 极易误判「已上线」（当天 v11 就卡在这里）。
+- **正确做法**：把公钥加到**仓库**的 Deploy key 并勾选 *Allow write access*：
+  `https://github.com/mengcity1/nucmed/settings/keys`
+  - 只对该仓库生效 · 不随账号 key 清理失效 · 可单独撤销（比账号级 key 安全）。
+
+### 7.3 每次推送后的固定三步（缺一步不算发布）
+
+1. `git push` 必须看到 `xxxx..yyyy  main -> main`（**没这行 = 没推**）；
+2. `node scripts/deploy_status.mjs --wait` ⇒ 最新 run 必须 `success`；
+3. 打开线上地址核对**页脚版本 / sha** 与本次提交一致（`index.html` 有 10 分钟缓存，必要时加 `?v=<日期>`）。
+
+### 7.4 故障判读矩阵
+
+| 现象 | 含义 | 处置 |
+|---|---|---|
+| `Permission denied (publickey)` | 公钥未被 GitHub 接受 | 按 §7.2 加 Deploy key |
+| `Connection timed out` / `kex_exchange_identification: Connection closed` | 网络/出口问题 | 确认 `~/.ssh/config` 仍指向 `ssh.github.com:443`；必要时加 `ProxyCommand`（当前不需要） |
+| push 成功但线上没变 | Actions 失败 / HTML 缓存 | 跑 `deploy_status.mjs` 看 conclusion；再 `?v=` 强刷 |
+| `Repository not found` | 仓库改名/转移/无权限 | 找 owner 确认仓库归属 |
+
+### 7.5 公钥（Deploy key 用这一个）
+
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM+AHCrcm8uHk39BCRnLvYDXhQGOpgDhuK/fYjLETWgK nucmed@newmachine
+```
+
+### 7.6 一句话总结
+
+**"build 成功 + commit 成功 + 工作区干净" ≠ "已发布"。** 唯一判据是 §7.3 第 2 步。
