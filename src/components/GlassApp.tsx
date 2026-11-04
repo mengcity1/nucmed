@@ -83,10 +83,12 @@ export function paintWallpaper(
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
     ctx.save();
-    ctx.filter = `blur(${Math.max(26, Math.round(w * 0.035))}px)`;
-    blob(0.16, 0.06, 0.62, "rgba(255,255,255,.7)");
-    blob(0.86, 0.28, 0.55, "rgba(224,211,186,.28)");
-    blob(0.5, 0.94, 0.6, "rgba(255,255,255,.45)");
+    ctx.filter = `blur(${Math.max(30, Math.round(w * 0.04))}px)`;
+    // v29：按深色参考图的配方做"正向版"——中心一团柔光（对应蓝微光）+ 四角极淡明暗
+    blob(0.5, 0.42, 0.58, "rgba(255,255,255,.55)");
+    blob(0.52, 0.46, 0.26, "rgba(255,253,244,.6)");
+    blob(0.16, 0.06, 0.55, "rgba(255,255,255,.4)");
+    blob(0.86, 0.9, 0.55, "rgba(226,214,186,.3)");
     ctx.restore();
     // 纸面微颗粒（v24）：米白底太平，加一层很淡的噪点当"纸纹"，玻璃压上去更有质感
     const tile = document.createElement("canvas");

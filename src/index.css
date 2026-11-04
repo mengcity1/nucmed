@@ -1118,12 +1118,14 @@
       0 12px 30px -26px rgba(96, 74, 40, 0.3);
   }
   .app-stage.light.webgl-ready .lg-surface {
-    background-image: radial-gradient(
-      520px circle at var(--mx, 50%) var(--my, -20%),
-      rgba(255, 253, 246, 0.9) 0%,
-      rgba(255, 251, 238, 0.4) 34%,
-      rgba(255, 255, 255, 0) 64%
-    );
+    /* 浅色下 canvas 玻璃会被着色压暗 ~10 级 ⇒ 叠一层薄白把玻璃"提回来"，同时保留光标聚光 */
+    background-image:
+      radial-gradient(
+        520px circle at var(--mx, 50%) var(--my, -20%),
+        rgba(255, 253, 246, 0.6) 0%,
+        rgba(255, 253, 246, 0) 64%
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.24));
   }
   .app-stage.light :is(button, [role="tab"]):not(.btn-plain) {
     border-color: rgba(255, 255, 255, 0.85);
@@ -1244,6 +1246,33 @@
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── v29 浅色（米白）液态玻璃 ─────────────────────────────────────────
+     按 owner 深色参考图的同一配方做正向版：白 60% 玻璃 + 白 85% 高光描边 + 18px 模糊 + 柔投影。
+     （深色的 13% 白在浅色里要反过来，否则玻璃"看不出存在"。） */
+  .app-stage.light .lg-surface {
+    border: 1px solid rgba(255, 255, 255, 0.85);
+  }
+  .app-stage.light.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+      0 18px 44px -30px rgba(62, 50, 28, 0.45);
+  }
+  .app-stage.light.fallback .lg-surface {
+    background: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    backdrop-filter: blur(18px) saturate(1.35);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+  }
+  .app-stage.light .card {
+    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(255, 255, 255, 0.75);
+  }
+  .app-stage.light .card-solid {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.8);
   }
 
   /* ── v27 排序下拉（原生 <select>）在深色下看不清 ─────────────────────
