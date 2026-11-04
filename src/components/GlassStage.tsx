@@ -67,7 +67,8 @@ export default function GlassStage({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // 移动端 / 减少动效：不跑 GPU，交给 CSS 毛玻璃（与 v16 同一套兜底）
+    // ① ≤640px：**不建系统**（手机不跑 GPU），挂 `.fallback` 走 CSS 毛玻璃；
+    // ② 减少动效：**照建**，但 `motion:false` 只渲染静态帧（它内部还会监听媒体查询变化）。
     const narrow = window.matchMedia("(max-width: 640px)").matches;
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (narrow) {
