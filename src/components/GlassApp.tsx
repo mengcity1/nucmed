@@ -25,10 +25,10 @@ import "../vendor/lens/components.css";
  *  ⇒ 观感 = 一整张浅色雾面，组件浮在上面；文字区仍近白，不影响对比度。 */
 function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: { width: number; height: number }) {
   const base = ctx.createLinearGradient(0, 0, w, h);
-  base.addColorStop(0, "#fdf6f2");
-  base.addColorStop(0.42, "#f4f7ff");
-  base.addColorStop(0.72, "#f3fbf8");
-  base.addColorStop(1, "#fdf7fb");
+  base.addColorStop(0, "#f8e3d2");
+  base.addColorStop(0.42, "#e3eaff");
+  base.addColorStop(0.72, "#dcf4ea");
+  base.addColorStop(1, "#f9e0ee");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
 
@@ -41,13 +41,14 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
   };
   ctx.save();
   ctx.filter = `blur(${Math.max(36, Math.round(w * 0.045))}px)`;
-  blob(0.05, 0.08, 0.5, "rgba(255,204,176,.42)"); // 暖橙
-  blob(0.5, -0.05, 0.55, "rgba(186,203,255,.4)"); // 冷蓝
-  blob(0.97, 0.18, 0.5, "rgba(170,236,222,.38)"); // 薄荷
-  blob(0.22, 0.95, 0.5, "rgba(240,196,228,.34)"); // 藕粉
-  blob(0.78, 0.88, 0.5, "rgba(190,214,255,.36)"); // 天蓝
+  // v20.5：加深一档 —— 指针高光（着色器 glint）在浅底上几乎看不出来，只能靠背景有"色"来承接
+  blob(0.05, 0.08, 0.5, "rgba(255,170,118,.62)"); // 暖橙
+  blob(0.5, -0.05, 0.55, "rgba(132,164,255,.6)"); // 冷蓝
+  blob(0.97, 0.18, 0.5, "rgba(110,224,200,.52)"); // 薄荷
+  blob(0.22, 0.95, 0.5, "rgba(246,150,206,.5)"); // 藕粉
+  blob(0.78, 0.88, 0.5, "rgba(150,186,255,.52)"); // 天蓝
   ctx.restore();
-  ctx.fillStyle = "rgba(253,254,255,.07)";
+  ctx.fillStyle = "rgba(253,254,255,.02)";
   ctx.fillRect(0, 0, w, h);
 }
 
@@ -82,7 +83,32 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       artwork: paintWallpaper,
     });
     sys.renderer?.set({ brightness: 1.0 });
-    return () => sys.destroy();
+
+    // v20.5：**光标波纹**（CSS 层，独立于 WebGL）——
+    // 着色器的 glint 也跟指针，但只在面板边缘看得出；这一层让每块玻璃上都能看到柔光斑随光标移动。
+    let raf = 0;
+    let px = 0;
+    let py = 0;
+    const paint = () => {
+      raf = 0;
+      // 每个面板写**自身坐标**（background-position 以元素自身为基准）
+      el.querySelectorAll<HTMLElement>(".lg-surface").forEach((s) => {
+        const r = s.getBoundingClientRect();
+        s.style.setProperty("--mx", `${(px - r.left).toFixed(0)}px`);
+        s.style.setProperty("--my", `${(py - r.top).toFixed(0)}px`);
+      });
+    };
+    const onMove = (e: PointerEvent) => {
+      px = e.clientX;
+      py = e.clientY;
+      if (!raf) raf = requestAnimationFrame(paint);
+    };
+    if (!calm) el.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      el.removeEventListener("pointermove", onMove);
+      sys.destroy();
+    };
   }, []);
 
   return (
