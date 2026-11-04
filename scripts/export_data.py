@@ -17,11 +17,15 @@
 import csv
 import hashlib
 import json
+import os
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-ROOT = Path(r"D:\nucmed")
+# ★ 2026-11-04：库根目录改为可由环境变量指定（默认仍是跑批机的 D:\nucmed）。
+#   原因：本项目有双机（跑批机 D:\nucmed / 新机 C:\nucmed），写死路径导致新机无法复算导出。
+#   用法：$env:NUCMED_ROOT='C:\nucmed'; python web\scripts\export_data.py
+ROOT = Path(os.environ.get("NUCMED_ROOT") or r"D:\nucmed")
 DB = ROOT / "db" / "nucmed.db"
 OUT = ROOT / "web" / "public" / "data"
 
