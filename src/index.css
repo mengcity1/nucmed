@@ -480,6 +480,20 @@
   .glass-bar.lg-stage {
     border-radius: 0;
   }
+  /* ⚠ Lens 的 `.lg-stage button{border:0}`（0,1,1）会清掉舞台内所有按钮描边，
+     而本站的 chip / pill 全靠 `border` 描边 ⇒ 在舞台内还原（`.glass-stage .chip` = 0,2,0 胜出）。
+     颜色也必须一起还原：`border:0` 同时把 border-color 重置成 currentColor。 */
+  .glass-stage .chip,
+  .glass-stage .chip-sm {
+    border-width: 1px;
+    border-style: solid;
+  }
+  .glass-stage .chip-off {
+    border-color: rgba(15, 23, 42, 0.1);
+  }
+  .glass-stage .chip-on {
+    border-color: rgba(30, 91, 168, 0.25);
+  }
   .glass-bar .lg-surface {
     border-radius: 0;
     border: 0;

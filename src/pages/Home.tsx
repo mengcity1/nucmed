@@ -364,8 +364,10 @@ export default function Home() {
         <Chip onClick={() => setNucs(["镓-68"])}>{tr("home.ga68")}</Chip>
       </div>
 
-      {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选 */}
-      <section className="card-tint mt-6 px-5 py-4">
+      {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选
+          v18：外层再套一层真折射玻璃（1 舞台 / 1 面片）；chip 的描边由 index.css 还原 */}
+      <GlassStage strength={0.5} className="mt-6">
+      <section data-glass="panel" className="card-tint lg-surface px-5 py-4">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <b className="text-[14px] tracking-tight">{tr("home.filters")}</b>
           <span className="rounded-full bg-white px-2 py-0.5 text-[11.5px] font-medium text-ink-3 ring-1 ring-[#e3e9f4]">
@@ -518,6 +520,7 @@ export default function Home() {
         </div>
         )}
       </section>
+      </GlassStage>
 
       {/* 结果带：4 个指标（2026-11-04 v18：外套一层**真折射**玻璃舞台 ——
           背景由 WebGL 采样并弯折，指标本身仍是排版 + 发丝线，不加底色） */}

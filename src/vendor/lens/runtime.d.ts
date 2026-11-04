@@ -22,6 +22,7 @@ export type ArtworkRenderer = (context: CanvasRenderingContext2D, info: ArtworkI
 export interface GlassSystem {
   jelly: { setIntensity(value: number, explicit?: boolean): void };
   sound: { set(value: { enabled?: boolean; volume?: number }): void };
+  renderer?: { set(options: Record<string, unknown>): void };
   mount(root?: HTMLElement): unknown;
   setMaterial(value: MaterialName | Partial<Material>): void;
   setScene(value: SceneName): void;

@@ -21,8 +21,14 @@ import "../vendor/lens/components.css";
 /** 舞台背景（= 会被玻璃真实折射的那张图）：近白底 + 极淡三色柔光 + 几道冷灰丝绸曲线。
  *  刻意做得**很淡**：v16 的取向是"透明极简"，玻璃的质感靠**边缘折射与色散**，
  *  而不是靠背景本身有颜色 —— 底色一浓就变成"彩色横幅"了。
- *  但仍需保留一点点结构（柔光 + 曲线），否则纯白背景折射出来什么也看不见。 */
-function paintArtwork(ctx: CanvasRenderingContext2D, { width, height }: { width: number; height: number }) {
+ *  但仍需保留一点点结构（柔光 + 曲线），否则纯白背景折射出来什么也看不见。
+ *  `strength` 用来分级：外壳（导航/KPI）= 1；内容区（成组卡片）= 0.5，避免整片染色。 */
+function paintArtwork(
+  ctx: CanvasRenderingContext2D,
+  { width, height }: { width: number; height: number },
+  strength = 1
+) {
+  const k = Math.max(0, Math.min(1, strength));
   const g = ctx.createLinearGradient(0, 0, width, height);
   g.addColorStop(0, "#fcfdfe");
   g.addColorStop(0.52, "#fbfbfc");
@@ -37,16 +43,16 @@ function paintArtwork(ctx: CanvasRenderingContext2D, { width, height }: { width:
     ctx.fillStyle = rg;
     ctx.fillRect(0, 0, width, height);
   };
-  // 三团柔光：alpha 只到 .18 ~ .22 —— 是"玻璃透出的那点色温"，不是底色
-  blob(0.06, 0.34, 0.38, "rgba(255,203,170,.20)");
-  blob(0.44, 0.0, 0.34, "rgba(191,203,255,.18)");
-  blob(0.95, 0.58, 0.38, "rgba(172,232,219,.16)");
+  // 三团柔光：alpha 只到 .18 ~ .22（×strength）—— 是"玻璃透出的那点色温"，不是底色
+  blob(0.06, 0.34, 0.38, `rgba(255,203,170,${(0.2 * k).toFixed(3)})`);
+  blob(0.44, 0.0, 0.34, `rgba(191,203,255,${(0.18 * k).toFixed(3)})`);
+  blob(0.95, 0.58, 0.38, `rgba(172,232,219,${(0.16 * k).toFixed(3)})`);
 
   // 丝绸曲线：用冷灰而非白色（白线在白底上等于没画），给折射一点可辨识的"边"
   ctx.lineCap = "round";
   for (let i = 0; i < 5; i++) {
     const y = (0.16 + i * 0.17) * height;
-    ctx.strokeStyle = `rgba(120,140,175,${(0.10 - i * 0.014).toFixed(3)})`;
+    ctx.strokeStyle = `rgba(120,140,175,${((0.1 - i * 0.014) * k).toFixed(3)})`;
     ctx.lineWidth = Math.max(1, height * 0.03);
     ctx.beginPath();
     ctx.moveTo(-0.1 * width, y);
@@ -58,9 +64,12 @@ function paintArtwork(ctx: CanvasRenderingContext2D, { width, height }: { width:
 export default function GlassStage({
   children,
   className = "",
+  strength = 1,
 }: {
   children: ReactNode;
   className?: string;
+  /** 背景柔光强度：外壳 1（导航/KPI）· 内容卡组 0.5（避免整片染色） */
+  strength?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -76,12 +85,18 @@ export default function GlassStage({
       return;
     }
     const sys = createGlassSystem(el, {
-      material: { refraction: 0.72, blur: 0.18, dispersion: 0.28 },
+      material:
+        strength >= 1
+          ? { refraction: 0.72, blur: 0.18, dispersion: 0.28 }
+          : { refraction: 0.66, blur: 0.2, dispersion: 0.14 },
       scene: "aurora",
       motion: !calm,
       audio: { enabled: false },
-      artwork: paintArtwork,
+      artwork: (ctx, info) => paintArtwork(ctx, info, strength),
     });
+    // 渲染器默认 `brightness:.95`（renderer.js:253）——小面板看不出，**大面积会变灰板**；
+    // 内容区把亮度拉回中性，避免"玻璃=灰底"的观感事故。
+    if (strength < 1) sys.renderer?.set({ brightness: 1.02 });
     return () => sys.destroy();
   }, []);
 

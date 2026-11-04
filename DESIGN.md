@@ -131,6 +131,7 @@
 | 2026-11-04 | v6：字阶/令牌落表；h1/h2 改衬线；动效 1–5 上线；图表色板换 Okabe–Ito；`prefers-reduced-motion` 全站兜底 |
 | 2026-11-04 | **v7 学术版式**：三线表（`.table-booktabs`）上首页目录与单药分布表；卡片 1px 内高光；目录标题加「表 1 / Table 1」；数值列右对齐 |
 | 2026-11-04 | **v17 WebGL 背景色场**：新增 `src/lib/backgroundShader.ts` —— 单 canvas 全屏 quad，片元着色器画 **4 个指数衰减柔光球**（暖橙/淡紫/薄荷/天蓝）以 ~3.5% 振幅极慢漂移 + **1.5/255 抖动去 banding**；DPR ≤1.5、**限 30fps**、页面隐藏即停、`prefers-reduced-motion` 只画一帧、≤640px 不启用、WebGL 不可用返回 null（CSS 背景原样保留）。玻璃卡片仍用 `backdrop-filter` 采样这层**活颜色** |
+| 2026-11-04 | **v18.1 玻璃扩围（≤6 处舞台）**：由「导航 + KPI」扩到 **6 处 / 11 个面片** —— 导航条 · 首页 KPI · 首页筛选卡 · About 内容卡组（**2 舞台 / 5 面片**）· 单药详情首屏三卡（1 舞台 / 3 面片）。新增 **两档材质**（`strength`：外壳 1 / 内容 0.5）与两个必须知道的坑：① 渲染器默认 `brightness:.95`，**大面积会变灰板** ⇒ 内容区设 `1.02`；② `.lg-stage button{border:0}` 会清掉舞台内按钮描边 ⇒ `index.css` 按类还原。**不做**：每卡一舞台（上下文上限）、数据面板玻璃化 |
 | 2026-11-04 | **v18 真折射玻璃（vendor Lens · WebGL2）**：`src/vendor/lens/`（MIT · ruiqichenbiec/design-systems · 22 文件 158 KB 源码，**零依赖、不进 package.json**）。`components/GlassStage.tsx` 把**导航条**与**首页 KPI 带**变成真玻璃：`artwork()` 自绘「近白 + 极淡三色柔光 + 冷灰丝绸曲线」作为**场景纹理**，片元着色器对其真实采样弯折（`refraction .72 / blur .18 / dispersion .28`），并带 `JellyController` 弹簧；文字仍是**真 DOM**（`.webgl-ready .lg-surface` 只把背景置透明）⇒ 可读、可选中、可打印。≤640px / 无 WebGL2 / `prefers-reduced-motion` ⇒ `.fallback` 退回 CSS 毛玻璃。实测增量 **+19.7 KB gzip (JS) + 5.1 KB (CSS)** |
 
 ## 10. 版式骨架（v8 起）
@@ -153,13 +154,28 @@
 **为什么 vendor 而不 `npm i`**：本项目**零新依赖**原则；它是 MIT + 零运行时依赖 + `as-is` 不再维护
 ⇒ 固定版本拷进 `src/vendor/lens/`，保留 `LICENSE`，**不 fork 维护**，升级=重拷 + 重跑验收。
 
-**允许挂玻璃的地方（白名单）**
+**允许挂玻璃的地方（白名单 · 2026-11-04 扩围后）**
 
-| 允许 | 禁止 |
+| 允许（全站共 6 处舞台） | 禁止 |
 |---|---|
-| 导航条（`.glass-bar`，满宽直角） | 数据表 / 图集 / 图表（必须纯白 `card-solid`） |
-| 首页 KPI 带（一个 `panel` 面片） | 任意"卡片墙"整体玻璃化（滚动成本 + 读数干扰） |
-| 将来的浮层 / 抽屉（单个 `panel`） | 移动端（≤640px 一律回退） |
+| 导航条（`.glass-bar`，满宽直角） | 数据面板：表格 / 图集 / 分布图 / 剂量表（必须纯白 `card-solid`） |
+| 首页 KPI 带（1 面片） | **每卡一舞台**（每舞台 = 1 上下文 + 1 块舞台尺寸 canvas；上限 ~8–16 个上下文） |
+| 首页筛选卡（1 面片） | 覆盖整页的单舞台（canvas 面积 = 舞台面积 × dpr²，长页面必炸显存） |
+| About 内容卡组（**2 舞台 / 5 面片**） | 移动端（≤640px 一律回退） |
+| 单药详情首屏三卡（1 舞台 / 3 面片） | — |
+
+**两档材质**（`GlassStage` 的 `strength` 决定）：
+
+| 档 | strength | 材质 | brightness | 用在哪 |
+|---|---|---|---|---|
+| 外壳 | `1` | `refraction .72 / blur .18 / dispersion .28` | 默认 `.95` | 导航、KPI |
+| 内容 | `0.5` | `refraction .66 / blur .20 / dispersion .14` | **`1.02`** | 筛选卡、About 卡组、详情首屏 |
+
+> ⚠ **坑 1（必读）**：渲染器默认 `brightness:.95`（`internal/renderer.js:253`）。小面板看不出来，
+> **大面积会变成"灰板"**（第一版 About 就是灰的）。内容区必须把亮度拉回 ≥1。
+> ⚠ **坑 2**：`.lg-stage button{border:0}`（0,1,1）会清掉**舞台内所有按钮描边**，
+> 而本站 chip / pill 全靠描边 ⇒ `index.css` 里按类还原（`.glass-stage .chip` 等，0,2,0 胜出）。
+> 包有"描边按钮"的区域前，先确认这条还原是否覆盖到。
 
 **用法**（新增一处玻璃）：
 ```tsx

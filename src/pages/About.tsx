@@ -1,5 +1,6 @@
 import { useJSON, fmt, type Meta, type Stats } from "../lib/data";
 import { useT } from "../lib/i18n";
+import GlassStage from "../components/GlassStage";
 
 const LIC = "CC BY-NC 4.0";
 // ★ 2026-10-28：原为 github.com/<TODO-OWNER> 占位（会显示成一个不存在的地址）。
@@ -25,7 +26,11 @@ export default function About() {
 
   return (
     <div className="pb-4">
-      <section className="card mt-5 p-6">
+      {/* v18：内容卡组交给真折射玻璃（**1 个舞台 / 5 个面片**）。
+          为什么不每卡一舞台：每个舞台 = 1 个 WebGL 上下文 + 1 块"舞台尺寸"的 canvas，
+          上下文有上限（~8–16）、canvas 显存按面积算 ⇒ 唯一可扩展的单位是"区"，不是卡片。 */}
+      <GlassStage strength={0.5}>
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.verTitle")}</h2>
         <div className="mt-3">
           {m ? (
@@ -77,7 +82,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="card mt-5 p-6">
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.availTitle")}</h2>
         <p className="mt-1 text-[12.5px] text-balance text-ink-3">{tr("about.availLead")}</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -101,8 +106,12 @@ export default function About() {
           {tr("about.availFullDb", { mb: m ? (m.db_bytes / 1048576).toFixed(1) : "…" })}
         </p>
       </section>
+      </GlassStage>
 
-      <section className="card mt-5 p-6">
+      {/* 第二组：引用 / 数据字典 / 联系（3 个面片）—— 拆两个舞台是为了把单块 canvas 面积压下去
+          （显存按面积算；一块覆盖整页的 stage 在长页面上既不划算也更容易触发帧缓冲失败） */}
+      <GlassStage strength={0.5}>
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.citeTitle")}</h2>
         <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-[#fafbfe] p-4 text-[12px] leading-relaxed text-ink-2">
 {`@article{nucmeddb2026,
@@ -117,7 +126,7 @@ export default function About() {
         <p className="mt-2 text-[12px] text-ink-3">{tr("about.citeNote")}</p>
       </section>
 
-      <section className="card mt-5 p-6">
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.srcTitle")}</h2>
         <ul className="prose-serif mt-3 grid gap-2">
           <li>
@@ -138,7 +147,7 @@ export default function About() {
         </ul>
       </section>
 
-      <section className="card mt-5 p-6">
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.contactTitle")}</h2>
         <div className="mt-3">
           <Row k={tr("about.kOrg")} v={tr("about.org")} />
@@ -149,6 +158,7 @@ export default function About() {
           <Row k={tr("about.kStack")} v={tr("about.stack")} />
         </div>
       </section>
+      </GlassStage>
     </div>
   );
 }

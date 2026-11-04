@@ -5,6 +5,7 @@ import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 import { Chart, PALETTE, AXIS } from "../components/Chart";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
+import GlassStage from "../components/GlassStage";
 import ImageViewer from "../components/ImageViewer";
 
 type Ref = { pmid: string; title: string | null; journal: string | null; year: number | null };
@@ -666,8 +667,11 @@ export default function DrugDetail() {
         {tr("drug.back")}
       </button>
 
-      {/* 详情页页头（2026-11-04 v4）：结构缩略 + 药名 + 编号 + 一行关键指标 + 渐变细条 */}
-      <section className="card mt-3 flex flex-wrap items-center gap-4 p-4">
+      {/* 详情页页头（2026-11-04 v4）：结构缩略 + 药名 + 编号 + 一行关键指标 + 渐变细条
+          v18：首屏三张"说明性卡"（页头 / 事实 / 组成）套一层真折射玻璃 —— 1 舞台 / 3 面片；
+          下面的**数据面板（表格/分布图/剂量表）保持纯白**，不进舞台（读数与打印优先）。 */}
+      <GlassStage strength={0.5}>
+      <section data-glass="panel" className="card lg-surface mt-3 flex flex-wrap items-center gap-4 p-4">
         <div className="hidden h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-line bg-white sm:flex">
           {hasRealStruct && !imgErr.struct ? (
             <img
@@ -711,7 +715,7 @@ export default function DrugDetail() {
         </div>
       </section>
 
-      <section className="card mt-5 grid gap-5 p-6 md:grid-cols-4">
+      <section data-glass="panel" className="card lg-surface mt-5 grid gap-5 p-6 md:grid-cols-4">
         <Field label={tr("drug.fType")}>{enSafe(lang, drug.drug_type) || "—"}</Field>
         <Field label={tr("drug.fIsotope")}>
           {lang === "en" ? nuclideEn(drug.radionuclides_zh) || "—" : drug.radionuclides_zh || "—"}
@@ -727,7 +731,7 @@ export default function DrugDetail() {
       </section>
 
       {/* 五段组成分解（数据来自 v_drug_overview；图只作辅助，点击可放大） */}
-      <section className="card mt-5 p-6">
+      <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <div className="flex items-baseline justify-between">
           <h2 className="text-[16px] font-semibold"><span className="sec-no">01</span>{tr("drug.parts")}</h2>
           <span className="text-[12px] text-ink-3">{tr("drug.partsHint")}</span>
@@ -847,6 +851,7 @@ export default function DrugDetail() {
           </div>
         )}
       </section>
+      </GlassStage>
 
       {/* 4 个 Tab（B1）：可见性来自 drugs.json 导出字段；灰态 Tab 不隐藏、仍可点，
           点进去是「该药暂无 + 覆盖说明」，避免用户以为功能被砍掉 */}
