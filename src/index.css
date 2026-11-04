@@ -1240,6 +1240,46 @@
       0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
+  /* ── v27 排序下拉（原生 <select>）在深色下看不清 ─────────────────────
+     根因：`option` 列表由浏览器/系统绘制，没声明 `color-scheme` 就仍是**白底浅字**；
+     这里显式声明 color-scheme + 给 select/option 配色 + 自绘箭头（不再用系统灰箭头）。 */
+  .app-stage.dark {
+    color-scheme: dark;
+  }
+  .app-stage.light {
+    color-scheme: light;
+  }
+  .app-stage select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 1.7rem;
+    background-repeat: no-repeat;
+    background-position: right 0.45rem center;
+    background-size: 10px 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .app-stage.dark select {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.24) !important;
+    color: #eef4fc !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23dfe8f5' stroke-width='1.6' stroke-linecap='round'/></svg>") !important;
+  }
+  .app-stage.dark option {
+    background-color: #2b2f36;
+    color: #eef4fc;
+  }
+  .app-stage.light select {
+    background-color: #fffdf7 !important;
+    border-color: rgba(120, 96, 60, 0.28) !important;
+    color: #3a332b !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%236b5f4c' stroke-width='1.6' stroke-linecap='round'/></svg>") !important;
+  }
+  .app-stage.light option {
+    background-color: #fffdf7;
+    color: #3a332b;
+  }
+
   /* ── v25 筛选区的"常驻滚动条"（owner：滑块要一直看得见）─────────────
      Chrome/Edge 里自定义 `::-webkit-scrollbar` 是**常显**的（不是 overlay 那种滚动才出现）；
      Firefox 用 `scrollbar-width / scrollbar-color`；`scrollbar-gutter` 预留槽位，内容不跳。 */
