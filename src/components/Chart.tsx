@@ -25,16 +25,16 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-/** ECharts 统一配色（与站点设计令牌对齐） */
+/** ECharts 统一配色（与站点设计令牌对齐 · 2026-11-04 v4 重排为 品牌蓝→青→紫→沙 四族） */
 export const PALETTE = [
   "#1e5ba8",
-  "#3d84d6",
-  "#78b0e2",
+  "#4a8ee0",
   "#0d9488",
-  "#d97706",
-  "#dc2626",
-  "#7a3fa8",
-  "#64748b",
+  "#4ecdc4",
+  "#6d5bd0",
+  "#a99cf0",
+  "#b4761f",
+  "#7c8ba1",
 ];
 
 export function Chart({
@@ -82,10 +82,10 @@ export function Chart({
   return <div ref={ref} style={{ height: h }} className="w-full" />;
 }
 
-/** 通用坐标轴样式 */
+/** 通用坐标轴样式（2026-11-04：网格线更淡、轴标签更柔和，避免图表"格子感"过重） */
 export const AXIS = {
-  axisLine: { lineStyle: { color: "#e4e9f2" } },
+  axisLine: { lineStyle: { color: "#e6ecf6" } },
   axisTick: { show: false },
-  axisLabel: { color: "#94a3b8", fontSize: 11 },
-  splitLine: { lineStyle: { color: "#f1f4f9" } },
+  axisLabel: { color: "#8fa0b8", fontSize: 11 },
+  splitLine: { lineStyle: { color: "#eef3fa" } },
 };

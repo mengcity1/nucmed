@@ -153,6 +153,25 @@
   .stat-ico {
     @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[15px];
   }
+  /* 骨架屏微光（2026-11-04）：比单纯的 pulse 更"有质地" */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+    animation: shimmerSweep 1.6s ease-in-out infinite;
+  }
+  @keyframes shimmerSweep {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   /* 表格：斑马纹 + 行悬停（只加在显式使用 .table-zebra 的表上，避免误伤紧凑表） */
   .table-zebra tbody tr:nth-child(odd) {
     background-color: #fbfcfe;

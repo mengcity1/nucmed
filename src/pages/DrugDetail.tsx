@@ -465,6 +465,8 @@ export default function DrugDetail() {
 
   const drug = useMemo(() => (drugs ?? []).find((d) => d.drug_id === did), [drugs, did]);
   const mine = useMemo(() => (pts ?? []).filter((p) => p.drug_id === did), [pts, did]);
+  /** 器官去重数：详情页头「关键指标」用（同一器官多个时点只算一次） */
+  const organCount = useMemo(() => new Set(mine.map((p) => p.organ_norm)).size, [mine]);
   /** `has_raw = 0` ⇒ 只有 PMID、没有原文片段（487/3,391，pk263）。
    *  这类行不展开、不留空白框，直接在表格里标明「仅文献级追溯」。 */
   const noRawCount = useMemo(() => mine.filter((p) => p.has_raw === 0).length, [mine]);
@@ -650,17 +652,50 @@ export default function DrugDetail() {
         {tr("drug.back")}
       </button>
 
-      <div className="mt-3 flex flex-wrap items-baseline gap-3">
-        <h1 className="text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
-        <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
-          # {drug.drug_id}
-        </span>
-        {drug.has_struct ? (
-          <span className="text-[12px] text-ok">{tr("drug.hasStruct")}</span>
-        ) : (
-          <span className="text-[12px] text-ink-3">{tr("drug.noStruct")}</span>
-        )}
-      </div>
+      {/* 详情页页头（2026-11-04 v4）：结构缩略 + 药名 + 编号 + 一行关键指标 + 渐变细条 */}
+      <section className="card mt-3 flex flex-wrap items-center gap-4 p-4">
+        <div className="hidden h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-line bg-white sm:flex">
+          {drug.has_struct && !imgErr.struct ? (
+            <img
+              src={`${import.meta.env.BASE_URL}struct/${drug.drug_id}.webp`}
+              alt={drug.name_en}
+              loading="lazy"
+              className="h-full w-full object-contain p-1"
+            />
+          ) : (
+            <span className="px-1 text-center text-[10.5px] leading-tight text-ink-3">{tr("drug.noStruct")}</span>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-2.5">
+            <h1 className="text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
+            <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
+              # {drug.drug_id}
+            </span>
+            <span className={`text-[12px] ${drug.has_struct ? "text-ok" : "text-ink-3"}`}>
+              {drug.has_struct ? tr("drug.hasStruct") : tr("drug.noStruct")}
+            </span>
+          </div>
+          <span
+            aria-hidden
+            className="mt-2 block h-[3px] w-16 rounded-full bg-gradient-to-r from-brand via-[#4a8ee0] to-accent"
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-ink-3">
+            <span>
+              {tr("drug.tabBio")} <b className="num text-ink-2">{fmt(mine.length)}</b>
+            </span>
+            <span>
+              {tr("drug.thOrgan")} <b className="num text-ink-2">{fmt(organCount)}</b>
+            </span>
+            <span>
+              {tr("drug.tabRefs")} <b className="num text-ink-2">{fmt(drugRefs?.length ?? drug.n_refs ?? 0)}</b>
+            </span>
+            <span>
+              {tr("drug.tabDos")} <b className="num text-ink-2">{fmt(drug.n_dosim ?? 0)}</b>
+            </span>
+          </div>
+        </div>
+      </section>
 
       <section className="card mt-5 grid gap-5 p-6 md:grid-cols-4">
         <Field label={tr("drug.fType")}>{enSafe(lang, drug.drug_type) || "—"}</Field>

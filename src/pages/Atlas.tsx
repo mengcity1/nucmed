@@ -220,10 +220,10 @@ export default function Atlas() {
       {loading && (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card animate-pulse p-3">
-              <div className="h-[150px] rounded-[10px] bg-[#f2f5fa]" />
-              <div className="mt-3 h-3 w-2/3 rounded bg-[#e9eef6]" />
-              <div className="mt-2 h-3 w-1/2 rounded bg-[#f0f3f9]" />
+            <div key={i} className="card p-3">
+              <div className="shimmer aspect-[4/3] rounded-[10px] bg-[#f2f5fa]" />
+              <div className="shimmer mt-3 h-3 w-2/3 rounded bg-[#e9eef6]" />
+              <div className="shimmer mt-2 h-3 w-1/2 rounded bg-[#f0f3f9]" />
             </div>
           ))}
         </div>
@@ -253,11 +253,11 @@ export default function Atlas() {
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shown.map((f) => (
-              <figure key={f.file} className="card card-hover m-0 overflow-hidden">
+              <figure key={f.file} className="card card-hover group m-0 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setZoom(f)}
-                  className="block w-full cursor-zoom-in bg-[#0b1220]"
+                  className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden bg-[#0b1220]"
                   title={tr("drug.clickZoom")}
                 >
                   <img
@@ -265,7 +265,7 @@ export default function Atlas() {
                     alt={`${f.drug_name} · ${f.label}`}
                     loading="lazy"
                     decoding="async"
-                    className="h-[190px] w-full object-contain"
+                    className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                   />
                 </button>
                 <figcaption className="p-3">

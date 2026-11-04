@@ -636,10 +636,10 @@ export default function Home() {
       </div>
 
       <div className="card mt-3 overflow-hidden">
-        <div className="hscroll">
+        <div className="hscroll max-h-[calc(100vh-230px)] overflow-y-auto">
           <table className="table-zebra w-full border-collapse text-[13px]">
-            <thead>
-              <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-line bg-[#f7fafe] text-[11.5px] uppercase tracking-wide text-ink-3 shadow-[0_1px_0_rgba(228,234,244,.9)]">
                 <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thProfile")}</th>
                 <th className="px-2 py-2.5 text-left font-semibold sm:px-4">{tr("home.thDrug")}</th>
                 <th className="px-2 py-2.5 text-left font-semibold sm:px-3">{tr("home.thType")}</th>
@@ -653,8 +653,8 @@ export default function Home() {
             </thead>
             <tbody>
               {rows.map((d) => (
-                <tr key={d.drug_id} className="border-b border-[#f1f4f9] transition hover:bg-[#f9fbfe]">
-                  <td className="px-2 py-2.5 text-center sm:px-3">
+                <tr key={d.drug_id} className="group border-b border-[#f1f4f9] transition-colors hover:bg-[#f7fbff]">
+                  <td className="border-l-2 border-transparent px-2 py-2.5 text-center transition-colors group-hover:border-l-brand/50 sm:px-3">
                     <Link
                       to={`/drug/${d.drug_id}`}
                       className="inline-block whitespace-nowrap rounded-lg border border-line bg-white px-2.5 py-1 text-[12px] font-medium text-brand transition hover:border-brand hover:bg-brand-soft"
