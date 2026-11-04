@@ -15,6 +15,7 @@
  */
 import { useEffect, useRef, type ReactNode } from "react";
 import { useTheme } from "../lib/theme";
+import { runContrastAudit } from "../lib/contrastAudit";
 import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
@@ -222,6 +223,11 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       if (!raf) raf = requestAnimationFrame(paint);
     };
     if (!calm) el.addEventListener("pointermove", onMove, { passive: true });
+    // ?contrast=1：对比度自检（结果写进 DOM，便于无头浏览器读取）
+    if (qs.get("contrast") === "1") {
+      runContrastAudit();
+      window.setTimeout(runContrastAudit, 2500);
+    }
     return () => {
       if (raf) cancelAnimationFrame(raf);
       el.removeEventListener("pointermove", onMove);
