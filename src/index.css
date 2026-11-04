@@ -449,6 +449,46 @@
     @apply mt-2.5 h-1 w-16 rounded-full;
     background: linear-gradient(90deg, #7dd3fc 0%, #4ecdc4 60%, rgba(78, 205, 196, 0) 100%);
   }
+  /* ── Lens 玻璃舞台（2026-11-04 v18 · vendor WebGL2 真折射）────────────
+     覆盖它自带的"卡片式舞台"外观（灰底 #cfdeed + 34px 圆角 + overflow:hidden），
+     让它只负责「背景 + 折射」，版式与圆角仍归我们。
+     选择器用 `.glass-stage.lg-stage`（0,2,0）压过 `.lg-stage`（0,1,0）—— 不用 !important。 */
+  .glass-stage.lg-stage {
+    background: transparent;
+    border-radius: 16px;
+    isolation: isolate;
+    color: inherit;
+    font: inherit;
+  }
+  .glass-stage .lg-surface {
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+  /* WebGL 就绪后它把 surface 背景置透明（玻璃像素由 canvas 画）；
+     这里只补一层极淡内高光 + 微投影，让玻璃边缘在白底上仍有轮廓。 */
+  .glass-stage.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  @media (max-width: 640px) {
+    .glass-stage .lg-surface {
+      background: rgba(255, 255, 255, 0.9);
+    }
+  }
+  /* 导航玻璃条：满宽直角（圆角在满宽条上没有意义，还会露出画布边） */
+  .glass-bar.lg-stage {
+    border-radius: 0;
+  }
+  .glass-bar .lg-surface {
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .glass-bar.webgl-ready .lg-surface {
+    box-shadow: none;
+  }
+
   /* 区块标题左侧色条：给长页面制造「段落节奏」 */
   .sec-h {
     @apply relative pl-3 text-[16px] font-semibold tracking-tight text-ink;

@@ -4,6 +4,7 @@ import { setDataLang, useJSON, type Meta } from "./lib/data";
 import { mountBackgroundShader } from "./lib/backgroundShader";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
+import GlassStage from "./components/GlassStage";
 import Overview from "./pages/Home";
 // ★ pk262 B6：单药画像按需加载 —— Chart 依赖 echarts（586 kB / gzip 195 kB），
 //   静态引入会让总览首屏也拉这个包。改为路由级 lazy 后 echarts 只在进入画像时才下载。
@@ -36,72 +37,78 @@ function Nav() {
   const tr = useT();
   const { lang, setLang } = useLang();
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)] bg-white/70 backdrop-blur-xl">
-      <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
-        <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
-            ⚛
-          </span>
-          <span className="hidden min-w-0 leading-none sm:block">
-            <b className="block truncate text-[15px] font-semibold tracking-wide">{tr("brand.name")}</b>
-            <span className="mt-0.5 block max-w-[200px] truncate text-[11px] font-medium tracking-[.6px] text-ink-3">
-              {tr("brand.sub")}
-            </span>
-          </span>
-        </NavLink>
-
-        <nav className="ml-auto flex min-w-0 items-center gap-1 overflow-x-auto">
-          {TABS.map((tab) => (
-            <NavLink
-              key={tab.to}
-              to={tab.to}
-              end={tab.end}
-              className={({ isActive }) =>
-                `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
-              }
-            >
-              <span className="hidden sm:inline-flex">
-                <Icon name={tab.icon} size={15} className="shrink-0 opacity-90" />
+    <header className="sticky top-0 z-50 border-b border-[rgba(15,23,42,.08)]">
+      {/* 导航条（2026-11-04 v18）：整条交给 WebGL 玻璃 —— 满宽、直角；
+          WebGL2 不可用 / ≤640px ⇒ `.fallback` 自动退回 CSS 毛玻璃，视觉仍成立。 */}
+      <GlassStage className="glass-bar">
+        <div data-glass="panel" className="lg-surface">
+          <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
+            <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
+              <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
+                ⚛
               </span>
-              {tr(tab.key)}
+              <span className="hidden min-w-0 leading-none sm:block">
+                <b className="block truncate text-[15px] font-semibold tracking-wide">{tr("brand.name")}</b>
+                <span className="mt-0.5 block max-w-[200px] truncate text-[11px] font-medium tracking-[.6px] text-ink-3">
+                  {tr("brand.sub")}
+                </span>
+              </span>
             </NavLink>
-          ))}
-        </nav>
-        <div
-          role="group"
-          aria-label="Language"
-          data-allow-cjk=""
-          className="ml-1 flex shrink-0 items-center rounded-[10px] border border-white/60 bg-white/50 p-0.5"
-        >
-          {([
-            { v: "zh" as Lang, label: "中文" },
-            { v: "en" as Lang, label: "EN" },
-          ]).map((o) => {
-            const on = lang === o.v;
-            return (
-              <button
-                key={o.v}
-                type="button"
-                onClick={() => {
-                  setLang(o.v);
-                  const p = new URLSearchParams(sp);
-                  if (o.v === "en") p.set("lang", "en");
-                  else p.delete("lang");
-                  setSp(p, { replace: true });
-                }}
-                aria-pressed={on}
-                aria-label={o.v === "zh" ? "Chinese" : "English"}
-                title={o.v === "zh" ? "Chinese" : "English"}
-                className={`rounded-[8px] px-2 py-1 text-[11.5px] font-medium transition ${
-                  on ? "bg-white text-brand-deep shadow-s1" : "text-ink-3 hover:text-ink"
-                }`}
-              >
-                {o.label}
-              </button>
-            );
-          })}
+
+            <nav className="ml-auto flex min-w-0 items-center gap-1 overflow-x-auto">
+              {TABS.map((tab) => (
+                <NavLink
+                  key={tab.to}
+                  to={tab.to}
+                  end={tab.end}
+                  className={({ isActive }) =>
+                    `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
+                  }
+                >
+                  <span className="hidden sm:inline-flex">
+                    <Icon name={tab.icon} size={15} className="shrink-0 opacity-90" />
+                  </span>
+                  {tr(tab.key)}
+                </NavLink>
+              ))}
+            </nav>
+            <div
+              role="group"
+              aria-label="Language"
+              data-allow-cjk=""
+              className="ml-1 flex shrink-0 items-center rounded-[10px] border border-white/60 bg-white/50 p-0.5"
+            >
+              {([
+                { v: "zh" as Lang, label: "中文" },
+                { v: "en" as Lang, label: "EN" },
+              ]).map((o) => {
+                const on = lang === o.v;
+                return (
+                  <button
+                    key={o.v}
+                    type="button"
+                    onClick={() => {
+                      setLang(o.v);
+                      const p = new URLSearchParams(sp);
+                      if (o.v === "en") p.set("lang", "en");
+                      else p.delete("lang");
+                      setSp(p, { replace: true });
+                    }}
+                    aria-pressed={on}
+                    aria-label={o.v === "zh" ? "Chinese" : "English"}
+                    title={o.v === "zh" ? "Chinese" : "English"}
+                    className={`rounded-[8px] px-2 py-1 text-[11.5px] font-medium transition ${
+                      on ? "bg-white text-brand-deep shadow-s1" : "text-ink-3 hover:text-ink"
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      </GlassStage>
     </header>
   );
 }

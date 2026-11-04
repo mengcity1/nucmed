@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
 import Reveal from "../components/Reveal";
+import GlassStage from "../components/GlassStage";
 import { useCountUp } from "../lib/useCountUp";
 import { ErrorState } from "../components/States";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
@@ -518,43 +519,49 @@ export default function Home() {
         )}
       </section>
 
-      {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡 · 进入视口时渐显） */}
+      {/* 结果带：4 个指标（2026-11-04 v18：外套一层**真折射**玻璃舞台 ——
+          背景由 WebGL 采样并弯折，指标本身仍是排版 + 发丝线，不加底色） */}
       <Reveal className="mt-6">
-      <section className="mt-6 grid grid-cols-2 gap-y-1 border-y border-[rgba(15,23,42,.08)] py-1 sm:grid-cols-4 sm:gap-0">
-        <Metric
-          tone="brand"
-          label={tr("home.kpiResult")}
-          value={view.length}
-          hint={tr("home.kpiResultHint", {
-            a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
-            b: st ? fmt(st.drugs) : "…",
-          })}
-        />
-        <Metric
-          tone="accent"
-          label={tr("home.kpiApproved")}
-          value={stageCount["已上市"] ?? 0}
-          hint={tr("home.kpiApprovedHint")}
-        />
-        <Metric
-          tone="violet"
-          label={tr("home.kpiStruct")}
-          value={nStruct}
-          hint={tr("home.kpiStructHint", {
-            p: view.length ? ((nStruct / view.length) * 100).toFixed(1) : "0.0",
-          })}
-        />
-        <Metric
-          tone="sand"
-          label={tr("home.kpiDosim")}
-          value={st?.dosimetry?.total ?? 0}
-          hint={
-            st?.dosimetry
-              ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
-              : tr("home.none")
-          }
-        />
-      </section>
+        <GlassStage>
+          <section
+            data-glass="panel"
+            className="lg-surface grid grid-cols-2 gap-y-1 px-1.5 py-1.5 sm:grid-cols-4 sm:gap-0"
+          >
+            <Metric
+              tone="brand"
+              label={tr("home.kpiResult")}
+              value={view.length}
+              hint={tr("home.kpiResultHint", {
+                a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+                b: st ? fmt(st.drugs) : "…",
+              })}
+            />
+            <Metric
+              tone="accent"
+              label={tr("home.kpiApproved")}
+              value={stageCount["已上市"] ?? 0}
+              hint={tr("home.kpiApprovedHint")}
+            />
+            <Metric
+              tone="violet"
+              label={tr("home.kpiStruct")}
+              value={nStruct}
+              hint={tr("home.kpiStructHint", {
+                p: view.length ? ((nStruct / view.length) * 100).toFixed(1) : "0.0",
+              })}
+            />
+            <Metric
+              tone="sand"
+              label={tr("home.kpiDosim")}
+              value={st?.dosimetry?.total ?? 0}
+              hint={
+                st?.dosimetry
+                  ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
+                  : tr("home.none")
+              }
+            />
+          </section>
+        </GlassStage>
       </Reveal>
 
       {/* 研发阶段徽章 + 排序 */}
