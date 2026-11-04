@@ -6,6 +6,7 @@ import Reveal from "../components/Reveal";
 import { useCountUp } from "../lib/useCountUp";
 import { ErrorState } from "../components/States";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
+import { diseaseEn, enDiseases } from "../lib/diseaseEn";
 
 const PAGE = 30;
 
@@ -247,7 +248,9 @@ export default function Home() {
   }, [allTargets, targets, qTgt]);
   const disList = useMemo(() => {
     const q = qDis.trim().toLowerCase();
-    const pool = q ? allDiseases.filter((t) => t.toLowerCase().includes(q)) : allDiseases;
+    const pool = q
+      ? allDiseases.filter((t) => t.toLowerCase().includes(q) || diseaseEn(t).toLowerCase().includes(q))
+      : allDiseases;
     const uniq = [...new Set([...diseases, ...pool])];
     return { items: uniq, total: uniq.length };
   }, [allDiseases, diseases, qDis]);
@@ -520,42 +523,32 @@ export default function Home() {
             )}
           </div>
 
-          {lang === "zh" ? (
-            <div>
-              <GroupLabel icon="heart" count={allDiseases.length}>{tr("home.diseases")}</GroupLabel>
-              <input
-                value={qDis}
-                onChange={(e) => setQDis(e.target.value)}
-                placeholder={tr("home.searchDiseases", { n: allDiseases.length })}
-                className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
-              />
-              <div className="filter-scroll flex max-h-[148px] flex-wrap gap-1.5 overflow-y-auto pr-1.5">
-                {disList.items.map((t) => (
-                  <Chip
-                    key={t}
-                    sm
-                    on={diseases.includes(t)}
-                    onClick={() => {
-                      setDiseases((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
-                      setPage(0);
-                    }}
-                  >
-                    {t}
-                  </Chip>
-                ))}
-              </div>
-              {disList.total > disList.items.length && (
-                <div className="mt-1.5 text-[11px] text-ink-3">
-                  {tr("home.moreHint", { n: disList.total - disList.items.length })}
-                </div>
-              )}
+          {/* v26：英文站也有「适应症」了 —— 病名用 `lib/diseaseEn.ts` 的中英对照表显示/搜索，
+              筛选仍按中文 key 生效（数据里只有 diseases_zh） */}
+          <div>
+            <GroupLabel icon="heart" count={allDiseases.length}>{tr("home.diseases")}</GroupLabel>
+            <input
+              value={qDis}
+              onChange={(e) => setQDis(e.target.value)}
+              placeholder={tr("home.searchDiseases", { n: allDiseases.length })}
+              className="mb-1.5 h-7 w-full rounded-md border border-line bg-white px-2 text-[12px] outline-none focus:border-[#9dc0ea]"
+            />
+            <div className="filter-scroll flex max-h-[148px] flex-wrap gap-1.5 overflow-y-auto pr-1.5">
+              {disList.items.map((t) => (
+                <Chip
+                  key={t}
+                  sm
+                  on={diseases.includes(t)}
+                  onClick={() => {
+                    setDiseases((p) => (p.includes(t) ? p.filter((x) => x !== t) : [...p, t]));
+                    setPage(0);
+                  }}
+                >
+                  {lang === "en" ? diseaseEn(t) : t}
+                </Chip>
+              ))}
             </div>
-          ) : (
-            <div>
-              <GroupLabel icon="heart" count={0}>{tr("home.diseases")}</GroupLabel>
-              <p className="text-[12px] leading-relaxed text-ink-3">{tr("home.diseasesEnOnly")}</p>
-            </div>
-          )}
+          </div>
         </div>
         )}
       </section>
@@ -726,9 +719,9 @@ export default function Home() {
                   </td>
                   <td
                     className="hidden max-w-[190px] truncate px-3 py-2.5 text-ink-2 lg:table-cell"
-                    title={enSafe(lang, d.diseases_zh)}
+                    title={lang === "en" ? enDiseases(d.diseases_zh) : enSafe(lang, d.diseases_zh)}
                   >
-                    {enSafe(lang, d.diseases_zh) || "—"}
+                    {(lang === "en" ? enDiseases(d.diseases_zh) : enSafe(lang, d.diseases_zh)) || "—"}
                   </td>
                   <td className="hidden px-3 py-2.5 sm:table-cell">
                     <span
