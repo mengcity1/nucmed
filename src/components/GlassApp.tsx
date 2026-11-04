@@ -237,7 +237,8 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     const paint = () => {
       raf = 0;
       // 每个面板写**自身坐标**（background-position 以元素自身为基准）
-      el.querySelectorAll<HTMLElement>(".lg-surface").forEach((s) => {
+      // v31：玻璃面板 + **按钮/chip/tab** 都吃这个光斑（按钮的镜面高光跟着指针走）
+      el.querySelectorAll<HTMLElement>(".lg-surface, button, [role=\"tab\"], .chip, .chip-sm").forEach((s) => {
         const r = s.getBoundingClientRect();
         s.style.setProperty("--mx", `${(px - r.left).toFixed(0)}px`);
         s.style.setProperty("--my", `${(py - r.top).toFixed(0)}px`);
