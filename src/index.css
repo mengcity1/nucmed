@@ -888,16 +888,16 @@
     }
   }
   .app-stage.dark .text-ink {
-    color: #e3ebf6;
+    color: #e3ebf6 !important;
   }
   .app-stage.dark .text-ink-2 {
-    color: #c2cfe0;
+    color: #ccd8e6 !important;
   }
   .app-stage.dark .text-ink-3 {
-    color: #93a3ba;
+    color: #c6d2e2 !important;
   }
   .app-stage.dark .text-brand {
-    color: #9cc7ff;
+    color: #9cc7ff !important;
   }
   /* 浅色模式（米白）：底色 + 文字回到暖调深墨 */
   .app-stage.light.lg-stage {
@@ -916,7 +916,7 @@
     border-color: rgba(255, 255, 255, 0.12);
   }
   .app-stage.dark .text-brand-deep {
-    color: #a9d0ff;
+    color: #a9d0ff !important;
   }
   /* KPI 的四个彩色数字（Tailwind 任意值类）—— 用属性选择器统一提亮 */
   .app-stage.dark [class*="#12457f"] {
@@ -1022,5 +1022,30 @@
   /* 页脚/说明文字（在背景上的）已由 .text-ink-3 覆盖；再压一下 hr 与分隔线 */
   .app-stage.dark .bg-gradient-to-r {
     opacity: 0.5;
+  }
+  /* ── 组件层 @apply 写死的文字色（深色必须整体提亮）──────────────────────
+     ⚠ 之前只覆盖了 Tailwind 的 `text-ink*` 工具类，**漏了这些组件类**（它们自己也写死了 color）；
+     又因为 utilities 层优先于 components 层 ⇒ 深底上仍是深墨字 = "字不明显"。
+     这里按"次/主/强调"三档统一提亮，且排在 `.num` 之后把 KPI 四色压回来。 */
+  .app-stage.dark :is(.label-caps, .sec-no, .figcap, .num, .sec-sub) {
+    color: #c6d2e2 !important;
+  }
+  .app-stage.dark :is(.label, .kpi-val, .badge-c, .tab, .chip, .chip-off, .sec-title, .sec-h) {
+    color: #d9e3ef !important;
+  }
+  .app-stage.dark :is(.eyebrow, .chip-on) {
+    color: #a9d0ff !important;
+  }
+  .app-stage.dark [class*="#12457f"] {
+    color: #a8c8ff !important;
+  }
+  .app-stage.dark [class*="#0a6f66"] {
+    color: #8fe7db !important;
+  }
+  .app-stage.dark [class*="#4b3ea3"] {
+    color: #c3baff !important;
+  }
+  .app-stage.dark [class*="#8a5a12"] {
+    color: #f3c98a !important;
   }
 }
