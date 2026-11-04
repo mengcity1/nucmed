@@ -1192,22 +1192,51 @@
     color: #08695e !important;
   }
 
-  /* 深色下 chip 的玻璃要反过来（白度压到 16%） */
+  /* 深色下 chip 的玻璃要"看得出"：白度 30%→12%→18%（三段模拟厚度），亮边 .45，底部内阴影加深 */
   .app-stage.dark :is(.chip, .chip-sm) {
-    border-color: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
     background-image: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.16) 0%,
-      rgba(255, 255, 255, 0.06) 100%
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.12) 55%,
+      rgba(255, 255, 255, 0.18) 100%
     ) !important;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.24),
-      0 2px 6px -2px rgba(0, 0, 0, 0.5);
-    color: #dbe6f4;
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -8px 12px -10px rgba(0, 0, 0, 0.55),
+      0 2px 6px -2px rgba(0, 0, 0, 0.55);
+    color: #eef4fc !important;
+  }
+  .app-stage.dark :is(.chip, .chip-sm):hover {
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.2) 100%
+    ) !important;
+    border-color: rgba(255, 255, 255, 0.42) !important;
   }
   .app-stage.dark .chip-on {
-    border-color: rgba(140, 185, 255, 0.5) !important;
-    background-image: linear-gradient(180deg, rgba(120, 170, 255, 0.34) 0%, rgba(90, 140, 230, 0.18) 100%) !important;
-    color: #eaf3ff;
+    border-color: rgba(150, 195, 255, 0.6) !important;
+    background-image: linear-gradient(180deg, rgba(120, 170, 255, 0.5) 0%, rgba(80, 130, 220, 0.3) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 2px 8px -3px rgba(30, 91, 168, 0.6);
+    color: #f4f9ff !important;
+  }
+
+  /* ── 深色下"半透明白"类工具（bg-white/xx）也要转深 ──────────────────
+     之前只匹配了精确的 `bg-white`，`bg-white/50` 这类（语言切换容器）留着浅白块，
+     而按钮文字被全局玻璃规则刷成浅色 ⇒ 浅字压浅块 = 看不清（owner 反馈）。 */
+  .app-stage.dark [class*="bg-white/"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  /* 按下/选中的按钮（语言切换的当前语言等）给明确的选中态 */
+  .app-stage.dark button[aria-pressed="true"] {
+    border-color: rgba(150, 195, 255, 0.55) !important;
+    background-image: linear-gradient(180deg, rgba(140, 185, 255, 0.4) 0%, rgba(90, 140, 230, 0.22) 100%) !important;
+    color: #ffffff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 1px 3px rgba(0, 0, 0, 0.4);
   }
 }
