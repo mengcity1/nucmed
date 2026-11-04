@@ -60,9 +60,8 @@ function Nav() {
                   key={tab.to}
                   to={tab.to}
                   end={tab.end}
-                  data-glass="small"
                   className={({ isActive }) =>
-                    `tab lg-surface shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
+                    `tab shrink-0 max-sm:px-2.5 max-sm:text-[12.5px] ${isActive ? "tab-on" : ""}`
                   }
                 >
                   <span className="hidden sm:inline-flex">

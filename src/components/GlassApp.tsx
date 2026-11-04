@@ -18,10 +18,20 @@ import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
 
-/** 背景壁纸：近白底 + 大半径柔和色斑，**整层再被 blur 糊掉**（"淡一点、虚化一点"） */
+/** 背景壁纸：**整片柔和的浅色**（不是四角上色、中间发白），再整层糊掉。
+ *  ① 先铺一条覆盖全幅的浅色斜向渐变（暖 → 冷 → 薄荷 → 藕），保证任何位置都有色；
+ *  ② 再叠 5 团大半径柔光打散均匀；
+ *  ③ 最后 `blur(≈4.5vw)` 抹平边界 + 7% 白纱压淡。
+ *  ⇒ 观感 = 一整张浅色雾面，组件浮在上面；文字区仍近白，不影响对比度。 */
 function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: { width: number; height: number }) {
-  ctx.fillStyle = "#fbfcfe";
+  const base = ctx.createLinearGradient(0, 0, w, h);
+  base.addColorStop(0, "#fdf6f2");
+  base.addColorStop(0.42, "#f4f7ff");
+  base.addColorStop(0.72, "#f3fbf8");
+  base.addColorStop(1, "#fdf7fb");
+  ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
+
   const blob = (x: number, y: number, r: number, c: string) => {
     const rg = ctx.createRadialGradient(x * w, y * h, 0, x * w, y * h, r * Math.max(w, h));
     rg.addColorStop(0, c);
@@ -30,15 +40,14 @@ function paintWallpaper(ctx: CanvasRenderingContext2D, { width: w, height: h }: 
     ctx.fillRect(0, 0, w, h);
   };
   ctx.save();
-  // 虚化：整组色斑一次性糊掉（够大才有"雾"的感觉，不是色块）
-  ctx.filter = `blur(${Math.max(40, Math.round(w * 0.05))}px)`;
-  blob(0.12, 0.04, 0.55, "rgba(255,206,176,.78)"); // 暖橙
-  blob(0.88, 0.08, 0.5, "rgba(176,196,255,.78)"); // 淡紫蓝
-  blob(0.56, 0.82, 0.6, "rgba(160,232,220,.66)"); // 薄荷
-  blob(0.02, 0.88, 0.45, "rgba(238,196,232,.58)"); // 藕粉
+  ctx.filter = `blur(${Math.max(36, Math.round(w * 0.045))}px)`;
+  blob(0.05, 0.08, 0.5, "rgba(255,204,176,.42)"); // 暖橙
+  blob(0.5, -0.05, 0.55, "rgba(186,203,255,.4)"); // 冷蓝
+  blob(0.97, 0.18, 0.5, "rgba(170,236,222,.38)"); // 薄荷
+  blob(0.22, 0.95, 0.5, "rgba(240,196,228,.34)"); // 藕粉
+  blob(0.78, 0.88, 0.5, "rgba(190,214,255,.36)"); // 天蓝
   ctx.restore();
-  // 再压一层白纱：整体更淡（不做"彩带"，只做"雾"）
-  ctx.fillStyle = "rgba(252,253,255,.08)";
+  ctx.fillStyle = "rgba(253,254,255,.07)";
   ctx.fillRect(0, 0, w, h);
 }
 

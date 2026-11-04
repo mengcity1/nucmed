@@ -274,10 +274,20 @@
   }
   .tab {
     @apply relative flex items-center gap-1.5 rounded-[11px] px-4 py-2 text-[14px] font-medium text-ink-2
-      transition-all duration-150 hover:bg-[#eff3f9] hover:text-ink;
+      transition-all duration-150;
+  }
+  /* v20.1：导航项**不再各开一层玻璃**（两层玻璃边缘相接 = 缝隙与背景不搭）；
+     改为"同一张玻璃板上的高光层"，只用半透明白 + 内高光，不参与折射。 */
+  .tab:hover {
+    background: rgba(255, 255, 255, 0.32);
+    color: #0f172a;
   }
   .tab-on {
-    @apply bg-white text-brand-deep shadow-[0_1px_2px_rgba(15,23,42,.06)];
+    background: rgba(255, 255, 255, 0.46);
+    color: #164a8a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 1px 2px rgba(15, 23, 42, 0.05);
   }
 
   /* 小屏横向滚动容器：惯性滚动 + 横向滑动不带动整页（2026-11-01 小屏适配） */
@@ -503,16 +513,12 @@
   .app-stage .chip-on {
     border-color: rgba(30, 91, 168, 0.25);
   }
-  /* chip / tab 也要液态玻璃：底改半透明（玻璃画在 canvas 上，透过底色显出来）；
-     选中态再洗回一层淡色，保住"这是选中的"可读性。选择器 (0,3,0) 压过 vendor 的 (0,2,0)。 */
-  .app-stage .chip-off.lg-surface {
-    background: rgba(255, 255, 255, 0.42);
+  /* v20.1：chip 同样是"玻璃板上的高光层"，不各开一层折射 */
+  .app-stage .chip-off {
+    background: rgba(255, 255, 255, 0.4);
   }
-  .app-stage .chip-on.lg-surface {
-    background: rgba(30, 91, 168, 0.14);
-  }
-  .app-stage .tab-on.lg-surface {
-    background: rgba(30, 91, 168, 0.1);
+  .app-stage .chip-on {
+    background: rgba(30, 91, 168, 0.13);
   }
   .glass-bar .lg-surface {
     border-radius: 0;
@@ -556,10 +562,7 @@
     font: inherit;
     /* 无 WebGL / 移动端时的静态底：与 `paintWallpaper()` 同一套色，糊成雾 */
     background:
-      radial-gradient(120% 90% at 12% 0%, #ffded0 0%, rgba(255, 255, 255, 0) 55%),
-      radial-gradient(110% 85% at 92% 6%, #dbe4ff 0%, rgba(255, 255, 255, 0) 52%),
-      radial-gradient(120% 90% at 55% 100%, #cff2ea 0%, rgba(255, 255, 255, 0) 58%),
-      #fbfcfe;
+      linear-gradient(135deg, #fdf6f2 0%, #f4f7ff 42%, #f3fbf8 72%, #fdf7fb 100%);
   }
   .app-scroll {
     height: 100%;
@@ -580,10 +583,7 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.7),
       0 1px 2px rgba(15, 23, 42, 0.04);
   }
-  /* 玻璃上的小件（chip / tab）：更薄一点，别抢读数 */
-  .app-stage .lg-surface[data-glass="small"] {
-    border-radius: 999px;
-  }
+  /* 玻璃上的小件（chip / tab）：同层高光，不参与折射 ⇒ 已由 .tab / .chip 承担 */
   @media print {
     .app-stage {
       position: static;
