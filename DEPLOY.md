@@ -187,3 +187,16 @@ git push
 > 于是换用了新的 `~/.ssh/id_ed25519_nucmed_gh`（指纹 `SHA256:Y2GEIXuWjeR8Hu5/Vfw9dYvlU8LRMHis4MvTmiyantE`，无口令，已加入账号）。
 > `~/.ssh/config` 里两把 key 都列着，新钥优先。
 
+### 7.8 SSH 会**偶发**失败 —— 直接重试，不要立刻断定 key 失效
+
+2026-11-04 实测：同一把 key、同一分钟内，
+```
+git push → Permission denied (publickey)
+git push → b90fe17..7ac3960  main -> main      ← 立刻重试就成功
+```
+原因是 git 侧并发连接 + 出口到 `ssh.github.com:443` 的线路抖动（同一台机器上 `git ls-remote` 也可能在下一秒失败）。
+
+**处置**：把 `git push` **再执行一次**；判据只看有没有 `xxxx..yyyy  main -> main`。
+推送成功后用 `node scripts/deploy_status.mjs` 核对 run（这一步走 `api.github.com`，与 SSH 无关，更可靠）。
+
+
