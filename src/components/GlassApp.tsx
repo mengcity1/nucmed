@@ -309,6 +309,22 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       if (!raf) raf = requestAnimationFrame(paint);
     };
     if (!calm) el.addEventListener("pointermove", onMove, { passive: true });
+
+    // v36 滚动期降级（owner：「拖到底原来的玻璃框会留在原地」）：
+    // 滚动中给舞台打 `is-scrolling`，CSS 侧关掉小件（按钮/chip/Link）的 backdrop-filter ——
+    // 它们每帧都要重新采样，是滚动时主要的合成开销；停手 140ms 后撤掉恢复。
+    // ⚠ 吸顶导航的毛玻璃**不在降级范围**（否则正文会从导航框里透出来）。
+    const scroller = el.querySelector<HTMLElement>(".app-scroll");
+    let scrollTimer = 0;
+    const onScroll = () => {
+      el.classList.add("is-scrolling");
+      if (scrollTimer) window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        scrollTimer = 0;
+        el.classList.remove("is-scrolling");
+      }, 140);
+    };
+    scroller?.addEventListener("scroll", onScroll, { passive: true });
     // ?contrast=1：对比度自检（结果写进 DOM，便于无头浏览器读取）
     if (qs.get("contrast") === "1") {
       runContrastAudit();
@@ -317,6 +333,9 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     return () => {
       if (raf) cancelAnimationFrame(raf);
       el.removeEventListener("pointermove", onMove);
+      if (scrollTimer) window.clearTimeout(scrollTimer);
+      scroller?.removeEventListener("scroll", onScroll);
+      el.classList.remove("is-scrolling");
       sys.destroy();
     };
   }, [theme]);

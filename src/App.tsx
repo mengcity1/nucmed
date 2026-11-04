@@ -44,7 +44,12 @@ function Nav() {
     <header className="sticky top-0 z-50 px-3 pt-2">
       {/* v20.4（实测驱动）：canvas 玻璃的效果强度≈**圆角**。之前给导航条设 radius:0（满宽直角）
           ⇒ 零透镜效应，看着完全不像玻璃。改为**悬浮圆角玻璃条**（radius 22），两端与上下沿都能折光。 */}
-        <div data-glass="panel" className="lg-surface glass-bar">
+        {/* v36（2026-11-04 owner：拖到底时"原来的液态玻璃框会留在原地"）——
+            吸顶件**不再参与 canvas 折射**（摘掉 data-glass）：canvas 的玻璃是"把背景纹理
+            按当前矩形弯折后画在画布上"，而吸顶件背后是**滚动的内容**、它的矩形要每帧重读，
+            跟不上就会把上一帧的框留在原处。吸顶件改由 `backdrop-filter` 承担（`.glass-sticky`），
+            内容穿过时被真正模糊，且不依赖任何 JS 重绘。 */}
+        <div className="lg-surface glass-bar glass-sticky">
           <div className="wrap flex h-14 items-center gap-3 sm:gap-6">
             <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
               <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">

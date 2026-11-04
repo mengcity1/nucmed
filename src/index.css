@@ -604,6 +604,32 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.7),
       0 1px 2px rgba(15, 23, 42, 0.04);
   }
+  /* ── v36 吸顶件 = CSS 毛玻璃（2026-11-04 · owner：「拖到底原来的玻璃框会留在原地」）──
+     物理原因：canvas 玻璃的前提是"元素背后是**静止**的背景纹理"；吸顶件背后是**滚动的内容**，
+     它的矩形必须每帧从 DOM 重读（`readGeometry()` 里逐祖先 getComputedStyle = 强制同步布局），
+     跟不上就把上一帧的玻璃框留在画布原处（canvas 开着 preserveDrawingBuffer）。
+     ⇒ 吸顶件摘掉 `data-glass`，改由 backdrop-filter 模糊**真实内容**；滚动时不需要 JS 重绘。
+     其余面板（KPI / 卡片 / 表格）背后是静止背景，继续走 canvas 折射（那才是对的物理）。 */
+  .app-stage .lg-surface.glass-sticky {
+    -webkit-backdrop-filter: blur(20px) saturate(1.55);
+    backdrop-filter: blur(20px) saturate(1.55);
+  }
+  .app-stage.dark .lg-surface.glass-sticky {
+    background-color: rgba(24, 26, 38, 0.58);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .app-stage.light .lg-surface.glass-sticky {
+    background-color: rgba(255, 255, 255, 0.52);
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+  /* 滚动期降级：滚动中关掉小件的 backdrop-filter（每帧重新采样 = 掉帧），停手 140ms 恢复；
+     吸顶导航**始终保留**（否则正文会从框里透出来）。 */
+  .app-stage.is-scrolling :is(button, [role="tab"], a[class*="rounded"], .chip, .chip-sm) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+
   /* ── v20.3 玻璃归属（实测驱动）────────────────────────────────────
      canvas 玻璃只给**大面板**（导航条 / KPI / 卡片 / 表格）—— 实测它们会随材质变化（KPI 7.95% 像素差）；
      `data-glass="small"` 的小件实测**不渲染**（soft↔极端值 0% 差），所以按钮改 CSS 玻璃高光。
