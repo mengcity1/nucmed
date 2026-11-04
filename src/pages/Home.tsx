@@ -153,7 +153,7 @@ function Metric({
     <div
       ref={ref}
       onPointerMove={onMove}
-      className={`spotlight group relative overflow-hidden rounded-xl2 border border-white/70 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 shadow-soft backdrop-blur-xl transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
+      className={`spotlight glass-tile group relative overflow-hidden rounded-xl2 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
     >
       <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${bar[tone]}`} />
       <div className="label-caps">{label}</div>

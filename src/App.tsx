@@ -35,10 +35,8 @@ function Nav() {
   const tr = useT();
   const { lang, setLang } = useLang();
   return (
-    <header className="sticky top-0 z-50 border-b border-white/60 bg-white/65 shadow-soft backdrop-blur-2xl backdrop-saturate-150">
-      {/* 顶部渐变细带（2026-11-04 视觉升级）：给固定导航一个品牌锚点，不占高度 */}
-      <span aria-hidden className="block h-[3px] w-full bg-gradient-to-r from-[#f0b8a8] via-[#8fb6ea] to-[#8fd6c8]" />
-      <div className="wrap flex h-16 items-center gap-3 sm:gap-7">
+    <header className="sticky top-0 z-50 px-3 pt-2.5 sm:px-5">
+      <div className="glass-nav mx-auto flex h-14 max-w-[1240px] items-center gap-2.5 rounded-[22px] px-3 sm:gap-6 sm:px-5">
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-gradient-to-br from-brand to-[#2f7ad1] text-[17px] text-white shadow-[0_4px_12px_-4px_rgba(30,91,168,.55)]">
             ⚛
@@ -51,7 +49,7 @@ function Nav() {
           </span>
         </NavLink>
 
-        <nav className="ml-auto flex min-w-0 gap-1 overflow-x-auto rounded-[14px] border border-white/60 bg-white/45 p-1 shadow-ceil backdrop-blur-xl">
+        <nav className="ml-auto flex min-w-0 items-center gap-1 overflow-x-auto">
           {TABS.map((tab) => (
             <NavLink
               key={tab.to}
@@ -72,7 +70,7 @@ function Nav() {
           role="group"
           aria-label="Language"
           data-allow-cjk=""
-          className="ml-1 flex shrink-0 items-center rounded-[10px] border border-line bg-[#f5f8fc] p-0.5"
+          className="ml-1 flex shrink-0 items-center rounded-[10px] border border-white/60 bg-white/50 p-0.5"
         >
           {([
             { v: "zh" as Lang, label: "中文" },
@@ -169,8 +167,8 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
   return (
     /* 报头（masthead · 2026-11-04 v8）：衬线大标题 + 一行元信息（版本/sha/许可）+ 底部 2px 墨线
        —— 取代原来的"工具栏式"细带，视觉上从"SaaS 面板"转成"出版物"。 */
-    <div className="relative overflow-hidden rounded-b-[26px] border-b border-white/50 bg-[linear-gradient(120deg,rgba(255,247,240,.85)_0%,rgba(255,255,255,.62)_44%,rgba(241,236,251,.85)_100%)] shadow-float backdrop-blur-xl">
-      <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-4 pt-4">
+    <div className="relative">
+      <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-2 pt-6">
         <div className="min-w-0">
           <h1 className="text-[25px] font-bold leading-none tracking-tight text-ink sm:text-[28px]">{tr(page.title)}</h1>
           <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-ink-3">
