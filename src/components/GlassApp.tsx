@@ -30,7 +30,7 @@ const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none"];
  *  - grain ：细噪点（像纸张/毛玻璃底，无方向感）
  *  - waves ：极淡斜向宽光带（绸缎感，最"有质感"但最容易被看出"有条纹"）
  *  - none  ：只有渐变（最极简，但玻璃几乎看不出透明） */
-function paintWallpaper(
+export function paintWallpaper(
   ctx: CanvasRenderingContext2D,
   { width: w, height: h }: { width: number; height: number },
   variant: BgVariant = "mesh"

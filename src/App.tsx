@@ -8,6 +8,8 @@ import Overview from "./pages/Home";
 // ★ pk262 B6：单药画像按需加载 —— Chart 依赖 echarts（586 kB / gzip 195 kB），
 //   静态引入会让总览首屏也拉这个包。改为路由级 lazy 后 echarts 只在进入画像时才下载。
 const DrugDetail = lazy(() => import("./pages/DrugDetail"));
+/** 临时：背景结构对照页（选完删除） */
+const GlassBgLab = lazy(() => import("./pages/GlassBgLab"));
 import About from "./pages/About";
 import Atlas from "./pages/Atlas";
 /** 临时：液态玻璃选型对照页（选完删除） */
@@ -288,6 +290,7 @@ export default function App() {
             {/* 兼容旧链接 /drugs/:id */}
             <Route path="/drugs/:id" element={<DrugDetail />} />
             <Route path="/about" element={<About />} />
+            <Route path="/lab/bg" element={<GlassBgLab />} />
             {LEGACY.map((p) => (
               <Route key={p} path={p} element={<Navigate to="/" replace />} />
             ))}

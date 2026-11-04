@@ -708,4 +708,15 @@
     @apply absolute left-0 top-1/2 h-[15px] w-[3px] -translate-y-1/2 rounded-full;
     background: linear-gradient(180deg, #8fb6ea 0%, #7ed4c6 100%);
   }
+
+  /* 仅 /lab/bg 对照页使用：把"全屏固定舞台"改成一条横向长条
+     （放在文件最后 ⇒ 同特异性下覆盖前面的 `.app-stage.lg-stage`） */
+  .app-stage.lab-stage {
+    position: relative;
+    inset: auto;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #fdfeff 0%, #f4f6fa 55%, #e9edf4 100%);
+  }
 }
