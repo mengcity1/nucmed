@@ -76,9 +76,9 @@ export function paintWallpaper(
   if (variant === "platinum") {
     // 亮铂金 · 金属版（2026-11-04 v35）：① 更硬的明暗过渡 ② 115° 多段金属亮带 ③ 细拉丝纹理（各向异性）
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#f2f0e9");
-    g.addColorStop(0.5, "#dfdad0");
-    g.addColorStop(1, "#f5f3ec");
+    g.addColorStop(0, "#f7f5ef");
+    g.addColorStop(0.5, "#eae5db");
+    g.addColorStop(1, "#f9f7f2");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
@@ -86,9 +86,9 @@ export function paintWallpaper(
     const sheen = ctx.createLinearGradient(0, 0, w * 0.95, h);
     sheen.addColorStop(0.0, "rgba(255,255,255,.62)");
     sheen.addColorStop(0.3, "rgba(255,255,255,.18)");
-    sheen.addColorStop(0.46, "rgba(150,146,136,.10)");
+    sheen.addColorStop(0.46, "rgba(150,146,136,.07)");
     sheen.addColorStop(0.66, "rgba(255,255,255,.10)");
-    sheen.addColorStop(1.0, "rgba(120,118,110,.14)");
+    sheen.addColorStop(1.0, "rgba(120,118,110,.10)");
     ctx.fillStyle = sheen;
     ctx.fillRect(0, 0, w, h);
 
