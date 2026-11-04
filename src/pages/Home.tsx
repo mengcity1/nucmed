@@ -186,12 +186,22 @@ export default function Home() {
   const [hideBad, setHideBad] = useState(() => sp.get("hide") === "1");
   /** ★ 研发阶段筛选（2026-11-04 owner 要求）：把原来只读的阶段徽标改成可点选（多选，与其它维度叠加）。 */
   const [stages, setStages] = useState<string[]>(() => arr("stage"));
-  /** 筛选卡默认折叠（2026-11-04 owner：太臃肿）；URL 里带筛选时默认展开，避免「筛选生效但面板看不见」。 */
-  const [fOpen, setFOpen] = useState(
-    () =>
-      arr("type").length + arr("nuc").length + arr("tgt").length + arr("dis").length + arr("stage").length >
-      0
-  );
+  /** 筛选面板开合（2026-11-04 v23）：**状态放进 URL（`?f=1|0`）**
+   *  ⇒ 从详情页返回、或前进后退，都能保留"筛选项 + 展开状态"。
+   *  没显式写过 `f` 时：有任一筛选条件就默认展开（避免"筛选生效但面板看不见"）。 */
+  const hasSel =
+    arr("type").length + arr("nuc").length + arr("tgt").length + arr("dis").length + arr("stage").length > 0;
+  const fParam = sp.get("f");
+  const fOpen = fParam === null ? hasSel : fParam === "1";
+  const setFOpen = (v: boolean) =>
+    setSp(
+      (prev) => {
+        const n = new URLSearchParams(prev);
+        n.set("f", v ? "1" : "0");
+        return n;
+      },
+      { replace: true }
+    );
   // ★ 筛选区：核素默认 Top12 + 可展开栏；三个维度各有搜索框
   const [nucAll, setNucAll] = useState(false);
   const [qNuc, setQNuc] = useState("");
@@ -341,6 +351,31 @@ export default function Home() {
     setPage(0);
   };
 
+  /** v23：把**筛选项同步进 URL**（`replace`，不产生历史）——
+   *  之前只"从 URL 读初值"、改动不写回 ⇒ 进详情再返回时选项全没了（owner 反馈）。
+   *  现在「选项 + 展开状态（f）」都在 URL 里，返回/前进后退都能原样恢复。 */
+  useEffect(() => {
+    setSp(
+      (prev) => {
+        const n = new URLSearchParams(prev);
+        const put = (k: string, v: string[]) => {
+          if (v.length) n.set(k, v.join(","));
+          else n.delete(k);
+        };
+        put("type", types);
+        put("nuc", nucs);
+        put("tgt", targets);
+        put("dis", diseases);
+        put("stage", stages);
+        if (kw) n.set("q", kw);
+        else n.delete("q");
+        return n.toString() === prev.toString() ? prev : n;
+      },
+      { replace: true }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [types, nucs, targets, diseases, stages, kw]);
+
   return (
     <div className="pb-4">
       {error && (
@@ -365,29 +400,48 @@ export default function Home() {
 
       {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选
           v18：外层再套一层真折射玻璃（1 舞台 / 1 面片）；chip 的描边由 index.css 还原 */}
-      <section data-glass="panel" className="card-tint lg-surface px-5 py-4">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <section data-glass="panel" className="card-tint lg-surface px-5 py-3">
+        {/* v23（owner）：**整条可点**展开/收起；只保留「重置」一个按钮；不再有"展开筛选"小按钮 */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-expanded={fOpen}
+          aria-controls="home-filter-panel"
+          title={tr("home.filterBarHint")}
+          onClick={() => setFOpen(!fOpen)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setFOpen(!fOpen);
+            }
+          }}
+          className="flex cursor-pointer select-none flex-wrap items-center gap-x-3 gap-y-2 rounded-[10px] py-1.5 outline-none transition hover:bg-white/45 focus-visible:ring-2 focus-visible:ring-white/70"
+        >
           <b className="text-[14px] tracking-tight">{tr("home.filters")}</b>
           <span className="rounded-full bg-white px-2 py-0.5 text-[11.5px] font-medium text-ink-3 ring-1 ring-[#e3e9f4]">
             {view.length !== (drugs?.length ?? 0) ? tr("home.filtered") : tr("home.allLib")}
           </span>
           {nSel > 0 && <span className="text-[11.5px] text-ink-3">{tr("home.selectedN", { n: nSel })}</span>}
-          <button onClick={reset} className="ml-auto text-[12.5px] text-ink-3 transition hover:text-brand">
-            {tr("home.reset")}
-          </button>
           <button
             type="button"
-            onClick={() => setFOpen((v) => !v)}
-            aria-expanded={fOpen}
-            className="inline-flex items-center gap-1 rounded-lg border border-[#e3e9f4] bg-white px-2.5 py-1 text-[12.5px] font-medium text-ink-2 transition hover:border-[#b9d0e9] hover:text-ink"
+            onClick={(e) => {
+              e.stopPropagation();
+              reset();
+            }}
+            className="ml-auto text-[12.5px] text-ink-3 transition hover:text-brand"
           >
-            {fOpen ? tr("home.collapseFilters") : tr("home.expandFilters")}
-            <span className="text-[10px] text-ink-3">{fOpen ? "▲" : "▼"}</span>
+            {tr("home.reset")}
           </button>
+          <span
+            aria-hidden
+            className={`text-[10px] text-ink-3 transition-transform duration-200 ${fOpen ? "rotate-180" : ""}`}
+          >
+            ▼
+          </span>
         </div>
 
         {fOpen && (
-        <div className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-2 xl:grid-cols-4">
+        <div id="home-filter-panel" className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <GroupLabel icon="layers" count={allTypes.length}>
               {tr("home.drugType")}

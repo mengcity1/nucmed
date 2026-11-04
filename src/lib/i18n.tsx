@@ -51,6 +51,10 @@ export const STR = {
   "home.lu177": { zh: "Lu-177 标记药物", en: "Lu-177 labelled" },
   "home.ga68": { zh: "Ga-68 标记药物", en: "Ga-68 labelled" },
   "home.filters": { zh: "筛选条件", en: "Filters" },
+  "home.filterBarHint": {
+    zh: "点这一条展开 / 收起筛选条件",
+    en: "Click this bar to expand / collapse filters",
+  },
   "home.filtered": { zh: "已筛选", en: "filtered" },
   "home.allLib": { zh: "全库", en: "all" },
   "home.tableNo": { zh: "表 1", en: "Table 1" },
