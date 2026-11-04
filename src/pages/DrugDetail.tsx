@@ -729,7 +729,7 @@ export default function DrugDetail() {
       {/* 五段组成分解（数据来自 v_drug_overview；图只作辅助，点击可放大） */}
       <section className="card mt-5 p-6">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[16px] font-semibold">{tr("drug.parts")}</h2>
+          <h2 className="text-[16px] font-semibold"><span className="sec-no">01</span>{tr("drug.parts")}</h2>
           <span className="text-[12px] text-ink-3">{tr("drug.partsHint")}</span>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -906,7 +906,7 @@ export default function DrugDetail() {
       {tab === "bio" && (
       <section className="mt-5">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[16px] font-semibold">{tr("drug.bioTitle")}</h2>
+          <h2 className="text-[16px] font-semibold"><span className="sec-no">02</span>{tr("drug.bioTitle")}</h2>
           <span className="text-[12.5px] text-ink-3">
             {tr("drug.bioCount", { n: fmt(mine.length) })}
             {noRawCount > 0 ? (
@@ -1048,7 +1048,7 @@ export default function DrugDetail() {
       {tab === "dos" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">{tr("drug.tabDos")}</h2>
+            <h2 className="text-[16px] font-semibold"><span className="sec-no">03</span>{tr("drug.tabDos")}</h2>
             <span className="text-[12.5px] text-ink-3">
               {(drug.n_dosim ?? 0) > 0 ? tr("drug.dosNote") : tr("drug.dosEmpty")}
             </span>
@@ -1062,7 +1062,7 @@ export default function DrugDetail() {
       {tab === "tbr" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">{tr("drug.tabTbr")}</h2>
+            <h2 className="text-[16px] font-semibold"><span className="sec-no">04</span>{tr("drug.tabTbr")}</h2>
             <span className="text-[12.5px] text-ink-3">
               {(drug.has_tbr ?? 0) === 1 ? tr("drug.tbrNote") : tr("drug.tbrNone")}
             </span>
@@ -1076,7 +1076,7 @@ export default function DrugDetail() {
       {tab === "refs" && (
       <section className="mt-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[16px] font-semibold">{tr("drug.refsTitle")}</h2>
+          <h2 className="text-[16px] font-semibold"><span className="sec-no">05</span>{tr("drug.refsTitle")}</h2>
           <span className="text-[12.5px] text-ink-3">
             {drugRefs === null
               ? tr("common.loading") + "…"
@@ -1178,7 +1178,7 @@ export default function DrugDetail() {
       {tab === "img" && (
         <section className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[16px] font-semibold">{tr("drug.tabImg")}</h2>
+            <h2 className="text-[16px] font-semibold"><span className="sec-no">06</span>{tr("drug.tabImg")}</h2>
             <span className="text-[12.5px] text-ink-3">
               {figs === null
                 ? tr("common.loading") + "…"

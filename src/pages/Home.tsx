@@ -106,41 +106,27 @@ function GroupLabel({ icon, children, count }: {
 
 type MetricTone = "brand" | "accent" | "violet" | "sand";
 
-/** 指标卡（2026-11-04 视觉升级）：顶部彩带 + 图标块 + 大数字。
- *  ★ 彩带只表达「这条指标属于哪条线」，**不做语义分级** —— 避免与证据徽标 A/B/C 的绿/灰/黄混淆。 */
+/** 指标（2026-11-04 v8 数据报头）：去掉彩色卡与图标块，改成**细线分隔的数值格** ——
+ *  四格共用上下两条细线，像期刊的 data panel，而不是 SaaS 仪表盘。
+ *  ★ 计数动画保留（`useCountUp`）；颜色只保留一条 2px 顶部色带做数据线标识。 */
 function Metric({
   label,
   value,
   hint,
   tone = "brand",
-  icon = "grid",
 }: {
   label: string;
   /** ★ 2026-11-04 改为数值：卡片内部自己做 600ms 计数动画（`useCountUp`） */
   value: number;
   hint?: string;
   tone?: MetricTone;
-  icon?: IconName;
 }) {
   const shown = useCountUp(value);
   const bar: Record<MetricTone, string> = {
-    brand: "bg-gradient-to-r from-[#1e5ba8] to-[#4a8ee0]",
-    accent: "bg-gradient-to-r from-[#0d9488] to-[#4ecdc4]",
-    violet: "bg-gradient-to-r from-[#6d5bd0] to-[#a99cf0]",
-    sand: "bg-gradient-to-r from-[#b4761f] to-[#e0b062]",
-  };
-  const ico: Record<MetricTone, string> = {
-    brand: "bg-brand-soft text-brand-deep",
-    accent: "bg-accent-soft text-accent-deep",
-    violet: "bg-violet-soft text-violet",
-    sand: "bg-sand-soft text-sand",
-  };
-  /* 卡片底色：白→浅色渐变（解决「一片白，太清淡」）；数字用同色系深色，不刺眼但有分量 */
-  const fill: Record<MetricTone, string> = {
-    brand: "from-white to-[#e9f2fe] border-[#d3e3f8]",
-    accent: "from-white to-[#e6faf6] border-[#cdeee6]",
-    violet: "from-white to-[#f1eefc] border-[#ded6f7]",
-    sand: "from-white to-[#fdf5e7] border-[#f0e0c4]",
+    brand: "bg-brand",
+    accent: "bg-accent",
+    violet: "bg-violet",
+    sand: "bg-sand",
   };
   const val: Record<MetricTone, string> = {
     brand: "text-[#12457f]",
@@ -149,22 +135,14 @@ function Metric({
     sand: "text-[#8a5a12]",
   };
   return (
-    <div className={`stat-card bg-gradient-to-br ${fill[tone]}`}>
-      <span className={`stat-accent ${bar[tone]}`} />
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-[12px] font-medium text-ink-2">{label}</div>
-          <div className={`num mt-1.5 text-[27px] font-bold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
-          {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
-        </div>
-        <span className={`stat-ico ${ico[tone]}`}>
-          <Icon name={icon} />
-        </span>
-      </div>
+    <div className="relative px-4 pb-4 pt-4 sm:px-5">
+      <span aria-hidden className={`absolute left-0 top-4 h-[18px] w-[2px] rounded-full ${bar[tone]}`} />
+      <div className="label-caps">{label}</div>
+      <div className={`num mt-2 text-[30px] font-bold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
+      {hint && <div className="mt-2 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
     </div>
   );
 }
-
 export default function Home() {
   const { data: drugs, error, reload } = useJSON<Drug[]>("drugs.json");
   const { data: st } = useJSON<Stats>("stats.json");
@@ -551,10 +529,9 @@ export default function Home() {
 
       {/* 结果带：4 个指标（2026-11-04 改为彩带指标卡 · 进入视口时渐显） */}
       <Reveal className="mt-6">
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-2 divide-y divide-line border-y border-line sm:grid-cols-4 sm:divide-x sm:divide-y-0">
         <Metric
           tone="brand"
-          icon="grid"
           label={tr("home.kpiResult")}
           value={view.length}
           hint={tr("home.kpiResultHint", {
@@ -564,14 +541,12 @@ export default function Home() {
         />
         <Metric
           tone="accent"
-          icon="shield"
           label={tr("home.kpiApproved")}
           value={stageCount["已上市"] ?? 0}
           hint={tr("home.kpiApprovedHint")}
         />
         <Metric
           tone="violet"
-          icon="layers"
           label={tr("home.kpiStruct")}
           value={nStruct}
           hint={tr("home.kpiStructHint", {
@@ -580,7 +555,6 @@ export default function Home() {
         />
         <Metric
           tone="sand"
-          icon="heart"
           label={tr("home.kpiDosim")}
           value={st?.dosimetry?.total ?? 0}
           hint={

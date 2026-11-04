@@ -113,22 +113,34 @@ function Footer() {
   return (
     <>
     <div aria-hidden className="mt-12 h-px w-full bg-gradient-to-r from-transparent via-[#d9e5f6] to-transparent" />
-    <footer className="wrap pb-14 pt-6 text-[12px] text-ink-3">
-      <div className="flex flex-wrap justify-between gap-4 pt-1">
-        <div>
-          {meta ? (
-            <>
-              {tr("footer.version")} <b className="font-semibold text-ink-2">{meta.version}</b> · sha{" "}
-              <b className="font-mono font-semibold text-ink-2">{meta.db_sha16}</b> ·{" "}
-              {meta.db_bytes.toLocaleString("en-US")} B ·{" "}
-              <b className="text-ink-2">{tr("footer.license")}</b>
-            </>
-          ) : (
-            "…"
-          )}
+    <footer className="wrap pb-12 pt-6 text-[12px] text-ink-3">
+      {/* 页脚三列（2026-11-04 v8）：引用格式 / 版本 / 许可 —— 出版物版权页的写法 */}
+      <div className="grid gap-6 border-t border-line pt-5 sm:grid-cols-[1.6fr_1fr_1fr]">
+        <div className="min-w-0">
+          <div className="label-caps">{tr("footer.cite")}</div>
+          <code className="mt-2 block break-words font-mono text-[11px] leading-relaxed text-ink-2">
+            NucMed DB contributors (2026). NucMed DB: a traceable radiopharmaceutical biodistribution
+            resource with a reproducible benchmark. Data version {meta?.version ?? "…"}, db sha256{" "}
+            {meta?.db_sha16 ?? "…"}.
+          </code>
         </div>
         <div>
-          {tr("brand.name")} · {tr("footer.org")}
+          <div className="label-caps">{tr("footer.version")}</div>
+          <div className="mt-2 font-mono text-[11px] leading-relaxed text-ink-2">
+            {meta?.version ?? "…"}
+            <br />
+            sha {meta?.db_sha16 ?? "…"}
+            <br />
+            {meta ? `${meta.db_bytes.toLocaleString("en-US")} B` : "…"}
+          </div>
+        </div>
+        <div>
+          <div className="label-caps">{tr("footer.license")}</div>
+          <div className="mt-2 text-[11px] leading-relaxed text-ink-2">
+            {tr("footer.org")}
+            <br />
+            {tr("brand.name")}
+          </div>
         </div>
       </div>
     </footer>
@@ -152,35 +164,40 @@ const PAGE_META: { match: (p: string) => boolean; title: StrKey; lead?: StrKey }
 
 function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSearch: (v: string) => void }) {
   const tr = useT();
-  const meta = PAGE_META.find((m) => m.match(pathname)) ?? PAGE_META[0];
+  const { data: meta } = useJSON<Meta>("meta.json");
+  const page = PAGE_META.find((m) => m.match(pathname)) ?? PAGE_META[0];
   return (
-    <div className="relative border-b border-line bg-white">
-      {/* 轻纹理（2026-11-04 v4）：右上蓝光 + 左下青光 + 26px 极淡网格 ——
-          代替原深色横幅的作用（有底纹、不空），但不压过内容。 */}
+    /* 报头（masthead · 2026-11-04 v8）：衬线大标题 + 一行元信息（版本/sha/许可）+ 底部 2px 墨线
+       —— 取代原来的"工具栏式"细带，视觉上从"SaaS 面板"转成"出版物"。 */
+    <div className="relative border-b-2 border-[#0f172a]/80 bg-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(620px 120px at 90% -10%, rgba(74,142,224,.13) 0%, rgba(74,142,224,0) 70%)," +
-            "radial-gradient(420px 120px at 6% 140%, rgba(13,148,136,.10) 0%, rgba(13,148,136,0) 70%)," +
-            "linear-gradient(rgba(30,91,168,.045) 1px, transparent 1px)," +
-            "linear-gradient(90deg, rgba(30,91,168,.045) 1px, transparent 1px)",
-          backgroundSize: "auto, auto, 26px 26px, 26px 26px",
+            "linear-gradient(rgba(30,91,168,.035) 1px, transparent 1px)," +
+            "linear-gradient(90deg, rgba(30,91,168,.035) 1px, transparent 1px)",
+          backgroundSize: "26px 26px, 26px 26px",
         }}
       />
-      <div className="wrap relative flex flex-wrap items-center gap-x-3.5 gap-y-2 py-2.5">
-        <span aria-hidden className="h-5 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-brand to-accent" />
-        <h1 className="shrink-0 text-[19px] font-bold tracking-tight text-ink sm:text-[20px]">{tr(meta.title)}</h1>
-        {meta.lead ? (
-          <>
-            <span aria-hidden className="hidden h-4 w-px shrink-0 bg-line lg:block" />
-            <p className="hidden min-w-0 flex-1 truncate text-[12.5px] text-ink-3 lg:block">{tr(meta.lead)}</p>
-          </>
-        ) : (
-          <span className="hidden flex-1 lg:block" />
-        )}
-        <div className="relative ml-auto w-full sm:w-[380px] lg:w-[420px]">
+      <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-3.5 pt-4">
+        <div className="min-w-0">
+          <h1 className="text-[25px] font-bold leading-none tracking-tight text-ink sm:text-[28px]">{tr(page.title)}</h1>
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-ink-3">
+            {page.lead ? (
+              <>
+                <span>{tr(page.lead)}</span>
+                <span aria-hidden className="h-3 w-px bg-line" />
+              </>
+            ) : null}
+            <span className="font-mono">{meta?.version ?? "…"}</span>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <span className="font-mono">sha {meta?.db_sha16 ? meta.db_sha16.slice(0, 8) : "…"}</span>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <span>{tr("footer.license")}</span>
+          </p>
+        </div>
+        <div className="relative w-full sm:w-[380px] lg:w-[420px]">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-ink-3">🔍</span>
           <input
             value={q}

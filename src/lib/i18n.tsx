@@ -29,6 +29,7 @@ export const STR = {
   "nav.lang.zh": { zh: "中文", en: "中文" },
   "nav.lang.en": { zh: "EN", en: "EN" },
   "footer.license": { zh: "CC BY-NC 4.0", en: "CC BY-NC 4.0" },
+  "footer.cite": { zh: "引用格式", en: "Cite as" },
   "footer.version": { zh: "版本", en: "Version" },
   "footer.org": { zh: "中国药科大学", en: "China Pharmaceutical University" },
 

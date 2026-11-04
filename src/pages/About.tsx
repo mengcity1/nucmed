@@ -119,7 +119,7 @@ export default function About() {
 
       <section className="card mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.srcTitle")}</h2>
-        <ul className="mt-3 grid gap-2 text-[13px] leading-relaxed text-ink-2">
+        <ul className="prose-serif mt-3 grid gap-2">
           <li>
             · <b className="text-ink">{tr("about.srcIngest")}</b>：{tr("about.srcIngestBody")}
           </li>

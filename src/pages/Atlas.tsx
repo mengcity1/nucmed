@@ -252,7 +252,7 @@ export default function Atlas() {
       {!loading && !err && list.length > 0 && (
         <>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {shown.map((f) => (
+            {shown.map((f, i) => (
               <figure key={f.file} className="card card-hover group m-0 overflow-hidden">
                 <button
                   type="button"
@@ -270,6 +270,7 @@ export default function Atlas() {
                 </button>
                 <figcaption className="p-3">
                   <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-mono text-[10.5px] uppercase tracking-[.12em] text-ink-3">Fig. {i + 1}</span>
                     <span className={`rounded px-1.5 py-0.5 text-[10.5px] font-medium ${ATTRIB[f.attrib].cls}`}>
                       {tr(ATTRIB[f.attrib].key)}
                     </span>

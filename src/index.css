@@ -78,9 +78,35 @@
     @apply mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8;
   }
   .card {
-    @apply rounded-md2 border border-[#e4eaf4] bg-white shadow-s1;
-    background-image: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(15, 23, 42, 0.04);
+    @apply rounded-md2 border border-[#e8edf5] bg-white;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(15, 23, 42, 0.03);
+  }
+
+  /* ── 期刊版式（2026-11-04 v8）─────────
+     小标签：全大写 + 大字距，用于报头/KPI/页脚的分组名 */
+  .label-caps {
+    @apply text-[10.5px] font-semibold uppercase tracking-[.16em] text-ink-3;
+  }
+  /* 章节号：01 / 02 …（等宽、灰、紧跟标题） */
+  .sec-no {
+    @apply mr-2 font-mono text-[11px] font-semibold tracking-[.14em] text-ink-3;
+  }
+  /* 图注：论文式小字（首词加粗由调用方决定） */
+  .figcap {
+    @apply text-[11.5px] leading-relaxed text-ink-3;
+  }
+  /* 正文散文块：衬线 + 更宽行高 + 限制行宽（学术阅读节奏） */
+  .prose-serif {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif;
+    font-size: 14.5px;
+    line-height: 1.85;
+    letter-spacing: 0.002em;
+    color: #1e293b;
+    max-width: 74ch;
+  }
+  .prose-serif strong {
+    font-weight: 700;
+    color: #0f172a;
   }
   .card-hover {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-s2 hover:border-[#d5e0f0];
@@ -118,6 +144,47 @@
   .hscroll {
     @apply overflow-x-auto overscroll-x-contain;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── 打印样式（2026-11-04 v8）──
+     审稿人常把页面打成 PDF：白底、去掉导航/页脚/动效、表格跨页重复表头、图表不被切断。 */
+  @media print {
+    header,
+    footer,
+    .no-print {
+      display: none !important;
+    }
+    body {
+      background: #fff !important;
+      font-size: 10.5pt;
+    }
+    main {
+      padding-top: 0 !important;
+    }
+    .card,
+    .table-booktabs {
+      border-color: #cbd5e1 !important;
+      box-shadow: none !important;
+    }
+    .card {
+      break-inside: avoid;
+    }
+    thead {
+      display: table-header-group;
+    }
+    tr,
+    img,
+    figure {
+      break-inside: avoid;
+    }
+    a {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 
   /* 筛选标签（大尺寸 · 醒目选中态） */
