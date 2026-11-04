@@ -48,12 +48,18 @@
     background-attachment: fixed;
   }
 
-  /* 丝绸光斑层（固定、缓慢漂移、只动 transform）
-     ★ 不裁切内容、不吃点击、reduced-motion 时完全静止 */
-  .silk-layer {
+  /* 丝绸光斑层（2026-11-04 v11）：外层负责滚动视差，内层负责缓慢漂移 ——
+     两层分开，避免 `animation: transform` 与 `scroll 时 inline transform` 互相打架。 */
+  .silk-parallax {
     position: fixed;
-    inset: -18%;
+    inset: 0;
     z-index: -1;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .silk-layer {
+    position: absolute;
+    inset: -18%;
     pointer-events: none;
     background-image:
       radial-gradient(42% 38% at 18% 26%, rgba(255, 211, 186, 0.55) 0%, rgba(255, 211, 186, 0.18) 52%, rgba(255, 211, 186, 0) 74%),
@@ -300,6 +306,32 @@
   .stat-ico {
     @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[15px];
   }
+  /* 卡片高光跟随鼠标（v11）：鼠标位置写入 --mx/--my，::after 用 radial 画一团柔光。
+     ★ 只在有 mouse 的设备启用；reduced-motion 关闭；不改布局、不挡点击。 */
+  .spotlight::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      190px 190px at var(--mx, 50%) var(--my, 0%),
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 255, 0.18) 42%,
+      rgba(255, 255, 255, 0) 72%
+    );
+    opacity: 0;
+    transition: opacity 240ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  }
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .spotlight::after {
+      display: none;
+    }
+  }
+
   /* 骨架屏微光（2026-11-04）：比单纯的 pulse 更"有质地" */
   .shimmer {
     position: relative;

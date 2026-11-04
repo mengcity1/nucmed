@@ -253,11 +253,36 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [lang]);
 
+  /** 丝绸层滚动视差（2026-11-04 v11）：-4% 位移，仅 transform + rAF 节流 + passive 监听；
+   *  reduced-motion 直接退出（不做视差）；不劫持滚动、不改布局。 */
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const el = document.querySelector<HTMLElement>(".silk-parallax");
+    if (!el) return;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      el.style.transform = `translate3d(0, ${Math.round(window.scrollY * -0.04)}px, 0)`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    apply();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <LangCtx.Provider value={{ lang, setLang }}>
     <div className="min-h-screen">
-      {/* 丝绸光斑层（2026-11-04 v10）：fixed + 52s 缓慢漂移，只动 transform；reduced-motion 静止 */}
-      <div className="silk-layer" aria-hidden />
+      {/* 丝绸光斑层（2026-11-04 v10/v11）：外层滚动视差（-4%），内层 52s 缓慢漂移；
+          两层都在 `prefers-reduced-motion` 下静止，且 `pointer-events:none` 不吃点击。 */}
+      <div className="silk-parallax" aria-hidden>
+        <span className="silk-layer" />
+      </div>
       <Nav />
       <PageBar pathname={loc.pathname} q={q} onSearch={onSearch} />
       <main className="wrap pt-6">

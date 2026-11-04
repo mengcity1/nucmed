@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, type Drug, type Stats } from "../lib/data";
 import { Icon, type IconName } from "../components/Icon";
@@ -122,6 +122,15 @@ function Metric({
   tone?: MetricTone;
 }) {
   const shown = useCountUp(value);
+  const ref = useRef<HTMLDivElement>(null);
+  /** 高光跟随鼠标：把指针坐标写进 CSS 变量（仅 4 张卡，开销可忽略） */
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
   const bar: Record<MetricTone, string> = {
     brand: "bg-gradient-to-r from-[#7aa7e0] to-[#2f6bb5]",
     accent: "bg-gradient-to-r from-[#7ed4c6] to-[#0f8f81]",
@@ -142,7 +151,9 @@ function Metric({
   };
   return (
     <div
-      className={`group relative overflow-hidden rounded-xl2 border border-white/70 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 shadow-soft backdrop-blur-xl transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
+      ref={ref}
+      onPointerMove={onMove}
+      className={`spotlight group relative overflow-hidden rounded-xl2 border border-white/70 bg-gradient-to-br ${glow[tone]} to-white/70 p-4 shadow-soft backdrop-blur-xl transition duration-240 ease-standard hover:-translate-y-0.5 hover:shadow-float`}
     >
       <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${bar[tone]}`} />
       <div className="label-caps">{label}</div>

@@ -127,7 +127,7 @@
 |---|---|
 | 2026-11-04 | v6：字阶/令牌落表；h1/h2 改衬线；动效 1–5 上线；图表色板换 Okabe–Ito；`prefers-reduced-motion` 全站兜底 |
 | 2026-11-04 | **v7 学术版式**：三线表（`.table-booktabs`）上首页目录与单药分布表；卡片 1px 内高光；目录标题加「表 1 / Table 1」；数值列右对齐 |
-| 2026-11-04 | **v10 丝绸 + 厚玻璃**：背景**彻底去线条**，改为 4 团柔光（`silk-layer`）+ 斜向雪纺高光 + 4.5% 颗粒，52s 缓慢漂移（`prefers-reduced-motion` 静止）；卡片玻璃加厚（白 58% / `blur(18px)` / `saturate(1.15)` / 双内高光 / 圆角 26px）；报头与搜索框玻璃化；小屏自动关 blur 保性能 |
+| 2026-11-04 | **v11 丝滑动效**：丝绸层拆成「外层滚动视差（-4%）+ 内层 52s 漂移」；KPI 卡加 **spotlight**（鼠标位置写入 `--mx/--my`，`radial-gradient` 跟手）；`hover:none` 与 `reduced-motion` 下自动关闭；所有位移只走 `transform` + rAF 节流 + `passive` 监听 |
 
 ## 10. 版式骨架（v8 起）
 
