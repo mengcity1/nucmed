@@ -725,7 +725,7 @@
      否则深底黑字直接不可读 —— 下面这一组就是那套翻转令牌（用 (0,2,0)+ 压过 Tailwind 工具类）。 */
   .app-stage.dark.lg-stage {
     color: #e8eef7;
-    background: linear-gradient(160deg, #2a3648 0%, #33445c 52%, #232d3d 100%);
+    background: linear-gradient(160deg, #454950 0%, #51555d 52%, #3d4146 100%);
   }
   /* ⚠ 深色下最大的坑：源码里 `bg-white`(32 处) 与一堆写死的浅底仍是**白块**，
      而文字已被转浅 ⇒ 浅字压白块 = 不可读。这里把它们统一压成半透明白/淡色。 */
@@ -829,7 +829,7 @@
   }
   /* 手机端（≤900px 不建 WebGL）走 `.fallback`：vendor 会把面板刷成近白 —— 深色下必须盖掉 */
   .app-stage.dark.fallback .lg-surface {
-    background: rgba(38, 50, 70, 0.78);
+    background: rgba(66, 69, 74, 0.78);
     -webkit-backdrop-filter: blur(14px) saturate(1.1);
     backdrop-filter: blur(14px) saturate(1.1);
   }
@@ -899,6 +899,22 @@
   .app-stage.dark .text-brand {
     color: #9cc7ff;
   }
+  /* 浅色模式（米白）：底色 + 文字回到暖调深墨 */
+  .app-stage.light.lg-stage {
+    color: #3a332b;
+    background: linear-gradient(160deg, #fdfaf3 0%, #f7f1e3 55%, #f3ecdb 100%);
+  }
+  /* 正文衬线块写死了深色 —— 深底上会看不见（owner 截图里的"文字看不清"就是这个） */
+  .app-stage.dark .prose-serif {
+    color: #ccd7e5;
+  }
+  .app-stage.dark .prose-serif strong {
+    color: #eef4fc;
+  }
+  .app-stage.dark .card-tint {
+    background: rgba(72, 75, 80, 0.6);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
   .app-stage.dark .text-brand-deep {
     color: #a9d0ff;
   }
@@ -917,14 +933,14 @@
   }
   /* 卡片 / 表格 */
   .app-stage.dark .card {
-    background: rgba(46, 60, 82, 0.55);
+    background: rgba(74, 77, 82, 0.55);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
   .app-stage.dark .card-solid {
-    background: rgba(42, 55, 76, 0.6);
+    background: rgba(70, 73, 78, 0.6);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: none;
   }

@@ -14,15 +14,16 @@
  * `.app-scroll` 承载（sticky/锚点/IntersectionObserver 均照常；`window.scrollY` 已无使用处）。
  */
 import { useEffect, useRef, type ReactNode } from "react";
+import { useTheme } from "../lib/theme";
 import { createGlassSystem } from "../vendor/lens/runtime.js";
 import "../vendor/lens/tokens.css";
 import "../vendor/lens/components.css";
 
 /** 背景结构变体（地址栏 `?bg=` 切换，默认 mesh）——四种"给玻璃可折射的结构"的极简做法。
  *  共同点：**全部无色相**（灰白），只靠明暗与微小纹理制造层次；底色仍是同一条中性纵向渐变。 */
-export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none" | "dark";
+export type BgVariant = "mesh" | "dots" | "grain" | "waves" | "none" | "dark" | "cream";
 
-const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none", "dark"];
+const BG_VARIANTS: BgVariant[] = ["mesh", "dots", "grain", "waves", "none", "dark", "cream"];
 
 /** 背景壁纸：中性纵向渐变（共同底）+ 按变体叠结构。
  *  - mesh  ：多层超大柔光交织（云雾感，**无线条**，最不抢眼）
@@ -52,18 +53,35 @@ export function paintWallpaper(
   };
 
   if (variant === "dark") {
-    // v20.9：深色渐变（**深底才让玻璃的折射/高光显形**）
+    // v22：**中性深灰**（去蓝）+ 再提亮一档（owner：接近深灰、再浅一点）
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#2a3648");
-    g.addColorStop(0.5, "#33445c");
-    g.addColorStop(1, "#232d3d");
+    g.addColorStop(0, "#454950");
+    g.addColorStop(0.5, "#51555d");
+    g.addColorStop(1, "#3d4146");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
     ctx.save();
     ctx.filter = `blur(${Math.max(30, Math.round(w * 0.04))}px)`;
-    blob(0.14, 0.06, 0.6, "rgba(96,150,255,.18)"); // 冷蓝
-    blob(0.9, 0.2, 0.5, "rgba(0,196,186,.10)"); // 青
-    blob(0.5, 0.92, 0.62, "rgba(124,92,255,.12)"); // 紫
+    blob(0.16, 0.06, 0.62, "rgba(255,255,255,.07)"); // 上缘微亮
+    blob(0.86, 0.26, 0.55, "rgba(0,0,0,.10)"); // 右下压暗
+    blob(0.5, 0.94, 0.6, "rgba(255,255,255,.05)");
+    ctx.restore();
+    return;
+  }
+
+  if (variant === "cream") {
+    // 浅色模式：**米白**（暖白纸张感），不加任何彩度
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, "#fdfaf3");
+    g.addColorStop(0.55, "#f7f1e3");
+    g.addColorStop(1, "#f3ecdb");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.filter = `blur(${Math.max(26, Math.round(w * 0.035))}px)`;
+    blob(0.16, 0.06, 0.62, "rgba(255,255,255,.7)");
+    blob(0.86, 0.28, 0.55, "rgba(224,211,186,.28)");
+    blob(0.5, 0.94, 0.6, "rgba(255,255,255,.45)");
     ctx.restore();
     return;
   }
@@ -147,6 +165,7 @@ const MATERIALS: Record<string, Record<string, number>> = {
 
 export default function GlassApp({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [theme] = useTheme();
 
   useEffect(() => {
     const el = ref.current;
@@ -158,11 +177,16 @@ export default function GlassApp({ children }: { children: ReactNode }) {
     //    2026-11-04 **实装**：默认 = 深色（owner 定）；浅色方案仍可 `?bg=mesh` 等切回。
     const qs = new URLSearchParams(window.location.search);
     const g = (qs.get("g") ?? "mid").toLowerCase();
-    const bgRaw = (qs.get("bg") ?? "dark").toLowerCase();
-    const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw) ? (bgRaw as BgVariant) : "dark";
+    const bgRaw = (qs.get("bg") ?? (theme === "light" ? "cream" : "dark")).toLowerCase();
+    const bg: BgVariant = (BG_VARIANTS as string[]).includes(bgRaw)
+      ? (bgRaw as BgVariant)
+      : theme === "light"
+        ? "cream"
+        : "dark";
     // ★ `.dark` 必须**在**窄屏早退之前加上：手机端不建 WebGL，靠 CSS 深色令牌渲染；
     //   若放在后面，手机就会退回"浅底 + 浅字"（不可读）。
-    if (bg === "dark") el.classList.add("dark");
+    el.classList.toggle("dark", bg === "dark");
+    el.classList.toggle("light", bg === "cream");
 
     if (narrow) {
       el.classList.add("fallback");
@@ -203,7 +227,7 @@ export default function GlassApp({ children }: { children: ReactNode }) {
       el.removeEventListener("pointermove", onMove);
       sys.destroy();
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div ref={ref} className="lg-stage app-stage">

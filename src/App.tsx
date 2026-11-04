@@ -4,6 +4,7 @@ import { setDataLang, useJSON, type Meta } from "./lib/data";
 import { LangCtx, useLang, useT, type Lang, type StrKey } from "./lib/i18n";
 import { Icon, type IconName } from "./components/Icon";
 import GlassApp from "./components/GlassApp";
+import { useTheme } from "./lib/theme";
 import Overview from "./pages/Home";
 // ★ pk262 B6：单药画像按需加载 —— Chart 依赖 echarts（586 kB / gzip 195 kB），
 //   静态引入会让总览首屏也拉这个包。改为路由级 lazy 后 echarts 只在进入画像时才下载。
@@ -36,6 +37,7 @@ const LEGACY = [
 
 function Nav() {
   const [sp, setSp] = useSearchParams();
+  const [theme, setTheme] = useTheme();
   const tr = useT();
   const { lang, setLang } = useLang();
   return (
@@ -73,6 +75,16 @@ function Nav() {
                 </NavLink>
               ))}
             </nav>
+            {/* 深浅色切换（v22）：深色 / 米白浅色，选择写进 localStorage */}
+            <button
+              type="button"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "浅色模式（米白）" : "深色模式"}
+              className="ml-1 grid h-8 w-8 shrink-0 place-items-center rounded-[10px] text-[14px] text-ink-2"
+            >
+              {theme === "dark" ? "☀" : "☾"}
+            </button>
             <div
               role="group"
               aria-label="Language"
