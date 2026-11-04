@@ -169,7 +169,7 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
   return (
     /* 报头（masthead · 2026-11-04 v8）：衬线大标题 + 一行元信息（版本/sha/许可）+ 底部 2px 墨线
        —— 取代原来的"工具栏式"细带，视觉上从"SaaS 面板"转成"出版物"。 */
-    <div className="relative overflow-hidden rounded-b-[26px] border-b border-white/60 bg-[linear-gradient(120deg,#fff7f0_0%,#fdfbf8_44%,#f1ecfb_100%)] shadow-soft">
+    <div className="relative overflow-hidden rounded-b-[26px] border-b border-white/50 bg-[linear-gradient(120deg,rgba(255,247,240,.85)_0%,rgba(255,255,255,.62)_44%,rgba(241,236,251,.85)_100%)] shadow-float backdrop-blur-xl">
       <div className="wrap relative flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-4 pt-4">
         <div className="min-w-0">
           <h1 className="text-[25px] font-bold leading-none tracking-tight text-ink sm:text-[28px]">{tr(page.title)}</h1>
@@ -194,7 +194,7 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
             onChange={(e) => onSearch(e.target.value)}
             placeholder={tr("nav.searchPh")}
             aria-label={tr("nav.searchPh")}
-            className="h-9 w-full rounded-[10px] border border-line bg-[#f5f8fd] pl-9 pr-9 text-[13.5px] outline-none transition placeholder:text-ink-3 focus:border-[#9dc0ea] focus:bg-white focus:ring-[3px] focus:ring-brand/10"
+            className="h-9 w-full rounded-[10px] border border-white/70 bg-white/60 pl-9 pr-9 text-[13.5px] shadow-ceil outline-none backdrop-blur-md transition placeholder:text-ink-3 focus:border-white focus:bg-white/85 focus:ring-[3px] focus:ring-white/60"
           />
           {q ? (
             <button
@@ -256,6 +256,8 @@ export default function App() {
   return (
     <LangCtx.Provider value={{ lang, setLang }}>
     <div className="min-h-screen">
+      {/* 丝绸光斑层（2026-11-04 v10）：fixed + 52s 缓慢漂移，只动 transform；reduced-motion 静止 */}
+      <div className="silk-layer" aria-hidden />
       <Nav />
       <PageBar pathname={loc.pathname} q={q} onSearch={onSearch} />
       <main className="wrap pt-6">

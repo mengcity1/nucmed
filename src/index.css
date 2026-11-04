@@ -36,18 +36,53 @@
     outline-offset: 2px;
   }
   body {
-    @apply bg-[#f7f5f8] text-ink font-sans text-[14px] leading-relaxed;
-    /* ★ 2026-11-04 v9「ins 氛围」：四角柔和光斑（奶油 → 淡紫 → 薄荷）+ 5% 纸张颗粒。
-       颗粒用内联 SVG 噪声（无外网依赖、可打印时自动忽略）。 */
+    @apply bg-[#f8f6f9] text-ink font-sans text-[14px] leading-relaxed;
+    /* ★ 2026-11-04 v10「丝绸」：**没有任何线条**，只有大面积柔光 + 5% 颗粒。
+       多层 radial 的色标刻意做成 3 段，避免渐变banding（条带）。 */
+    background-color: #f8f6f9;
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
-      radial-gradient(1100px 700px at 4% -8%, #fff1e8 0%, rgba(255, 241, 232, 0) 62%),
-      radial-gradient(900px 620px at 98% -4%, #efe9fb 0%, rgba(239, 233, 251, 0) 58%),
-      radial-gradient(900px 700px at 50% 112%, #e6f5f0 0%, rgba(230, 245, 240, 0) 60%),
-      linear-gradient(180deg, #fbf8f5 0%, #f7f7fb 100%);
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-size: 160px 160px, auto, auto, auto, auto;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.5) 62%, rgba(255, 255, 255, 0) 100%);
+    background-repeat: repeat, no-repeat;
+    background-size: 160px 160px, 100% 100%;
     background-attachment: fixed;
+  }
+
+  /* 丝绸光斑层（固定、缓慢漂移、只动 transform）
+     ★ 不裁切内容、不吃点击、reduced-motion 时完全静止 */
+  .silk-layer {
+    position: fixed;
+    inset: -18%;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(42% 38% at 18% 26%, rgba(255, 211, 186, 0.55) 0%, rgba(255, 211, 186, 0.18) 52%, rgba(255, 211, 186, 0) 74%),
+      radial-gradient(38% 40% at 84% 16%, rgba(206, 203, 255, 0.5) 0%, rgba(206, 203, 255, 0.16) 55%, rgba(206, 203, 255, 0) 76%),
+      radial-gradient(46% 42% at 58% 92%, rgba(184, 236, 222, 0.5) 0%, rgba(184, 236, 222, 0.15) 55%, rgba(184, 236, 222, 0) 78%),
+      radial-gradient(34% 34% at 92% 78%, rgba(198, 222, 255, 0.45) 0%, rgba(198, 222, 255, 0) 72%);
+    animation: silkDrift 52s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes silkDrift {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(1.6%, -1.2%, 0) scale(1.035);
+    }
+    100% {
+      transform: translate3d(-1.6%, 1.2%, 0) scale(1.015);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .silk-layer {
+      animation: none;
+    }
+  }
+  /* 内容层必须压在丝绸层之上（否则光斑会盖住正文） */
+  #root {
+    position: relative;
+    z-index: 1;
   }
   ::selection {
     background: #cfe1f7;
@@ -80,16 +115,26 @@
     @apply mx-auto max-w-[1240px] px-4 sm:px-6 md:px-8;
   }
   .card {
-    @apply rounded-xl2 border border-white/70 bg-white/70 shadow-soft;
-    -webkit-backdrop-filter: blur(14px) saturate(1.05);
-    backdrop-filter: blur(14px) saturate(1.05);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 1px 2px rgba(15, 23, 42, 0.03),
-      0 10px 28px -14px rgba(15, 23, 42, 0.12);
+    @apply rounded-xl3 border border-white/60 shadow-float;
+    background: rgba(255, 255, 255, 0.58);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+      0 2px 6px rgba(15, 23, 42, 0.03), 0 22px 50px -26px rgba(15, 23, 42, 0.20);
   }
   /* 数据卡（含表格 / 图表）：**纯白不透明** —— 玻璃卡会让表格读数变糊，也会毁掉打印 */
   .card-solid {
-    @apply rounded-xl2 border border-[#e9eef6] bg-white;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 10px 28px -16px rgba(15, 23, 42, 0.10);
+    @apply rounded-xl3 border border-[#e9eef6] bg-white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 14px 34px -20px rgba(15, 23, 42, 0.12);
+  }
+  /* 小屏降级：玻璃模糊在低端手机上很贵 ⇒ 退回半透明白，观感不变但省 GPU */
+  @media (max-width: 640px) {
+    .card,
+    .card-tint {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgba(255, 255, 255, 0.92);
+    }
   }
 
   /* ── 期刊版式（2026-11-04 v8）─────────
