@@ -929,7 +929,7 @@ export default function DrugDetail() {
         )}
         <div className="card mt-3 overflow-hidden">
           <div className="hscroll">
-            <table className="w-full border-collapse text-[13px]">
+            <table className="table-booktabs w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
                   <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thOrgan")}</th>

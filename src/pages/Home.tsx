@@ -653,7 +653,10 @@ export default function Home() {
       </div>
 
       <div className="mt-7 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="sec-h">{tr("home.list")}</h2>
+        <div className="flex items-baseline gap-2.5">
+          <span className="font-mono text-[11px] uppercase tracking-[.14em] text-ink-3">{tr("home.tableNo")}</span>
+          <h2 className="sec-h">{tr("home.list")}</h2>
+        </div>
         <span className="text-[12px] text-ink-3">
           {tr("home.countLine", {
             a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
@@ -664,9 +667,9 @@ export default function Home() {
 
       <div className="card mt-3 overflow-hidden">
         <div className="hscroll max-h-[calc(100vh-230px)] overflow-y-auto">
-          <table className="table-zebra w-full border-collapse text-[13px]">
+          <table className="table-booktabs w-full border-collapse text-[13px]">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-line bg-[#f7fafe] text-[11.5px] uppercase tracking-wide text-ink-3 shadow-[0_1px_0_rgba(228,234,244,.9)]">
+              <tr className="border-b border-line bg-white text-[11.5px] uppercase tracking-wide text-ink-3 shadow-[0_1px_0_rgba(228,234,244,.9)]">
                 <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thProfile")}</th>
                 <th className="px-2 py-2.5 text-left font-semibold sm:px-4">{tr("home.thDrug")}</th>
                 <th className="px-2 py-2.5 text-left font-semibold sm:px-3">{tr("home.thType")}</th>
@@ -674,7 +677,7 @@ export default function Home() {
                 <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">{tr("home.thTarget")}</th>
                 <th className="hidden px-3 py-2.5 text-left font-semibold lg:table-cell">{tr("home.thDisease")}</th>
                 <th className="hidden px-3 py-2.5 text-left font-semibold sm:table-cell">{tr("home.thStage")}</th>
-                <th className="px-2 py-2.5 text-center font-semibold sm:px-3">{tr("home.thPoints")}</th>
+                <th className="px-2 py-2.5 text-right font-semibold sm:px-3">{tr("home.thPoints")}</th>
                 <th className="hidden px-3 py-2.5 text-center font-semibold sm:table-cell">{tr("home.thStruct")}</th>
               </tr>
             </thead>
@@ -722,7 +725,7 @@ export default function Home() {
                       {stageLabel(lang, d.stage)}
                     </span>
                   </td>
-                  <td className="num px-2 py-2.5 text-center text-[12.5px] sm:px-3">
+                  <td className="num px-2 py-2.5 text-right text-[12.5px] sm:px-3">
                     {d.n_points ? (
                       <span className="font-semibold text-ink">{d.n_points}</span>
                     ) : (
