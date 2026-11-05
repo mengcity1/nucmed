@@ -5,7 +5,7 @@ import { Icon, type IconName } from "../components/Icon";
 import Reveal from "../components/Reveal";
 import { useCountUp } from "../lib/useCountUp";
 import { ErrorState } from "../components/States";
-import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
+import { enSafe, nuclideEn, stageLabel, useLang, useT, type StrKey } from "../lib/i18n";
 import { diseaseEn, enDiseases } from "../lib/diseaseEn";
 
 const PAGE = 30;
@@ -29,6 +29,15 @@ function stageOf(s: string | null): string {
 }
 
 const STAGE_ORDER = ["已上市", "4期", "3期", "2/3期", "2期", "1/2期", "1期", "临床", "临床前", "未标注"];
+
+/** 排序选项（2026-11-05）：原生 `<select>` 在玻璃主题里是"外来控件" —— 深色下弹层是系统白底，
+ *  选中态也只有文字变化；改成与其它筛选同一套 chip（选中 = 实心勾徽标 + 加粗）。 */
+const SORTS: { v: string; k: StrKey }[] = [
+  { v: "阶段优先", k: "home.sortStage" },
+  { v: "名称 A→Z", k: "home.sortAZ" },
+  { v: "名称 Z→A", k: "home.sortZA" },
+];
+
 const STAGE_TONE: Record<string, string> = {
   已上市: "bg-[#e6f4f1] text-[#0a7d6f] border-[#c6e8e1]",
   "4期": "bg-[#e6eefb] text-[#134a86] border-[#cfdff5]",
@@ -269,6 +278,11 @@ export default function Home() {
   }, [allDiseases, diseases, qDis]);
   const nSel = types.length + nucs.length + targets.length + diseases.length + stages.length;
 
+  /** 2026-11-05：`隐藏疑似非药名（175）` 里的 **175 原来是写死的**（Home.tsx 里硬编码），
+   *  而它就是 `name_ok === 0` 的条数（今天实测正好 175 / 5,159）⇒ 改为从数据现算，
+   *  以后导出层数字变了不会"看起来对、其实过期"。数据未到时显示 `…`，不显示 0。 */
+  const badNameCount = useMemo(() => (drugs ?? []).filter((d) => d.name_ok === 0).length, [drugs]);
+
   /** ★ facet：除「核素」外的所有筛选条件 → 用于计算核素的动态 Top（选别的维度时，核素 Top 跟着变） */
   const facetBase = useMemo(() => {
     let v = drugs ?? [];
@@ -405,7 +419,7 @@ export default function Home() {
           {tr("home.onlyPts", { n: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…" })}
         </Chip>
         <Chip on={hideBad} onClick={() => setHideBad((v) => !v)}>
-          {tr("home.hideBad", { n: 175 })}
+          {tr("home.hideBad", { n: drugs ? fmt(badNameCount) : "…" })}
         </Chip>
         {/* 2026-11-05：这三枚快捷筛选原先只是"设值动作"，点完**没有任何选中反馈**（与 owner
             说的"看不出选没选"是同一类问题）⇒ 改为有状态的开关：再点一次取消。 */}
@@ -676,26 +690,21 @@ export default function Home() {
             </button>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-[12px] text-ink-3">{tr("home.sort")}</span>
-          <select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              setPage(0);
-            }}
-            className="rounded-lg border border-line bg-white px-2 py-1 text-[12.5px] outline-none focus:border-[#9dc0ea]"
-          >
-            {[
-              { v: "阶段优先", k: "home.sortStage" as const },
-              { v: "名称 A→Z", k: "home.sortAZ" as const },
-              { v: "名称 Z→A", k: "home.sortZA" as const },
-            ].map((o) => (
-              <option key={o.v} value={o.v}>
-                {tr(o.k)}
-              </option>
-            ))}
-          </select>
+          {SORTS.map((o) => (
+            <Chip
+              key={o.v}
+              sm
+              on={sort === o.v}
+              onClick={() => {
+                setSort(o.v);
+                setPage(0);
+              }}
+            >
+              {tr(o.k)}
+            </Chip>
+          ))}
         </div>
       </div>
 

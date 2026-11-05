@@ -1641,4 +1641,26 @@
   color: #0b1220;
 }
 
+/* ── v47 Tab 的选中态补一条下划线（2026-11-05 · 承接"看不出选没选"）────────────────────
+   `.tab-on` 原本只是 `rgba(255,255,255,.55)` 叠在浅色玻璃上 —— 实测亮度差 ≈ **2.8/255**，
+   导航里 4 个 Tab 并排时几乎看不出当前在哪一页；单药页 5 个 Tab 同理。
+   用 `::after` 画一条 2px 品牌色条：伪元素**不被现有 glass 规则命中**（那些规则只选
+   `button` / `.tab` 的背景与 box-shadow）⇒ 不会被 `!important` 洗掉，也不用再加一层 `!important`。
+   浅色 #1e5ba8 对浅底 ≈6.7:1、深色 #7bb8ff 对深底 ≈7:1，都是"一眼可见"级别。 */
+.tab-on::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 2px;
+  background: #1e5ba8;
+  pointer-events: none;
+}
+.app-stage.dark .tab-on::after {
+  background: #7bb8ff;
+}
+
+
 }
