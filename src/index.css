@@ -118,10 +118,10 @@
     *,
     *::before,
     *::after {
-      animation-duration: 0.001ms;
-      animation-iteration-count: 1;
-      transition-duration: 0.001ms;
-      scroll-behavior: auto;
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
@@ -302,19 +302,19 @@
     header,
     footer,
     .no-print {
-      display: none;
+      display: none !important;
     }
     body {
-      background: #fff;
+      background: #fff !important;
       font-size: 10.5pt;
     }
     main {
-      padding-top: 0;
+      padding-top: 0 !important;
     }
     .card,
     .table-booktabs {
-      border-color: #cbd5e1;
-      box-shadow: none;
+      border-color: #cbd5e1 !important;
+      box-shadow: none !important;
     }
     .card {
       break-inside: avoid;
@@ -328,12 +328,12 @@
       break-inside: avoid;
     }
     a {
-      color: inherit;
-      text-decoration: none;
+      color: inherit !important;
+      text-decoration: none !important;
     }
     * {
-      animation: none;
-      transition: none;
+      animation: none !important;
+      transition: none !important;
     }
   }
 
@@ -507,9 +507,19 @@
     border-width: 1px;
     border-style: solid;
   }
-  /* 2026-11-05 S3：此处原有 `.app-stage .chip-off/.chip-on` 的 border-color / background
-     （rgba(15,23,42,.1) / rgba(30,91,168,.25/.13)），均被后文同选择器的 667/671/703/1144/1099
-     以及 `.app-stage.light` / `.dark` 的 chip 规则覆盖 ⇒ 删除；快照比对 0 差异。 */
+  .app-stage .chip-off {
+    border-color: rgba(15, 23, 42, 0.1);
+  }
+  .app-stage .chip-on {
+    border-color: rgba(30, 91, 168, 0.25);
+  }
+  /* v20.1：chip 同样是"玻璃板上的高光层"，不各开一层折射 */
+  .app-stage .chip-off {
+    background: rgba(255, 255, 255, 0.4);
+  }
+  .app-stage .chip-on {
+    background: rgba(30, 91, 168, 0.13);
+  }
   .glass-bar .lg-surface {
     border-radius: 0;
     border: 0;
@@ -541,7 +551,7 @@
   @media print {
     .glass-edge .table-booktabs thead th,
     .glass-edge .table-booktabs tbody tr {
-      background: #fff;
+      background: #fff !important;
     }
   }
 
@@ -589,7 +599,11 @@
       rgba(255, 255, 255, 0) 70%
     );
   }
-  /* 2026-11-05 S3：`.app-stage.webgl-ready .lg-surface` 的 box-shadow 被 675 那条（更晚、同选择器）覆盖 ⇒ 删除 */
+  .app-stage.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(15, 23, 42, 0.04);
+  }
   /* ── v36 吸顶件 = CSS 毛玻璃（2026-11-04 · owner：「拖到底原来的玻璃框会留在原地」）──
      物理原因：canvas 玻璃的前提是"元素背后是**静止**的背景纹理"；吸顶件背后是**滚动的内容**，
      它的矩形必须每帧从 DOM 重读（`readGeometry()` 里逐祖先 getComputedStyle = 强制同步布局），
@@ -650,23 +664,46 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
       0 1px 3px rgba(15, 23, 42, 0.07);
   }
-  /* 2026-11-05 S3：此处原有 `.app-stage .chip-off/.chip-on` 的
-     `background` + `box-shadow`（.45/.16 + inset 高光），均被后文
-     `.app-stage :is(.chip,.chip-sm)`（1058）/ `.app-stage .chip-on`（1089）/
-     `.app-stage.light .chip-on` 覆盖 ⇒ 删除；快照比对 0 差异。 */
+  .app-stage .chip-off {
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .app-stage .chip-on {
+    background: rgba(30, 91, 168, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
   /* ── v20.6 全站按钮 = 液态玻璃（owner：只要是按钮都得是）────────────────
      玻璃放在**按钮这一层**：多半透明白 + 顶部内高光 + 亮描边 + 背景模糊 + 轻投影。
      用 `.app-stage :is(button,[role=tab])`（0,2,1）压过 Tailwind 的 bg/border 工具类 ⇒ 全站统一；
      确实要保持原样的按钮加 `.btn-plain` 排除。 */
-  /* 2026-11-05 S3：按钮玻璃只保留 **1347 起那一版**（同选择器、更晚、且带 `!important`）。
-     此处原有的 border / background-image / backdrop-filter / box-shadow / transition 以及
-     `:hover`、`:active` 两块全部被覆盖 ⇒ 删除；只留 `border-radius`（后文没再声明它）。
-     快照比对：8 页 × 12 组件 × 11 属性 **0 差异**。 */
   .app-stage :is(button, [role="tab"]):not(.btn-plain) {
     border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.36) 100%);
+    -webkit-backdrop-filter: blur(12px) saturate(1.25);
+    backdrop-filter: blur(12px) saturate(1.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 1px 2px rgba(15, 23, 42, 0.06);
+    transition:
+      background-image 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
   }
-  /* 2026-11-05 S3：`.app-stage .chip-on` 的 background-image / border-color 在同选择器的
-     1089 块里以 `!important` 重设 ⇒ 此处删除；快照比对 0 差异。 */
+  .app-stage :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.54) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 2px 8px rgba(15, 23, 42, 0.09);
+  }
+  .app-stage :is(button, [role="tab"]):not(.btn-plain):active {
+    transform: translateY(0.5px);
+  }
+  /* 选中态按钮（chip）保留品牌色，只在玻璃上叠一层淡色 */
+  .app-stage .chip-on {
+    background-image: linear-gradient(180deg, rgba(30, 91, 168, 0.2) 0%, rgba(30, 91, 168, 0.12) 100%);
+    border-color: rgba(30, 91, 168, 0.35);
+  }
   /* 面板的玻璃厚度：顶沿亮边 + 亮轮廓 + 底部内阴影 + 淡外投影（CSS 层，弥补 WebGL 只在边缘可见） */
   .app-stage.webgl-ready .lg-surface {
     box-shadow:
@@ -730,7 +767,7 @@
   /* ⚠ 深色下最大的坑：源码里 `bg-white`(32 处) 与一堆写死的浅底仍是**白块**，
      而文字已被转浅 ⇒ 浅字压白块 = 不可读。这里把它们统一压成半透明白/淡色。 */
   .app-stage.dark [class~="bg-white"] {
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.07) !important;
   }
   .app-stage.dark [class*="bg-[#eef2f8]"],
   .app-stage.dark [class*="bg-[#e9eef6]"],
@@ -742,20 +779,20 @@
   .app-stage.dark [class*="bg-[#f2f6fc]"],
   .app-stage.dark [class*="bg-[#f3e8fb]"],
   .app-stage.dark [class*="bg-[#f1f4f9]"] {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.06) !important;
   }
   /* 语义色底（绿/黄/红）：保留色相，压成深色版，避免"白里发亮"的地块 */
   .app-stage.dark [class*="bg-[#dcfce7]"] {
-    background-color: rgba(52, 211, 153, 0.16);
+    background-color: rgba(52, 211, 153, 0.16) !important;
   }
   .app-stage.dark [class*="bg-[#fef3c7]"] {
-    background-color: rgba(251, 191, 36, 0.16);
+    background-color: rgba(251, 191, 36, 0.16) !important;
   }
   .app-stage.dark [class*="bg-[#fee2e2]"] {
-    background-color: rgba(248, 113, 113, 0.16);
+    background-color: rgba(248, 113, 113, 0.16) !important;
   }
   .app-stage.dark [class*="bg-brand-soft"] {
-    background-color: rgba(120, 170, 255, 0.16);
+    background-color: rgba(120, 170, 255, 0.16) !important;
   }
   /* 写死的深色字（`text-[#0…]`~`text-[#8…]`）统一提亮；KPI 四色在后面单独覆盖回来 */
   .app-stage.dark [class*="text-[#0"],
@@ -767,37 +804,70 @@
   .app-stage.dark [class*="text-[#6"],
   .app-stage.dark [class*="text-[#7"],
   .app-stage.dark [class*="text-[#8"] {
-    color: #dbe6f4;
+    color: #dbe6f4 !important;
   }
   /* KPI 四色（盖在统一提亮之后，保留色相但用暗底友好的亮度） */
   .app-stage.dark [class*="#12457f"] {
-    color: #a8c8ff;
+    color: #a8c8ff !important;
   }
   .app-stage.dark [class*="#0a6f66"] {
-    color: #8fe7db;
+    color: #8fe7db !important;
   }
   .app-stage.dark [class*="#4b3ea3"] {
-    color: #c3baff;
+    color: #c3baff !important;
   }
   .app-stage.dark [class*="#8a5a12"] {
-    color: #f3c98a;
+    color: #f3c98a !important;
   }
   /* 降高光：玻璃边光/按钮/输入框的白色量都调低一档（owner：有的地方太白高亮了） */
   /* 参考图：玻璃描边 = 白 19%（深色下原来的 6% 深边等于看不见） */
   .app-stage.dark .lg-surface {
     border: 1px solid rgba(255, 255, 255, 0.19);
   }
-  /* 2026-11-05 S3：深色 `webgl-ready` 的 box-shadow 与 background-image 都被更晚的同选择器规则
-     覆盖（951 / 958）⇒ 两段均删除。快照比对 0 差异。 */
+  .app-stage.dark.webgl-ready .lg-surface {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 -20px 28px -26px rgba(0, 0, 0, 0.5),
+      0 14px 36px -26px rgba(0, 0, 0, 0.7);
+  }
   .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
-    color: #dfe8f5;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+    color: #dbe5f2;
+  }
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
   }
   .app-stage.dark .tab:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.14);
   }
-  /* 2026-11-05 S3：此处原有 `.tab-on` / `.chip-off` / `.chip-on` 三块深色规则，
-     均被后文**同选择器**的规则整块覆盖 ⇒ 已删除；快照比对 0 差异（见 DESIGN v52）。 */
+  .app-stage.dark .tab-on {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #eef4ff;
+  }
+  .app-stage.dark .chip-off {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #d5e0ef;
+  }
+  .app-stage.dark .chip-on {
+    background: rgba(120, 170, 255, 0.16);
+    border-color: rgba(140, 185, 255, 0.32);
+    color: #eaf2ff;
+  }
+  .app-stage.dark.webgl-ready .lg-surface {
+    background-image: radial-gradient(
+      520px circle at var(--mx, 50%) var(--my, -20%),
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 34%,
+      rgba(255, 255, 255, 0) 64%
+    );
+  }
   /* 手机端（≤900px 不建 WebGL）走 `.fallback`：vendor 会把面板刷成近白 —— 深色下必须盖掉 */
   .app-stage.dark.fallback .lg-surface {
     background: rgba(255, 255, 255, 0.13);
@@ -808,32 +878,35 @@
      免得再出现"白块 + 浅字"；语义色（绿/黄/红）在下面单独盖回来。 */
   .app-stage.dark [class*="bg-[#f"],
   .app-stage.dark [class*="bg-[#e"] {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.06) !important;
   }
   .app-stage.dark [class*="bg-[#fffbeb]"],
   .app-stage.dark [class*="bg-[#fef3c7]"] {
-    background-color: rgba(251, 191, 36, 0.16);
+    background-color: rgba(251, 191, 36, 0.16) !important;
+  }
+  .app-stage.dark [class*="bg-[#dcfce7]"] {
+    background-color: rgba(52, 211, 153, 0.16) !important;
   }
   .app-stage.dark [class*="bg-[#fee2e2]"],
   .app-stage.dark [class*="bg-[#fdf2f2]"] {
-    background-color: rgba(248, 113, 113, 0.16);
+    background-color: rgba(248, 113, 113, 0.16) !important;
   }
   /* 写死的深色字兜底扩到 `#9/#a/#b`（Atlas 的语义 chip 用了 #92400e / #991b1b 这类） */
   .app-stage.dark [class*="text-[#9"],
   .app-stage.dark [class*="text-[#a"],
   .app-stage.dark [class*="text-[#b"] {
-    color: #dbe6f4;
+    color: #dbe6f4 !important;
   }
   /* 语义文字令牌 */
   .app-stage.dark .text-bad {
-    color: #ffa8a8;
+    color: #ffa8a8 !important;
   }
   .app-stage.dark .text-good {
-    color: #7fe0ac;
+    color: #7fe0ac !important;
   }
   /* 表格里的 ✓ 用 text-ok(青绿 #0d9488) —— 深灰底上只有 2.41:1，实测自检点名 22 处 */
   .app-stage.dark .text-ok {
-    color: #5fe5c6;
+    color: #5fe5c6 !important;
   }
   /* 打印：深色不能污染 PDF —— 强制白底 + 深字（在深色主题下也必须） */
   @media print {
@@ -845,31 +918,31 @@
     .app-stage.dark .text-ink-2,
     .app-stage.dark .text-ink-3,
     .app-stage.dark [class*="text-[#"] {
-      color: #0f172a;
+      color: #0f172a !important;
     }
     .app-stage.dark .card,
     .app-stage.dark .card-solid,
     .app-stage.dark .table-booktabs thead th,
     .app-stage.dark .table-booktabs tbody tr,
     .app-stage.dark [class*="bg-[#"] {
-      background: #fff;
+      background: #fff !important;
     }
     .app-stage.dark .lg-surface {
-      background-image: none;
-      box-shadow: none;
+      background-image: none !important;
+      box-shadow: none !important;
     }
   }
   .app-stage.dark .text-ink {
-    color: #e3ebf6;
+    color: #e3ebf6 !important;
   }
   .app-stage.dark .text-ink-2 {
-    color: #ccd8e6;
+    color: #ccd8e6 !important;
   }
   .app-stage.dark .text-ink-3 {
-    color: #c6d2e2;
+    color: #c6d2e2 !important;
   }
   .app-stage.dark .text-brand {
-    color: #9cc7ff;
+    color: #9cc7ff !important;
   }
   /* 浅色模式（米白）：底色 + 文字回到暖调深墨 */
   .app-stage.light.lg-stage {
@@ -888,7 +961,20 @@
     border-color: rgba(255, 255, 255, 0.12);
   }
   .app-stage.dark .text-brand-deep {
-    color: #a9d0ff;
+    color: #a9d0ff !important;
+  }
+  /* KPI 的四个彩色数字（Tailwind 任意值类）—— 用属性选择器统一提亮 */
+  .app-stage.dark [class*="#12457f"] {
+    color: #9dc2ff;
+  }
+  .app-stage.dark [class*="#0a6f66"] {
+    color: #7fe2d6;
+  }
+  .app-stage.dark [class*="#4b3ea3"] {
+    color: #b9b0ff;
+  }
+  .app-stage.dark [class*="#8a5a12"] {
+    color: #f0c07a;
   }
   /* 卡片 / 表格 */
   .app-stage.dark .card {
@@ -942,8 +1028,18 @@
       rgba(255, 255, 255, 0) 64%
     );
   }
-  /* 2026-11-05 S3：这一版深色按钮玻璃同样被更晚的同选择器规则覆盖（border/bg-image/box-shadow → 1387），
-     color 与 804 那条重复 ⇒ 整块删除 + 其 :hover 由 1409 接管。快照比对 0 差异。 */
+  /* 按钮 / tab / chip 的深色玻璃 */
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
+    border-color: rgba(255, 255, 255, 0.2);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 1px 2px rgba(0, 0, 0, 0.35);
+    color: #dfe8f5;
+  }
+  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
   .app-stage.dark .tab-on {
     background: rgba(255, 255, 255, 0.16);
     border-color: rgba(255, 255, 255, 0.28);
@@ -961,9 +1057,9 @@
   }
   /* 输入框 / 搜索 */
   .app-stage.dark input {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
-    color: #eef3fa;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #eef3fa !important;
   }
   .app-stage.dark input::placeholder {
     color: #93a3ba;
@@ -977,37 +1073,46 @@
      又因为 utilities 层优先于 components 层 ⇒ 深底上仍是深墨字 = "字不明显"。
      这里按"次/主/强调"三档统一提亮，且排在 `.num` 之后把 KPI 四色压回来。 */
   .app-stage.dark :is(.label-caps, .sec-no, .figcap, .num, .sec-sub) {
-    color: #c6d2e2;
+    color: #c6d2e2 !important;
   }
   .app-stage.dark :is(.label, .kpi-val, .badge-c, .tab, .chip, .chip-off, .sec-title, .sec-h) {
-    color: #d9e3ef;
+    color: #d9e3ef !important;
   }
   .app-stage.dark :is(.eyebrow, .chip-on) {
-    color: #a9d0ff;
+    color: #a9d0ff !important;
+  }
+  .app-stage.dark [class*="#12457f"] {
+    color: #a8c8ff !important;
+  }
+  .app-stage.dark [class*="#0a6f66"] {
+    color: #8fe7db !important;
+  }
+  .app-stage.dark [class*="#4b3ea3"] {
+    color: #c3baff !important;
   }
   /* 徽标（A/B/C 级）：浅色底是写在 `.badge-*` 类里的（不是元素上的 bg 工具类），兜底规则抓不到 ⇒ 单独处理 */
   .app-stage.dark .badge-a {
     background: rgba(10, 125, 111, 0.3);
     border-color: rgba(94, 229, 198, 0.45);
-    color: #7ff0d8;
+    color: #7ff0d8 !important;
   }
   .app-stage.dark .badge-b {
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.22);
-    color: #dbe6f4;
+    color: #dbe6f4 !important;
   }
   /* ── v24 选项按钮（chip）的液态玻璃 ─────────────────────────────────
      之前 chip 只有"半透明底"，缺**边缘高光/厚度**，所以看着是平的。
      这里补：顶部亮边 + 亮轮廓 + 底部内阴影（厚度）+ 外投影 + 背景模糊 + 三段渐变。 */
   .app-stage :is(.chip, .chip-sm) {
-    border: 1px solid rgba(255, 255, 255, 0.72);
-    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.72) !important;
+    background-color: transparent !important;
     background-image: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.74) 0%,
       rgba(255, 255, 255, 0.34) 55%,
       rgba(255, 255, 255, 0.44) 100%
-    );
+    ) !important;
     -webkit-backdrop-filter: blur(14px) saturate(1.45);
     backdrop-filter: blur(14px) saturate(1.45);
     box-shadow:
@@ -1021,7 +1126,7 @@
       border-color 180ms ease;
   }
   .app-stage :is(.chip, .chip-sm):hover {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
     box-shadow:
       inset 0 1px 0 #fff,
       inset 0 -8px 12px -10px rgba(15, 23, 42, 0.2),
@@ -1029,8 +1134,8 @@
     transform: translateY(-0.5px);
   }
   .app-stage .chip-on {
-    border-color: rgba(120, 170, 255, 0.6);
-    background-image: linear-gradient(180deg, rgba(186, 214, 255, 0.6) 0%, rgba(120, 170, 255, 0.3) 100%);
+    border-color: rgba(120, 170, 255, 0.6) !important;
+    background-image: linear-gradient(180deg, rgba(186, 214, 255, 0.6) 0%, rgba(120, 170, 255, 0.3) 100%) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
       0 2px 8px -3px rgba(30, 91, 168, 0.35);
@@ -1047,11 +1152,22 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.5),
       0 12px 30px -26px rgba(96, 74, 40, 0.3);
   }
-  /* 2026-11-05 S3：浅色 `webgl-ready` 的 background-image 被更晚的同选择器规则（1402 起，
-     多一层 150px 高光 + 115° 斜向光泽）覆盖 ⇒ 此处删除。快照比对 0 差异。 */
-  /* 2026-11-05 S3：浅色按钮玻璃只保留更晚那一版（border-color / background-image 带 `!important`），
-     此处删到只剩 `color`（后文没有再声明它）。快照比对 0 差异。 */
+  .app-stage.light.webgl-ready .lg-surface {
+    /* 浅色下 canvas 玻璃会被着色压暗 ~10 级 ⇒ 叠一层薄白把玻璃"提回来"，同时保留光标聚光 */
+    background-image:
+      radial-gradient(
+        520px circle at var(--mx, 50%) var(--my, -20%),
+        rgba(255, 253, 246, 0.6) 0%,
+        rgba(255, 253, 246, 0) 64%
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.24));
+  }
   .app-stage.light :is(button, [role="tab"]):not(.btn-plain) {
+    border-color: rgba(255, 255, 255, 0.85);
+    background-image: linear-gradient(180deg, rgba(255, 253, 247, 0.88) 0%, rgba(255, 249, 236, 0.46) 100%);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 1px 2px rgba(120, 96, 60, 0.1);
     color: #4a4234;
   }
   .app-stage.light .tab {
@@ -1063,13 +1179,13 @@
     color: #5a4a2e;
   }
   .app-stage.light :is(.chip, .chip-sm) {
-    border-color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.85) !important;
     background-image: linear-gradient(
       180deg,
       rgba(255, 253, 247, 0.9) 0%,
       rgba(255, 249, 236, 0.5) 55%,
       rgba(255, 252, 244, 0.6) 100%
-    );
+    ) !important;
     box-shadow:
       inset 0 1px 0 #fff,
       inset 0 -8px 12px -10px rgba(120, 96, 60, 0.18),
@@ -1077,91 +1193,91 @@
     color: #4a4234;
   }
   .app-stage.light .chip-on {
-    border-color: rgba(30, 91, 168, 0.35);
-    background-image: linear-gradient(180deg, rgba(196, 220, 250, 0.85) 0%, rgba(160, 196, 240, 0.55) 100%);
+    border-color: rgba(30, 91, 168, 0.35) !important;
+    background-image: linear-gradient(180deg, rgba(196, 220, 250, 0.85) 0%, rgba(160, 196, 240, 0.55) 100%) !important;
     color: #123a63;
   }
   /* 米白底上的文字对比（实测自检点名 116 处：ink-3 #94a3b8 只有 2.28:1）——
      三档统一加深到暖墨色，保持暖调但达到 ≥4.5:1 */
   .app-stage.light .text-ink {
-    color: #2f2a22;
+    color: #2f2a22 !important;
   }
   .app-stage.light .text-ink-2 {
-    color: #4c4335;
+    color: #4c4335 !important;
   }
   .app-stage.light .text-ink-3 {
-    color: #6b5f4c;
+    color: #6b5f4c !important;
   }
   .app-stage.light :is(.label-caps, .sec-no, .figcap, .sec-sub, .num) {
-    color: #6b5f4c;
+    color: #6b5f4c !important;
   }
   .app-stage.light :is(.label, .kpi-val, .badge-c, .sec-title, .sec-h) {
-    color: #3a332b;
+    color: #3a332b !important;
   }
   .app-stage.light .text-brand-deep {
-    color: #1c4f86;
+    color: #1c4f86 !important;
   }
   .app-stage.light .text-brand {
-    color: #1a63b8;
+    color: #1a63b8 !important;
   }
   /* 语义色在米白底上也要够深（text-ok #0d9488 只有 3.32:1） */
   .app-stage.light .text-ok {
-    color: #0a6b60;
+    color: #0a6b60 !important;
   }
   .app-stage.light .text-bad {
-    color: #a52c2c;
+    color: #a52c2c !important;
   }
   .app-stage.light .text-good {
-    color: #1d6b3f;
+    color: #1d6b3f !important;
   }
   /* 徽标 A 的 4.45 只差一点点（阈值 4.5），再压深一点 */
   .app-stage.light .badge-a {
-    color: #08695e;
+    color: #08695e !important;
   }
 
   /* 深色下 chip 的玻璃要"看得出"：白度 30%→12%→18%（三段模拟厚度），亮边 .45，底部内阴影加深 */
   .app-stage.dark :is(.chip, .chip-sm) {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3) !important;
     background-image: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.3) 0%,
       rgba(255, 255, 255, 0.12) 55%,
       rgba(255, 255, 255, 0.18) 100%
-    );
+    ) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.45),
       inset 0 -8px 12px -10px rgba(0, 0, 0, 0.55),
       0 2px 6px -2px rgba(0, 0, 0, 0.55);
-    color: #eef4fc;
+    color: #eef4fc !important;
   }
   .app-stage.dark :is(.chip, .chip-sm):hover {
     background-image: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.4) 0%,
       rgba(255, 255, 255, 0.2) 100%
-    );
-    border-color: rgba(255, 255, 255, 0.42);
+    ) !important;
+    border-color: rgba(255, 255, 255, 0.42) !important;
   }
   .app-stage.dark .chip-on {
-    border-color: rgba(150, 195, 255, 0.6);
-    background-image: linear-gradient(180deg, rgba(120, 170, 255, 0.5) 0%, rgba(80, 130, 220, 0.3) 100%);
+    border-color: rgba(150, 195, 255, 0.6) !important;
+    background-image: linear-gradient(180deg, rgba(120, 170, 255, 0.5) 0%, rgba(80, 130, 220, 0.3) 100%) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       0 2px 8px -3px rgba(30, 91, 168, 0.6);
-    color: #f4f9ff;
+    color: #f4f9ff !important;
   }
 
   /* ── 深色下"半透明白"类工具（bg-white/xx）也要转深 ──────────────────
      之前只匹配了精确的 `bg-white`，`bg-white/50` 这类（语言切换容器）留着浅白块，
      而按钮文字被全局玻璃规则刷成浅色 ⇒ 浅字压浅块 = 看不清（owner 反馈）。 */
   .app-stage.dark [class*="bg-white/"] {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.08) !important;
   }
   /* 按下/选中的按钮（语言切换的当前语言等）给明确的选中态 */
   .app-stage.dark button[aria-pressed="true"] {
-    border-color: rgba(150, 195, 255, 0.55);
-    background-image: linear-gradient(180deg, rgba(140, 185, 255, 0.4) 0%, rgba(90, 140, 230, 0.22) 100%);
-    color: #ffffff;
+    border-color: rgba(150, 195, 255, 0.55) !important;
+    background-image: linear-gradient(180deg, rgba(140, 185, 255, 0.4) 0%, rgba(90, 140, 230, 0.22) 100%) !important;
+    color: #ffffff !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       0 1px 3px rgba(0, 0, 0, 0.4);
@@ -1222,20 +1338,20 @@
     font-weight: 500;
   }
   .app-stage.dark select {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.24);
-    color: #eef4fc;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23dfe8f5' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.24) !important;
+    color: #eef4fc !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23dfe8f5' stroke-width='1.6' stroke-linecap='round'/></svg>") !important;
   }
   .app-stage.dark option {
     background-color: #2b2f36;
     color: #eef4fc;
   }
   .app-stage.light select {
-    background-color: #fffdf7;
-    border-color: rgba(120, 96, 60, 0.28);
-    color: #3a332b;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%236b5f4c' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    background-color: #fffdf7 !important;
+    border-color: rgba(120, 96, 60, 0.28) !important;
+    color: #3a332b !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%236b5f4c' stroke-width='1.6' stroke-linecap='round'/></svg>") !important;
   }
   .app-stage.light option {
     background-color: #fffdf7;
@@ -1284,7 +1400,7 @@
        ⑤ 厚度/悬浮：底部内阴影（厚度）+ 2 层外投影（贴地 + 悬空） */
   .app-stage :is(button, [role="tab"]):not(.btn-plain) {
     position: relative;
-    background-color: transparent;
+    background-color: transparent !important;
     background-image:
       radial-gradient(
         120px circle at var(--mx, 50%) var(--my, -40%),
@@ -1297,8 +1413,8 @@
         rgba(255, 255, 255, 0.7) 0%,
         rgba(255, 255, 255, 0.34) 55%,
         rgba(255, 255, 255, 0.46) 100%
-      );
-    border: 1px solid rgba(255, 255, 255, 0.78);
+      ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.78) !important;
     -webkit-backdrop-filter: blur(14px) saturate(1.5);
     backdrop-filter: blur(14px) saturate(1.5);
     box-shadow:
@@ -1320,7 +1436,7 @@
         rgba(255, 255, 255, 0) 72%
       ),
       linear-gradient(115deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 44%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.5) 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
     box-shadow:
       inset 0 1px 0 #fff,
       inset 0 -1px 0 rgba(255, 255, 255, 0.5),
@@ -1351,8 +1467,8 @@
         rgba(255, 255, 255, 0.17) 0%,
         rgba(255, 255, 255, 0.06) 55%,
         rgba(255, 255, 255, 0.1) 100%
-      );
-    border-color: rgba(255, 255, 255, 0.24);
+      ) !important;
+    border-color: rgba(255, 255, 255, 0.24) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.3),
       inset 0 -1px 0 rgba(255, 255, 255, 0.1),
@@ -1368,7 +1484,7 @@
         rgba(255, 255, 255, 0) 72%
       ),
       linear-gradient(115deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 44%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
   }
 
   /* chip 同样加"镜面 + 斜向光泽"两层（它原来的三段渐变保留） */
@@ -1385,7 +1501,7 @@
         rgba(255, 255, 255, 0.74) 0%,
         rgba(255, 255, 255, 0.34) 55%,
         rgba(255, 255, 255, 0.44) 100%
-      );
+      ) !important;
   }
   /* ── v32 浅色"光影不够"的两处根因修复 ─────────────────────────────────
      ① 光标光斑：浅底上叠**纯白**等于看不见 ⇒ 改成「冷色光泽(偏蓝) + 一点白色热点」，
@@ -1425,8 +1541,8 @@
         rgba(255, 255, 255, 0.72) 0%,
         rgba(255, 255, 255, 0.36) 55%,
         rgba(255, 255, 255, 0.48) 100%
-      );
-    border-color: rgba(255, 255, 255, 0.85);
+      ) !important;
+    border-color: rgba(255, 255, 255, 0.85) !important;
     box-shadow:
       inset 0 1px 0 #fff,
       inset 0 -1px 0 rgba(255, 255, 255, 0.55),
@@ -1447,7 +1563,7 @@
         rgba(255, 255, 255, 0) 72%
       ),
       linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.52) 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.52) 100%) !important;
   }
   /* 深色 chip：保留三段渐变 + 镜面 + 斜向光泽（v31 的数值，别丢） */
   .app-stage.dark :is(.chip, .chip-sm) {
@@ -1463,16 +1579,16 @@
         rgba(255, 255, 255, 0.3) 0%,
         rgba(255, 255, 255, 0.12) 55%,
         rgba(255, 255, 255, 0.18) 100%
-      );
-    border-color: rgba(255, 255, 255, 0.3);
+      ) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.45),
       inset 0 -8px 12px -10px rgba(0, 0, 0, 0.55),
       0 2px 6px -2px rgba(0, 0, 0, 0.55);
-    color: #eef4fc;
+    color: #eef4fc !important;
   }
   .app-stage.dark :is(a[class*="rounded"]):not(.btn-plain) {
-    background-color: transparent;
+    background-color: transparent !important;
     background-image:
       radial-gradient(
         120px circle at var(--mx, 50%) var(--my, -40%),
@@ -1485,8 +1601,8 @@
         rgba(255, 255, 255, 0.17) 0%,
         rgba(255, 255, 255, 0.06) 55%,
         rgba(255, 255, 255, 0.1) 100%
-      );
-    border: 1px solid rgba(255, 255, 255, 0.24);
+      ) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.3),
       inset 0 -1px 0 rgba(255, 255, 255, 0.1),
@@ -1496,41 +1612,12 @@
   
 }
 
-/* ── v56 S5：语义化的"浅底 tint"（2026-11-05）
-   把 tsx 里最常见的两个色号 `#eef2f8` / `#fafbfe` 收成 `bg-tint` / `bg-tint-soft`；
-   浅色下值完全相同；深色侧原先靠 `.app-stage.dark [class*="bg-[#e…"]` 兜底转成 6% 白，
-   改成语义类后必须在这里给同值规则，否则深色会掉回浅色块（快照会抓到）。 */
-.app-stage.dark .bg-tint,
-.app-stage.dark .bg-tint-soft {
-  background-color: rgba(255, 255, 255, 0.06);
-}
-
-/* ── v49 tokens：颜色的**唯一字面量处**（2026-11-05 · S1+S2，见 docs/ui_style_consolidation_20261105.md）
-   本块只做两件事，**不改老规则**（S5 再迁）：
-   ① 把"选中标记"这类语义色抽成变量，供 `.chip-badge` / `.tab-on::after` / `.is-selected` 消费；
-   ② 提供**唯一的选中语义** `.is-selected`（今天散在 chip-on / tab-on / bg-brand 三处）。
-   ⚠ 图表内部颜色不在这里 —— 它在 `src/components/Chart.tsx` 的 LIGHT_TONE/DARK_TONE
-     （ECharts 画在 canvas 上，吃不到 CSS 变量），由 `scripts/check_chart_theme.py` 把关。 */
-:root {
-  --ui-marker-bg: #1e5ba8; /* 选中标记（徽标 / 下划线）底色 */
-  --ui-marker-fg: #ffffff; /* 标记上的勾/字 */
-  --ui-selected-weight: 600;
-}
-.app-stage.dark {
-  --ui-marker-bg: #7bb8ff;
-  --ui-marker-fg: #0b1220;
-}
-/* 唯一的"选中"语义：组件只负责加这个 class（可见性由 `.chip-badge` / `::after` 提供） */
-.is-selected {
-  font-weight: var(--ui-selected-weight);
-}
-
 /* ── v47 「选中」用**实心徽标**表达，不跟玻璃底色抢（2026-11-05 · owner：「点了就只有一个 √，
    看不清到底选了没」）────────────────────────────────────────────────────────────
    为什么不像上一版那样改 `.chip-on` 的底色：`.app-stage.light :is(button…)` 那条全站玻璃规则
    带 `!important` 且与本规则同层同量级，浅色下会**把实底洗掉**（实测深色成功、浅色失败）。
    徽标是 chip **内部的一个 `<span>`**，不参与那些 button/chip 规则 ⇒ 两套主题都稳定可见：
-   浅色 = 深蓝底白勾（6.7:1）、深色 = 亮蓝底深字（9.0:1）。颜色走 v49 tokens。 */
+   浅色 = 深蓝底白勾（6.7:1）、深色 = 亮蓝底深字（9.0:1）。选中态同时加粗。 */
 .chip-badge {
   display: inline-grid;
   place-items: center;
@@ -1538,8 +1625,8 @@
   height: 15px;
   flex: none;
   border-radius: 9999px;
-  background: var(--ui-marker-bg);
-  color: var(--ui-marker-fg);
+  background: #1e5ba8;
+  color: #fff;
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
@@ -1549,12 +1636,17 @@
   height: 13px;
   font-size: 9px;
 }
+.app-stage.dark .chip-badge {
+  background: #7bb8ff;
+  color: #0b1220;
+}
 
 /* ── v47 Tab 的选中态补一条下划线（2026-11-05 · 承接"看不出选没选"）────────────────────
    `.tab-on` 原本只是 `rgba(255,255,255,.55)` 叠在浅色玻璃上 —— 实测亮度差 ≈ **2.8/255**，
    导航里 4 个 Tab 并排时几乎看不出当前在哪一页；单药页 5 个 Tab 同理。
    用 `::after` 画一条 2px 品牌色条：伪元素**不被现有 glass 规则命中**（那些规则只选
-   `button` / `.tab` 的背景与 box-shadow）⇒ 不会被 `!important` 洗掉。颜色走 v49 tokens。 */
+   `button` / `.tab` 的背景与 box-shadow）⇒ 不会被 `!important` 洗掉，也不用再加一层 `!important`。
+   浅色 #1e5ba8 对浅底 ≈6.7:1、深色 #7bb8ff 对深底 ≈7:1，都是"一眼可见"级别。 */
 .tab-on::after {
   content: "";
   position: absolute;
@@ -1563,9 +1655,39 @@
   bottom: 2px;
   height: 2px;
   border-radius: 2px;
-  background: var(--ui-marker-bg);
+  background: #1e5ba8;
   pointer-events: none;
 }
+.app-stage.dark .tab-on::after {
+  background: #7bb8ff;
+}
 
 
 }
+
+/* ── v57 回滚说明 + 只保留「加载项」（2026-11-05）────────────────────────────────
+   为什么回滚：S3/S4/S5 的删除与 `!important` 移除，是在**无主题态**下验证的
+   （`?bg=none` 会让 GlassApp 不加 `light`/`dark` 类 ⇒ 主题规则根本不生效）= 无效证据。
+   用正确 URL + **同数据**的旧构建（`ed855fe` worktree）对照后，发现 **40 处 color 漂移**
+   （按钮/容器的 color 把 `.text-ink*` / `.chip` 的文字色压掉）⇒ 全部回滚到 ed855fe 基线。
+   下面几段是**纯加载项**：不删任何旧规则，只提供 token / 唯一选中语义 / tint 的深色等价规则。
+   后续再做收敛，必须用 `scripts/ui_style_snapshot.mjs`（**已修正：不带 bg=none**）+ 同数据对照。 */
+:root {
+  --ui-marker-bg: #1e5ba8;
+  --ui-marker-fg: #ffffff;
+  --ui-selected-weight: 600;
+}
+.app-stage.dark {
+  --ui-marker-bg: #7bb8ff;
+  --ui-marker-fg: #0b1220;
+}
+.is-selected {
+  font-weight: var(--ui-selected-weight);
+}
+/* S5：tsx 已改用 `bg-tint` / `bg-tint-soft`（色号 → token），深色侧补同值规则
+   （等价于原先 `[class*="bg-[#e…"]` 把它压成 6% 白） */
+.app-stage.dark .bg-tint,
+.app-stage.dark .bg-tint-soft {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+

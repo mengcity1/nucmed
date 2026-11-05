@@ -82,15 +82,19 @@ const TARGETS = [
   { sel: "select", n: 1 },
 ];
 
+/* ⚠ 2026-11-05 重要修正：**不要用 `bg=none`** —— 它会让 GlassApp 不加 `light`/`dark` 类，
+   于是 `.app-stage.light …` / `.dark …` 那整套主题规则根本不生效（实测 stageClass 只有
+   `lg-stage app-stage webgl-ready`、`.text-ink-3` 退回 #94a3b8）。
+   计算样式与 canvas 动画无关 ⇒ 不需要为了"冻结画面"牺牲主题。 */
 const PAGES = [
-  ["home-light", "/?theme=light&bg=none"],
-  ["home-dark", "/?theme=dark&bg=none"],
-  ["drug-light", "/drug/1145?theme=light&bg=none"],
-  ["drug-dark", "/drug/1145?theme=dark&bg=none"],
-  ["atlas-light", "/atlas?drug=3&theme=light&bg=none"],
-  ["atlas-dark", "/atlas?drug=3&theme=dark&bg=none"],
-  ["about-light", "/about?theme=light&bg=none"],
-  ["about-dark", "/about?theme=dark&bg=none"],
+  ["home-light", "/?theme=light"],
+  ["home-dark", "/?theme=dark"],
+  ["drug-light", "/drug/1145?theme=light"],
+  ["drug-dark", "/drug/1145?theme=dark"],
+  ["atlas-light", "/atlas?drug=3&theme=light"],
+  ["atlas-dark", "/atlas?drug=3&theme=dark"],
+  ["about-light", "/about?theme=light"],
+  ["about-dark", "/about?theme=dark"],
 ];
 
 async function snap() {

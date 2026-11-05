@@ -29,13 +29,15 @@ ROOT = Path(__file__).resolve().parent.parent
 CSS = ROOT / "src" / "index.css"
 SRC = ROOT / "src"
 
-# 棘轮基线（**只允许往下调**；2026-11-05 S4：全部 !important 已移除并证明等价 ⇒ 锁 0）
-# ⚠ 要把 `!important` 加回来，必须同时改这个基线，并在规则上方写明"对抗哪条 vendor 规则"。
-BASE_IMPORTANT = 0
-BASE_CHIP = 21
-BASE_TAB = 12
-BASE_BUTTON = 10
-BASE_LG = 27
+# 棘轮基线（**只允许往下调**；2026-11-05 收口时的**真实**值）
+# ⚠ 说明：先前"S3/S4/S5 把 chip 31→21、button 15→10、!important 107→0"的结论**已撤回** ——
+#   那批验证用了 `?bg=none`，而它会让 GlassApp 不加 light/dark 类 ⇒ 主题规则没被验证。
+#   现已回滚到 `ed855fe` 基线（见 DESIGN v58），下面的数字是回滚后的实测值。
+BASE_IMPORTANT = 111
+BASE_CHIP = 31
+BASE_TAB = 14
+BASE_BUTTON = 15
+BASE_LG = 31
 
 SELECTED = ("chip-on", "tab-on", "is-selected")
 OPAQUE_BG = re.compile(r"background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3}\b|#[0-9a-fA-F]{6}\b|rgb\(\s*\d+[,\s]+\d+[,\s]+\d+\s*\)|var\(--ui-marker-bg\))")
