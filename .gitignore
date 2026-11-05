@@ -10,6 +10,8 @@ preview.log
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+__pycache__/
+*.pyc
 
 # ── ★ 内部待办数据，不进库也不部署（2026-10-28） ──────
 # public/data/candidates.json = 3,779 个"看过但未入库"的候选 + tier 分级，

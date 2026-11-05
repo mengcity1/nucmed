@@ -32,6 +32,17 @@ jobs:
       - name: Install
         run: npm ci
 
+      # ★ 2026-11-05：图表配色/点径自动门（scripts/check_chart_theme.py）
+      #   2026-11-05 一天内同一张图因配色返工 4 次（深色点看不见 / 点被放大成"误差条" /
+      #   浅色网格线淡到测不出 / 又一次补强），全靠 owner 截图发现 ⇒ 把判据固化：
+      #   点径与折线点径跨主题必须相等、pointStyle 不得有光晕、数据色 ≥3:1、
+      #   网格线亮度差 ∈[6,28]/255、图例/tooltip 文字 ≥4.5:1。
+      - name: Check chart theme tokens
+        run: python3 scripts/check_chart_theme.py
+
+      - name: Check chart theme — negative test
+        run: python3 scripts/check_chart_theme.py --self-test
+
       # ★ base 必须与 Pages 路径一致：
       #   - 仓库名 <user>.github.io  → VITE_BASE 留空（默认 "/"）
       #   - 仓库名其它（项目站）      → VITE_BASE=/<仓库名>/
