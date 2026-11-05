@@ -48,7 +48,7 @@ const STAGE_TONE: Record<string, string> = {
   "1期": "bg-[#f0f7ff] text-[#3576b4] border-[#e0edfa]",
   临床: "bg-[#f2f6fc] text-[#475f7d] border-[#e2e9f3]",
   临床前: "bg-[#f3e8fb] text-[#7a3fa8] border-[#e6d2f2]",
-  未标注: "bg-[#eef2f8] text-[#516078] border-[#dfe6f0]",
+  未标注: "bg-tint text-[#516078] border-[#dfe6f0]",
 };
 
 /** 元素中文 → 符号（让搜索框同时支持「镥」和「Lu」） */
@@ -116,7 +116,7 @@ function GroupLabel({ icon, children, count }: {
       <Icon name={icon} size={14} className="text-ink-3/80" />
       <span>{children}</span>
       {count !== undefined && (
-        <span className="rounded bg-[#eef2f8] px-1.5 py-[1px] text-[11px] tabular-nums text-ink-3">
+        <span className="rounded bg-tint px-1.5 py-[1px] text-[11px] tabular-nums text-ink-3">
           {count}
         </span>
       )}
@@ -808,12 +808,12 @@ export default function Home() {
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={`sk-${i}`} className="border-b border-[#f1f4f9]">
                     <td className="px-3 py-2.5">
-                      <div className="mx-auto h-6 w-16 animate-pulse rounded bg-[#eef2f8]" />
+                      <div className="mx-auto h-6 w-16 animate-pulse rounded bg-tint" />
                     </td>
                     {[0, 1, 2, 3, 4, 5, 6].map((c) => (
                       <td key={c} className="px-3 py-2.5">
                         <div
-                          className="h-3.5 animate-pulse rounded bg-[#eef2f8]"
+                          className="h-3.5 animate-pulse rounded bg-tint"
                           style={{ width: `${[70, 55, 40, 80, 65, 35, 45][c]}%` }}
                         />
                       </td>

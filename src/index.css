@@ -1496,6 +1496,15 @@
   
 }
 
+/* ── v56 S5：语义化的"浅底 tint"（2026-11-05）
+   把 tsx 里最常见的两个色号 `#eef2f8` / `#fafbfe` 收成 `bg-tint` / `bg-tint-soft`；
+   浅色下值完全相同；深色侧原先靠 `.app-stage.dark [class*="bg-[#e…"]` 兜底转成 6% 白，
+   改成语义类后必须在这里给同值规则，否则深色会掉回浅色块（快照会抓到）。 */
+.app-stage.dark .bg-tint,
+.app-stage.dark .bg-tint-soft {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
 /* ── v49 tokens：颜色的**唯一字面量处**（2026-11-05 · S1+S2，见 docs/ui_style_consolidation_20261105.md）
    本块只做两件事，**不改老规则**（S5 再迁）：
    ① 把"选中标记"这类语义色抽成变量，供 `.chip-badge` / `.tab-on::after` / `.is-selected` 消费；

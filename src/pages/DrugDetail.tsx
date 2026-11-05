@@ -30,13 +30,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function DetailSkeleton() {
   return (
     <div className="pb-4" aria-busy="true">
-      <div className="h-3.5 w-24 animate-pulse rounded bg-[#eef2f8]" />
+      <div className="h-3.5 w-24 animate-pulse rounded bg-tint" />
       <div className="mt-4 h-7 w-64 animate-pulse rounded bg-[#e9eef6]" />
       <div className="card mt-5 p-6">
         <div className="grid gap-5 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i}>
-              <div className="h-3 w-12 animate-pulse rounded bg-[#eef2f8]" />
+              <div className="h-3 w-12 animate-pulse rounded bg-tint" />
               <div className="mt-2 h-4 w-24 animate-pulse rounded bg-[#e9eef6]" />
             </div>
           ))}
@@ -451,7 +451,7 @@ function TbrPanel({ pts, hasTbr, onGoBio }: { pts: Point[]; hasTbr: boolean; onG
           <div className="mt-2 hscroll rounded-[10px] border border-line">
             <table className="w-full border-collapse text-[13px]">
               <thead>
-                <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
+                <tr className="border-b border-line bg-tint-soft text-[11.5px] uppercase tracking-wide text-ink-3">
                   <th className="px-4 py-2 text-left font-semibold">{tr("drug.thOrganModel")}</th>
                   <th className="px-4 py-2 text-left font-semibold">{tr("drug.thTime")}</th>
                   <th className="px-4 py-2 text-right font-semibold">{tr("drug.thValue")}</th>
@@ -857,7 +857,7 @@ export default function DrugDetail() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-2.5">
             <h1 className="font-sans text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
-            <span className="rounded-full border border-[#dfe6f0] bg-[#eef2f8] px-2.5 py-0.5 text-[12px] text-[#516078]">
+            <span className="rounded-full border border-[#dfe6f0] bg-tint px-2.5 py-0.5 text-[12px] text-[#516078]">
               # {drug.drug_id}
             </span>
             <span className={`text-[12px] ${hasRealStruct ? "text-ok" : "text-ink-3"}`}>
@@ -917,7 +917,7 @@ export default function DrugDetail() {
             <div
               key={p.key}
               className={`rounded-[10px] border p-3 ${
-                p.v ? "border-line bg-[#fafbfe]" : "border-dashed border-[#e8edf5] bg-white"
+                p.v ? "border-line bg-tint-soft" : "border-dashed border-[#e8edf5] bg-white"
               }`}
             >
               <div className="text-[11.5px] font-medium tracking-wide text-ink-3">{p.k}</div>
@@ -962,7 +962,7 @@ export default function DrugDetail() {
                       alt: tr("drug.partAltZoom", { d: drug.name_en, k: p.k }),
                     })
                   }
-                  className="mt-2 w-full cursor-zoom-in rounded border border-[#eef2f8] bg-white transition hover:opacity-90"
+                  className="mt-2 w-full cursor-zoom-in rounded border border-tint bg-white transition hover:opacity-90"
                   onError={() => setImgErr((s) => ({ ...s, [`part:${p.part}`]: true }))}
                 />
               )}
@@ -1106,7 +1106,7 @@ export default function DrugDetail() {
           <div className="hscroll">
             <table className="table-booktabs w-full border-collapse text-[13px]">
               <thead>
-                <tr className="border-b border-line bg-[#fafbfe] text-[11.5px] uppercase tracking-wide text-ink-3">
+                <tr className="border-b border-line bg-tint-soft text-[11.5px] uppercase tracking-wide text-ink-3">
                   <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thOrgan")}</th>
                   <th className="px-4 py-2.5 text-left font-semibold">{tr("drug.thTime")}</th>
                   <th className="px-4 py-2.5 text-right font-semibold">{tr("drug.thValue")}</th>
@@ -1176,7 +1176,7 @@ export default function DrugDetail() {
                     </tr>
                     {openId === p.id && p.has_raw !== 0 && (
                       <tr className="border-b border-[#f1f4f9]">
-                        <td colSpan={6} className="bg-[#fafbfe] px-4 py-3">
+                        <td colSpan={6} className="bg-tint-soft px-4 py-3">
                           <div className="text-[12px] leading-relaxed text-ink-2">
                             <span className="font-medium text-ink">{tr("drug.rawSnippet")}</span>
                             {raw === null ? tr("common.loading") + "…" : (raw[String(p.id)] ?? tr("drug.noRawPlaceholder"))}
@@ -1279,7 +1279,7 @@ export default function DrugDetail() {
                       className={
                         g.tone === "src"
                           ? "rounded bg-[#dcfce7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#166534]"
-                          : "rounded bg-[#eef2f8] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
+                          : "rounded bg-tint px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
                       }
                     >
                       {g.tone === "src" ? tr("drug.badgeSrc") : tr("drug.badgeBg")}
@@ -1309,7 +1309,7 @@ export default function DrugDetail() {
                           <span
                             className={`num ${
                               L.kind === "nct" || L.kind === "url"
-                                ? "rounded bg-[#eef2f8] px-1.5 py-0.5 text-[10.5px] text-ink-2"
+                                ? "rounded bg-tint px-1.5 py-0.5 text-[10.5px] text-ink-2"
                                 : ""
                             }`}
                           >

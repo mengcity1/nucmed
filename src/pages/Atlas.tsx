@@ -208,7 +208,7 @@ export default function Atlas() {
                 setFilter({ drug: 0 });
               }}
               aria-label={tr("atlas.drugClear")}
-              className="absolute right-2 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full text-[11px] text-ink-3 transition hover:bg-[#eef2f8] hover:text-ink"
+              className="absolute right-2 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full text-[11px] text-ink-3 transition hover:bg-tint hover:text-ink"
             >
               ✕
             </button>

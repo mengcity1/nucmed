@@ -227,7 +227,7 @@ function PageBar({ pathname, q, onSearch }: { pathname: string; q: string; onSea
               type="button"
               onClick={() => onSearch("")}
               aria-label={tr("drug.clearKw")}
-              className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-ink-3 transition hover:bg-[#eef2f8] hover:text-ink"
+              className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-ink-3 transition hover:bg-tint hover:text-ink"
             >
               ✕
             </button>
@@ -296,9 +296,9 @@ export default function App() {
         <Suspense
           fallback={
             <div className="mt-6 space-y-4" aria-busy="true" aria-label="页面加载中">
-              <div className="h-8 w-40 animate-pulse rounded-lg bg-[#eef2f8]" />
+              <div className="h-8 w-40 animate-pulse rounded-lg bg-tint" />
               <div className="h-4 w-64 animate-pulse rounded bg-[#f2f5fa]" />
-              <div className="h-40 animate-pulse rounded-2xl bg-[#eef2f8]" />
+              <div className="h-40 animate-pulse rounded-2xl bg-tint" />
             </div>
           }
         >

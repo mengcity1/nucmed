@@ -10,6 +10,10 @@ export default {
         ok: "#0d9488",
         warn: "#d97706",
         bad: "#dc2626",
+        /* ★ 2026-11-05 S5：把最常出现的两个"骨架/浅底"色号提成 token
+           （原来在 tsx 里写 `bg-[#eef2f8]` / `bg-[#fafbfe]`，并靠 `[class*="bg-[#e"]` 兜底转深色）
+           ⇒ 换成语义类后，深色侧改用 `.bg-tint*` 规则（值不变，见 index.css）。 */
+        tint: { DEFAULT: "#eef2f8", soft: "#fafbfe" },
         /* ★ 2026-11-04 视觉升级：数据用色（KPI 彩带 / 区块强调），只做点缀不改主色 */
         accent: { DEFAULT: "#0d9488", deep: "#0a7d6f", soft: "#e6f7f4" },
         violet: { DEFAULT: "#6d5bd0", soft: "#efecfc" },

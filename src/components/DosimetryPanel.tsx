@@ -130,7 +130,7 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
       </div>
 
       <div
-        className={`mt-3 grid gap-x-4 gap-y-2 rounded-[10px] bg-[#fafbfe] px-3.5 py-3 text-[12px] ${
+        className={`mt-3 grid gap-x-4 gap-y-2 rounded-[10px] bg-tint-soft px-3.5 py-3 text-[12px] ${
           top ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2"
         }`}
       >
@@ -174,7 +174,7 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                     <span className="truncate text-[13px] font-medium text-ink">
                       {organLabel(a.organ, lang)}
                       {a.rows.length > 1 && (
-                        <span className="ml-1.5 rounded bg-[#eef2f8] px-1.5 py-[1px] text-[10.5px] font-normal text-ink-3">
+                        <span className="ml-1.5 rounded bg-tint px-1.5 py-[1px] text-[10.5px] font-normal text-ink-3">
                           {tr("dose.rowsN", { n: a.rows.length })}
                         </span>
                       )}
@@ -184,7 +184,7 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                       <span className="ml-1 text-[11px] text-ink-3">mGy/MBq</span>
                     </span>
                   </div>
-                  <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-[#eef2f8]">
+                  <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-tint">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-[#4b8fd9] to-brand"
                       style={{ width: `${w}%` }}
@@ -199,7 +199,7 @@ function DrugView({ rows }: { rows: DoseRow[] }) {
                   )}
                 </button>
                 {isOpen && (
-                  <div className="mt-1.5 rounded-[8px] border border-line bg-[#fafbfe] px-3 py-2">
+                  <div className="mt-1.5 rounded-[8px] border border-line bg-tint-soft px-3 py-2">
                     {a.rows.map((r) => (
                       <div
                         key={`${r.did}-${r.organ}-${r.u}-${r.v}`}
@@ -355,7 +355,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
         <div className="hscroll">
           <table className="w-full min-w-[720px] border-collapse text-[12.5px]">
             <thead>
-              <tr className="border-b border-line bg-[#fafbfe] text-[11px] uppercase tracking-wide text-ink-3">
+              <tr className="border-b border-line bg-tint-soft text-[11px] uppercase tracking-wide text-ink-3">
                 <th className="px-4 py-2 text-left font-medium">{tr("dose.thDrug")}</th>
                 <th className="px-3 py-2 text-left font-medium">{tr("dose.thIsotope")}</th>
                 <th className="px-3 py-2 text-right font-medium">{tr("dose.thOrgans")}</th>
@@ -369,7 +369,7 @@ function LibraryView({ rows }: { rows: DoseRow[] }) {
             </thead>
             <tbody>
               {list.map((g) => (
-                <tr key={g.did} className="border-b border-[#f4f6fb] transition hover:bg-[#fafbfe]">
+                <tr key={g.did} className="border-b border-[#f4f6fb] transition hover:bg-tint-soft">
                   <td className="max-w-[240px] px-4 py-2">
                     <div className="truncate font-medium text-ink">{g.name}</div>
                     <div className="num text-[11px] text-ink-3">#{g.did}</div>

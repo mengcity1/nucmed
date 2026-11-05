@@ -284,7 +284,7 @@ export default function About() {
           （显存按面积算；一块覆盖整页的 stage 在长页面上既不划算也更容易触发帧缓冲失败） */}
       <section data-glass="panel" className="card lg-surface mt-5 p-6">
         <h2 className="text-[16px] font-semibold">{tr("about.citeTitle")}</h2>
-        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-[#fafbfe] p-4 text-[12px] leading-relaxed text-ink-2">
+        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-tint-soft p-4 text-[12px] leading-relaxed text-ink-2">
 {`@article{nucmeddb2026,
   title   = {NucMed DB: a traceable radiopharmaceutical
              biodistribution resource with a reproducible benchmark},
