@@ -62,6 +62,8 @@ export default function Atlas() {
   /** 药名检索：输入即给建议（前 8 个匹配药），选中后写进 URL 的 ?drug=（510 个药不再逐个铺 chip） */
   const [drugQ, setDrugQ] = useState("");
   const [sugOpen, setSugOpen] = useState(false);
+  /** 2026-11-05：建议列表的**键盘游标**（↑↓ 移动、Enter 选中）—— 原来只能鼠标点 */
+  const [sugIdx, setSugIdx] = useState(0);
 
   const drugs = useMemo(() => {
     const m = new Map<number, { name: string; n: number }>();
@@ -162,13 +164,35 @@ export default function Atlas() {
             onChange={(e) => {
               setDrugQ(e.target.value);
               setSugOpen(true);
+              setSugIdx(0);
               if (!e.target.value.trim()) setFilter({ drug: 0 });
             }}
             onFocus={() => setSugOpen(true)}
             onBlur={() => setSugOpen(false)}
             onKeyDown={(e) => {
-              if (e.key === "Escape") setSugOpen(false);
-              if (e.key === "Enter" && suggest[0]) pickDrug(suggest[0][0], suggest[0][1].name);
+              /* 键盘可达：↑↓ 移动游标、Enter 选中当前高亮项、Esc 关闭（2026-11-05） */
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setSugOpen(true);
+                setSugIdx((i) => Math.min(i + 1, Math.max(suggest.length - 1, 0)));
+                return;
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setSugIdx((i) => Math.max(i - 1, 0));
+                return;
+              }
+              if (e.key === "Escape") {
+                setSugOpen(false);
+                return;
+              }
+              if (e.key === "Enter") {
+                const pick = suggest[sugIdx] ?? suggest[0];
+                if (pick) {
+                  e.preventDefault();
+                  pickDrug(pick[0], pick[1].name);
+                }
+              }
             }}
             placeholder={tr("atlas.drugPh")}
             aria-label={tr("atlas.drugPh")}
@@ -191,15 +215,17 @@ export default function Atlas() {
           )}
           {sugOpen && suggest.length > 0 && (
             <ul className="absolute left-0 top-10 z-40 max-h-[280px] w-[260px] overflow-auto rounded-[10px] border border-line bg-white py-1 shadow-s2">
-              {suggest.map(([id, d]) => (
+              {suggest.map(([id, d], i) => (
                 <li key={id}>
                   <button
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
+                    onMouseEnter={() => setSugIdx(i)}
                     onClick={() => pickDrug(id, d.name)}
-                    className={`flex w-full items-center justify-between gap-2 px-3 py-1.5 text-left text-[12.5px] transition hover:bg-brand-soft ${
-                      drug === id ? "text-brand-deep" : "text-ink-2"
-                    }`}
+                    aria-selected={i === sugIdx}
+                    className={`flex w-full items-center justify-between gap-2 px-3 py-1.5 text-left text-[12.5px] transition ${
+                      i === sugIdx ? "bg-brand-soft" : ""
+                    } ${drug === id ? "text-brand-deep" : "text-ink-2"}`}
                   >
                     <span className="truncate">{d.name}</span>
                     <span className="num shrink-0 text-[11px] text-ink-3">{d.n} {tr("atlas.imgUnit")}</span>

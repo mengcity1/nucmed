@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 import { Chart, SYMBOLS, axisStyle, chartTone, legendStyle, pointStyle, tooltipStyle } from "../components/Chart";
@@ -535,7 +535,20 @@ export default function DrugDetail() {
     };
   }, [openId, raw]);
   const [zoom, setZoom] = useState<{ src: string; alt?: string; pmc?: string } | null>(null);
-  const [tab, setTab] = useState<TabKey>("bio");
+  /* ★ 2026-11-05：Tab 状态写进 URL（`?tab=dos`）⇒ 「剂量学 / 靶本比 / 文献 / 影像」可直接分享；
+     用 `replace` 写，避免切 Tab 把浏览器历史塞满（返回键仍回到上一页而不是上一个 Tab）。 */
+  const [sp, setSp] = useSearchParams();
+  const tabParam = sp.get("tab");
+  const tab: TabKey = tabParam === "dos" || tabParam === "tbr" || tabParam === "refs" || tabParam === "img" ? tabParam : "bio";
+  const setTab = useCallback(
+    (k: TabKey) => {
+      const p = new URLSearchParams(sp);
+      if (k === "bio") p.delete("tab");
+      else p.set("tab", k);
+      setSp(p, { replace: true });
+    },
+    [sp, setSp],
+  );
   // ★ 结构图来源（884 浙大 / 575 示意图 / 11 肽段 2D / 759 本地 RDKit）：此前一律标成 radiopharm，属错标
   const [structSrc, setStructSrc] = useState<string | null>(null);
   // ★ 文献 Tab 数字：挂载即取 drug_refs（104 KB，小）；题录 refs_all（979 KB）仍懒加载
@@ -670,8 +683,9 @@ export default function DrugDetail() {
       /* 影像：manifest 未到时（null）当"可能有"，别把用户从 Tab 上弹走 */
       img: figs === null || figs.length > 0,
     };
-    setTab((cur) => (ok[cur] ? cur : TAB_ORDER.find((k) => ok[k]) ?? "bio"));
-  }, [drug, mine.length, figs?.length]);
+    /* 2026-11-05：`tab` 现在来自 URL ⇒ 这里只负责"落到有数据的第一个"，并写回 URL（依赖里带 tab，落定后不再触发） */
+    if (!ok[tab]) setTab(TAB_ORDER.find((k) => ok[k]) ?? "bio");
+  }, [drug, mine.length, figs?.length, tab, setTab]);
 
   /* 无 id ⇒ 选择器（导航「单药画像」直接进来时） */
   if (!did) {
@@ -1010,7 +1024,7 @@ export default function DrugDetail() {
 
       {/* 4 个 Tab（B1）：可见性来自 drugs.json 导出字段；灰态 Tab 不隐藏、仍可点，
           点进去是「该药暂无 + 覆盖说明」，避免用户以为功能被砍掉 */}
-      <div className="-mx-1 mt-5 px-1 pb-1">
+      <div className="-mx-1 mt-5 overflow-x-auto px-1 pb-1">
         <div
           role="tablist"
           aria-label={tr("drug.tablist")}
