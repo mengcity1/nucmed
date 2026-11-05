@@ -648,13 +648,19 @@ export default function Home() {
                   setStages((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
                   setPage(0);
                 }}
-                className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition hover:ring-1 hover:ring-brand/30 ${
-                  on
-                    ? "border-brand bg-brand text-white shadow-[0_2px_8px_-2px_rgba(30,91,168,.55)]"
-                    : `${STAGE_TONE[s]} hover:-translate-y-px hover:shadow-s1`
-                }`}
+                /* 2026-11-05：选中态原来只有 `bg-brand text-white`（纯 background-color）⇒ 被全站玻璃规则的
+                   `background-image: … !important` 盖住，**看着完全没变化**。改用与其它筛选一致的
+                   "实心勾徽标 + 加粗"（徽标是 span，不受 button/chip 规则影响）。 */
+                className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11.5px] transition hover:ring-1 hover:ring-brand/30 ${
+                  STAGE_TONE[s]
+                } ${on ? "font-semibold" : "hover:-translate-y-px hover:shadow-s1"}`}
                 title={tr("home.stageClick")}
               >
+                {on && (
+                  <span aria-hidden="true" className="chip-badge chip-badge-xs mr-1 align-middle">
+                    ✓
+                  </span>
+                )}
                 {stageLabel(lang, s)}{" "}
                 <span className="tabular-nums opacity-80">{fmt(stageFacet[s])}</span>
               </button>

@@ -1631,6 +1631,11 @@
   font-weight: 700;
   line-height: 1;
 }
+.chip-badge-xs {
+  width: 13px;
+  height: 13px;
+  font-size: 9px;
+}
 .app-stage.dark .chip-badge {
   background: #7bb8ff;
   color: #0b1220;
