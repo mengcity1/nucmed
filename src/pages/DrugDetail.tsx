@@ -2,7 +2,8 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
-import { Chart, PALETTE, AXIS } from "../components/Chart";
+import { Chart, axisStyle, chartTone, legendStyle, pointStyle, tooltipStyle } from "../components/Chart";
+import { useTheme } from "../lib/theme";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
 import ImageViewer from "../components/ImageViewer";
@@ -64,6 +65,9 @@ function DetailSkeleton() {
 function DrugCurve({ pts }: { pts: Point[] }) {
   const tr = useT();
   const { lang } = useLang();
+  /** 图表画在 `<canvas>` 上，CSS 的深色令牌摸不到像素 ⇒ 这里按当前主题取一套图表令牌（2026-11-05） */
+  const [theme] = useTheme();
+  const tone = chartTone(theme === "dark");
   const units = useMemo(() => {
     const m = new Map<string, number>();
     for (const p of pts) m.set(p.value_unit, (m.get(p.value_unit) ?? 0) + 1);
@@ -105,41 +109,68 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       for (const p of rows) m.set(p.organ_norm, Math.max(m.get(p.organ_norm) ?? 0, p.value_num));
       return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k]) => k);
     })();
+    /* ★ 2026-11-05 修：`value` 必须是 **[器官名, 数值]** 数组，不能是裸数值。
+       裸数值时 category 轴按「系列内下标」定位 ⇒ 每个时点的点被依次排到第 1/2/3… 列，
+       与 x 轴标签毫无关系（实测：kidney 56 %ID/g 的点画在 liver 列上方）。
+       给成 [`器官名`, `数值`] 后，类目轴按**名字**匹配列，点才真的落在自己的器官上。 */
     const mk = (arr: Point[]) =>
       arr.map((p) => ({
-        value: p.value_num,
+        value: [p.organ_norm, p.value_num] as [string, number],
         name: p.organ_norm,
         sd: p.value_sd,
         pmid: p.doc_pmid,
         species: p.species,
       }));
-    const series: { name: string; type: "scatter"; symbolSize: number; data: unknown[] }[] = times
-      .slice(0, 6)
-      .map((t) => ({
-        name: `${t} h`,
-        type: "scatter",
-        symbolSize: 9,
-        data: mk(rows.filter((p) => p.time_h === t && organs.includes(p.organ_norm))),
-      }));
+    const series: {
+      name: string;
+      type: "scatter";
+      symbolSize: number;
+      itemStyle: ReturnType<typeof pointStyle>;
+      emphasis: { scale: number };
+      data: unknown[];
+    }[] = times.slice(0, 6).map((t, i) => ({
+      name: `${t} h`,
+      type: "scatter" as const,
+      symbolSize: tone.pointSize,
+      itemStyle: pointStyle(tone, tone.palette[i % tone.palette.length]),
+      emphasis: { scale: 1.35 },
+      data: mk(rows.filter((p) => p.time_h === t && organs.includes(p.organ_norm))),
+    }));
     const noT = rows.filter((p) => (p.time_h === null || p.time_h <= 0) && organs.includes(p.organ_norm));
-    if (noT.length) series.push({ name: tr("drug.chartNoTime"), type: "scatter", symbolSize: 9, data: mk(noT) });
+    if (noT.length)
+      series.push({
+        name: tr("drug.chartNoTime"),
+        type: "scatter",
+        symbolSize: tone.pointSize,
+        itemStyle: pointStyle(tone, tone.palette[series.length % tone.palette.length]),
+        emphasis: { scale: 1.35 },
+        data: mk(noT),
+      });
 
     return {
-      color: PALETTE,
+      color: tone.palette,
       /* 动效：先出坐标轴、再错峰落点（600ms / cubicOut / 每系列 +40ms） */
       animationDuration: 600,
       animationEasing: "cubicOut" as const,
       animationDelay: (idx: number) => idx * 40,
       tooltip: {
+        ...tooltipStyle(tone),
         trigger: "item" as const,
         formatter: (q: {
-          data: { name?: string; value: number; sd?: number | null; pmid?: string | null; species?: string | null };
+          data: {
+            value: [string, number];
+            name?: string;
+            sd?: number | null;
+            pmid?: string | null;
+            species?: string | null;
+          };
         }) => {
           const d = q.data;
+          const [organ, val] = d.value;
           const sd = d.sd != null ? ` ± ${d.sd}` : "";
           return [
-            `<b>${d.name}</b>`,
-            `${d.value}${sd} ${unit}`,
+            `<b>${organ}</b>`,
+            `${val}${sd} ${unit}`,
             d.species ? tr("drug.chartSpecies", { s: d.species }) : "",
             d.pmid ? `PMID ${d.pmid}` : "",
           ]
@@ -147,23 +178,28 @@ function DrugCurve({ pts }: { pts: Point[] }) {
             .join("<br/>");
         },
       },
-      legend: { type: "scroll" as const, top: 0, textStyle: { fontSize: 11, color: "#475569" } },
+      legend: legendStyle(tone),
       grid: { left: 56, right: 18, top: 40, bottom: 62 },
       xAxis: {
         type: "category" as const,
         data: organs,
-        axisLabel: { color: "#94a3b8", fontSize: 10.5, rotate: 32, interval: 0 },
+        axisLabel: { color: tone.label, fontSize: 10.5, rotate: 32, interval: 0 },
         axisTick: { show: false },
-        axisLine: { lineStyle: { color: "#e4e9f2" } },
+        axisLine: { lineStyle: { color: tone.axisLine } },
       },
-      yAxis: { type: "value" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
+      yAxis: {
+        type: "value" as const,
+        name: unit,
+        nameTextStyle: { color: tone.axisName, fontSize: 11 },
+        ...axisStyle(tone),
+      },
       series,
     };
-  }, [rows, times, unit, lang]);
+  }, [rows, times, unit, lang, tone]);
 
   /** 「时间曲线」：每个器官一条线，按 PMID 分段（换文献处断线，不把两篇论文连成一条趋势） */
   const curveOption = useMemo(() => {
-    const series = curvable.slice(0, 6).map((organ) => {
+    const series = curvable.slice(0, 6).map((organ, i) => {
       const arr = rows.filter((p) => p.organ_norm === organ && p.time_h !== null && p.time_h > 0);
       const byPmid = new Map<string, Point[]>();
       for (const p of arr) {
@@ -179,16 +215,31 @@ function DrugCurve({ pts }: { pts: Point[] }) {
         }
         data.push(null);
       }
-      return { name: organ, type: "line" as const, symbolSize: 6, connectNulls: false, smooth: false, data };
+      const c = tone.palette[i % tone.palette.length];
+      return {
+        name: organ,
+        type: "line" as const,
+        symbolSize: tone.dark ? 7 : 6,
+        symbol: "circle" as const,
+        showSymbol: true,
+        connectNulls: false,
+        smooth: false,
+        /* 线只用"数据色"，网格线已改虚线 ⇒ 不再是"一片实线" */
+        lineStyle: { width: tone.lineWidth, color: c },
+        itemStyle: { color: c, borderColor: tone.pointBorder, borderWidth: 1 },
+        emphasis: { focus: "series" as const, scale: 1.3 },
+        data,
+      };
     });
     return {
-      color: PALETTE,
+      color: tone.palette,
       /* 动效：曲线同样 600ms 生长；换视图时用 300ms 过渡，不闪 */
       animationDuration: 600,
       animationDurationUpdate: 300,
       animationEasing: "cubicOut" as const,
       animationEasingUpdate: "cubicOut" as const,
       tooltip: {
+        ...tooltipStyle(tone),
         trigger: "item" as const,
         formatter: (q: { seriesName: string; data: { value: [number, number]; pmid: string | null } | null }) => {
           if (!q.data) return "";
@@ -196,18 +247,23 @@ function DrugCurve({ pts }: { pts: Point[] }) {
           return `<b>${q.seriesName}</b><br/>${t} h → ${v} ${unit}` + (q.data.pmid ? `<br/>PMID ${q.data.pmid}` : "");
         },
       },
-      legend: { type: "scroll" as const, top: 0, textStyle: { fontSize: 11, color: "#475569" } },
+      legend: legendStyle(tone),
       grid: { left: 56, right: 18, top: 40, bottom: 40 },
       xAxis: {
         type: logX ? ("log" as const) : ("value" as const),
         name: logX ? tr("drug.chartTimeLog") : tr("drug.chartTime"),
-        nameTextStyle: { color: "#94a3b8", fontSize: 11 },
-        ...AXIS,
+        nameTextStyle: { color: tone.axisName, fontSize: 11 },
+        ...axisStyle(tone),
       },
-      yAxis: { type: "log" as const, name: unit, nameTextStyle: { color: "#94a3b8", fontSize: 11 }, ...AXIS },
+      yAxis: {
+        type: "log" as const,
+        name: unit,
+        nameTextStyle: { color: tone.axisName, fontSize: 11 },
+        ...axisStyle(tone),
+      },
       series,
     };
-  }, [rows, curvable, unit, logX, lang]);
+  }, [rows, curvable, unit, logX, lang, tone]);
 
   if (!rows.length) {
     return (
