@@ -103,6 +103,15 @@ async function snap() {
   const all = {};
   for (const [name, path] of PAGES) {
     await page.goto(BASE + path, { waitUntil: "networkidle", timeout: 60000 });
+    // v59：等"元素数稳定"再采样 —— 线上/CDN 首次访问时 `networkidle` 可能早于数据渲染
+    // （实测线上 home 只渲染出 257 个元素 vs 本地 655 ⇒ 会把"少了 6 个采样点"误报成样式差异）。
+    let prev = -1;
+    for (let i = 0; i < 30; i++) {
+      const n = await page.evaluate(() => document.querySelectorAll("*").length);
+      if (n === prev && n > 100) break;
+      prev = n;
+      await page.waitForTimeout(300);
+    }
     // 冻结动效，保证可重复
     await page.addStyleTag({ content: "*,*::before,*::after{animation:none!important;transition:none!important}" });
     await page.waitForTimeout(400);

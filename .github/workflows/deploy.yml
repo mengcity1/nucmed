@@ -65,6 +65,15 @@ jobs:
       - name: Verify 404 fallback exists
         run: test -f dist/404.html
 
+      # 页面级对比度门（v59）：4 页 × 深浅，任何"直接含文字的元素"< 4.5:1 即失败。
+      # 基线是 0（2026-11-05 修掉 badge-c / 已上市胶囊后），所以可以直接当硬门用。
+      - name: Contrast audit (WCAG AA)
+        run: |
+          npx playwright install --with-deps chromium
+          npx --yes serve -s dist -l 4175 >/dev/null 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4175 >/dev/null && break; sleep 1; done
+          node scripts/ui_contrast_audit.mjs --base http://127.0.0.1:4175
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
