@@ -149,8 +149,11 @@ const LIGHT_TONE: ChartTone = {
   lineSymbolSize: 6,
   pointBorder: "#ffffff",
   lineWidth: 2,
-  axisLine: "#e6ecf6",
-  splitLine: "#eef3fa",
+  /* 浅色网格线：早前 `#eef3fa` + 虚线实测**每行只差 ~2/255**（等于没画，owner：「浅色模式这里的线太不明显了」）。
+     现取 `#dde5f1`：对浅底 ~246 的行均值差 ≈ -8/255（虚线覆盖约一半），仍远弱于数据点（Δ≈130）。
+     轴线 `#cfdaea` 比网格线再重一档 —— 它是"坐标系的下边界"，不是网格。 */
+  axisLine: "#cfdaea",
+  splitLine: "#dde5f1",
   splitLineType: "dashed",
   label: "#8fa0b8",
   axisName: "#94a3b8",
