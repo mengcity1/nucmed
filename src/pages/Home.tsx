@@ -105,7 +105,7 @@ function GroupLabel({ icon, children, count }: {
   );
 }
 
-type MetricTone = "brand" | "accent" | "violet" | "sand";
+type MetricTone = "brand" | "accent" | "violet" | "sand" | "ink";
 
 /** 指标（2026-11-04 v16 简约）：**无底、无框、无阴影**，只有排版 + 细线分栏。
  *  计数动画保留；颜色只落在数字上（轻声量级，不抢视线）。 */
@@ -114,11 +114,13 @@ function Metric({
   value,
   hint,
   tone = "brand",
+  className = "",
 }: {
   label: string;
   value: number;
   hint?: string;
   tone?: MetricTone;
+  className?: string;
 }) {
   const shown = useCountUp(value);
   const val: Record<MetricTone, string> = {
@@ -126,9 +128,10 @@ function Metric({
     accent: "text-[#0a6f66]",
     violet: "text-[#4b3ea3]",
     sand: "text-[#8a5a12]",
+    ink: "text-[#334155]",
   };
   return (
-    <div className="px-4 py-4 sm:border-l sm:border-[rgba(15,23,42,.08)] sm:first:border-l-0">
+    <div className={`px-4 py-4 sm:border-l sm:border-[rgba(15,23,42,.08)] sm:first:border-l-0 ${className}`}>
       <div className="label-caps">{label}</div>
       <div className={`num mt-2 text-[28px] font-semibold leading-none tracking-tight ${val[tone]}`}>{fmt(shown)}</div>
       {hint && <div className="mt-1.5 text-[11.5px] leading-snug text-ink-3">{hint}</div>}
@@ -558,7 +561,7 @@ export default function Home() {
       <Reveal className="mt-6">
           <section
             data-glass="panel"
-            className="lg-surface grid grid-cols-2 gap-y-1 px-1.5 py-1.5 sm:grid-cols-4 sm:gap-0"
+            className="lg-surface grid grid-cols-2 gap-y-1 px-1.5 py-1.5 sm:grid-cols-5 sm:gap-0"
           >
             <Metric
               tone="brand"
@@ -592,6 +595,16 @@ export default function Home() {
                   ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
                   : tr("home.none")
               }
+            />
+            {/* 2026-11-05：第 5 张 —— 生物分布点总量（全库口径，不是筛选值）。
+                数据源 = stats.json 的 total / tables / organs（与 About 页同源）；
+                移动端 5 项排 2 列会剩 1 格 ⇒ 本卡跨 2 列，占满最后一整行。 */}
+            <Metric
+              tone="ink"
+              label={tr("home.kpiPts")}
+              value={st?.total ?? 0}
+              hint={st ? tr("home.kpiPtsHint", { a: fmt(st.tables), b: st.organs }) : tr("home.none")}
+              className="max-sm:col-span-2"
             />
           </section>
       </Reveal>

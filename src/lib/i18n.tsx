@@ -90,6 +90,8 @@ export const STR = {
   "home.kpiStructHint": { zh: "{p}% · 有背证结构", en: "{p}% with curated structure" },
   "home.kpiDosim": { zh: "剂量学记录", en: "Dosimetry rows" },
   "home.kpiDosimHint": { zh: "{a} 个药 · {b} 器官", en: "{a} drugs · {b} organs" },
+  "home.kpiPts": { zh: "生物分布点", en: "Biodistribution points" },
+  "home.kpiPtsHint": { zh: "{a} 张表 · {b} 个器官", en: "{a} tables · {b} organs" },
   "home.none": { zh: "暂无", en: "none" },
   "home.stage": { zh: "研发阶段：", en: "Stage:" },
   "home.sort": { zh: "排序", en: "Sort" },
