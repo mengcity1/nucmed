@@ -10,8 +10,7 @@
 | `pointStyle()` 里**不得**有 `shadowBlur` | 无 | 12px 光晕把 9px 点撑到 ~15px |
 | 数据色对各自底色 **≥ 3.0:1**（WCAG 图形对象门槛） | 3.0 | 深色沿用浅色板 `#1e5ba8` ⇒ 1.6:1，等于没画 |
 | 网格线对底色**亮度差 ∈ [6, 28]/255**（画到的像素） | 6–28 | `#eef3fa` 在浅底 ≈3（看不见）；在深底 ≈177（抢数据） |
-| 图例 / tooltip 文字 **≥ 4.5:1** | 4.5 | `#475569` 压深底读不出 |
-| （只报不拦）轴标签 / 轴名对比度 | 建议 ≥4.5 | 浅色 `#8fa0b8` 实测 ≈2.4，属既有设计，先记账 |
+| 图例 / tooltip / **轴标签 / 轴名** 文字 **≥ 4.5:1** | 4.5 | `#475569` 压深底读不出；浅色轴标签 `#8fa0b8` 只有 2.46:1 |
 
 **唯一实现处**：`src/components/Chart.tsx` 的 `LIGHT_TONE` / `DARK_TONE` / `PALETTE*` / `pointStyle()`。
 本脚本只**读**它、不复制颜色 —— 改配色只改那一处，这里自动跟上（与项目「禁止第二份口径」同理）。
@@ -164,18 +163,13 @@ def run_checks(light: dict, dark: dict, pal_l: list[str], pal_d: list[str], psrc
         tb = over(parse_color(tone["tooltipBg"]), bg)
         r = contrast(over(parse_color(tone["tooltipText"]), tb), tb)
         rows.append((r >= TEXT_MIN, f"{label}.tooltip 文字 ≥{TEXT_MIN}", f"{r:.2f}:1"))
-
-    return rows
-
-
-def warnings(light: dict, dark: dict):
-    """只报不拦：轴标签/轴名对比度（既有设计可能不足 4.5，先记账）"""
-    out = []
-    for label, tone, bg in (("浅色", light, LIGHT_BG), ("深色", dark, DARK_BG)):
+        # 轴标签 / 轴名：读者靠它读数。2026-11-05 由"只报不拦"升级为硬断言
+        # （浅色原先 #8fa0b8 = 2.46:1，已提到 #5f7089 = 4.65:1）
         for key in ("label", "axisName"):
             r = contrast(over(parse_color(tone[key]), bg), bg)
-            out.append((f"{label}.{key}", r, r >= TEXT_MIN))
-    return out
+            rows.append((r >= TEXT_MIN, f"{label}.{key} ≥{TEXT_MIN}", f"{r:.2f}:1"))
+
+    return rows
 
 
 def show(rows):
@@ -216,9 +210,6 @@ def main() -> int:
     light, dark = tone_block(src, "LIGHT_TONE"), tone_block(src, "DARK_TONE")
     rows = run_checks(light, dark, palette(src, "PALETTE"), palette(src, "PALETTE_DARK"), point_style_src(src))
     show(rows)
-    print("\n只报不拦（既有设计，改不改由 owner 定）：")
-    for name, r, ok in warnings(light, dark):
-        print(f"  {'✓' if ok else '!'}  {name:<12} {r:.2f}:1")
 
     bad = [r for r in rows if not r[0]]
     print(f"\n{len(rows) - len(bad)}/{len(rows)} PASS")

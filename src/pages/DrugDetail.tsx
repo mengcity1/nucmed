@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
-import { Chart, axisStyle, chartTone, legendStyle, pointStyle, tooltipStyle } from "../components/Chart";
+import { Chart, SYMBOLS, axisStyle, chartTone, legendStyle, pointStyle, tooltipStyle } from "../components/Chart";
 import { Caption } from "../components/Caption";
 import { useTheme } from "../lib/theme";
 import DosimetryPanel from "../components/DosimetryPanel";
@@ -86,6 +86,26 @@ function DrugCurve({ pts }: { pts: Point[] }) {
     return [...s].sort((a, b) => a - b);
   }, [rows]);
 
+  /** 图上**真正会画出来**的器官 / 时点（与 organOption 同一口径；抽出来是给脚注与 aria-label 用，
+   *  免得"图里画了 6 个"和"文案说 6 个"各算一遍 ⇒ 两份口径）。2026-11-05 */
+  const organTop = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of rows) m.set(p.organ_norm, Math.max(m.get(p.organ_norm) ?? 0, p.value_num));
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  }, [rows]);
+  const organShown = useMemo(() => organTop.slice(0, 12), [organTop]);
+  const timeShown = useMemo(() => times.slice(0, 6), [times]);
+  /** 会被画出来的点数（含"未标注时点"那组） */
+  const plotted = useMemo(
+    () =>
+      rows.filter(
+        (p) =>
+          organShown.includes(p.organ_norm) &&
+          (p.time_h === null || p.time_h <= 0 ? true : timeShown.includes(p.time_h)),
+      ).length,
+    [rows, organShown, timeShown],
+  );
+
   /** 可画时间曲线的器官（同一器官 ≥2 个时点） */
   const curvable = useMemo(() => {
     const m = new Map<string, Set<number>>();
@@ -98,6 +118,12 @@ function DrugCurve({ pts }: { pts: Point[] }) {
     return [...m.entries()].filter(([, s]) => s.size >= 2).map(([k]) => k);
   }, [rows]);
 
+  /** 时间曲线视图实际会画出的点数（前 6 个器官 × 有时点的记录），给 aria-label 用 */
+  const plottedCurve = useMemo(() => {
+    const keep = curvable.slice(0, 6);
+    return rows.filter((p) => keep.includes(p.organ_norm) && p.time_h !== null && p.time_h > 0).length;
+  }, [rows, curvable]);
+
   /** 换药后若原单位已不存在，回落到行数最多的单位 */
   useEffect(() => {
     if (units.length && !units.some(([u]) => u === unit)) setUnit(units[0][0]);
@@ -105,11 +131,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
 
   /** 「器官对比」：x = 器官（按最大值降序取前 12），按时点分色，不聚合 */
   const organOption = useMemo(() => {
-    const organs = (() => {
-      const m = new Map<string, number>();
-      for (const p of rows) m.set(p.organ_norm, Math.max(m.get(p.organ_norm) ?? 0, p.value_num));
-      return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k]) => k);
-    })();
+    const organs = organShown;
     /* ★ 2026-11-05 修：`value` 必须是 **[器官名, 数值]** 数组，不能是裸数值。
        裸数值时 category 轴按「系列内下标」定位 ⇒ 每个时点的点被依次排到第 1/2/3… 列，
        与 x 轴标签毫无关系（实测：kidney 56 %ID/g 的点画在 liver 列上方）。
@@ -125,13 +147,16 @@ function DrugCurve({ pts }: { pts: Point[] }) {
     const series: {
       name: string;
       type: "scatter";
+      symbol: string;
       symbolSize: number;
       itemStyle: ReturnType<typeof pointStyle>;
       emphasis: { scale: number };
       data: unknown[];
-    }[] = times.slice(0, 6).map((t, i) => ({
+    }[] = timeShown.map((t, i) => ({
       name: `${t} h`,
       type: "scatter" as const,
+      /* 形状与颜色正交：色觉障碍/黑白打印下靠形状也能分时点（WCAG 1.4.1） */
+      symbol: SYMBOLS[i % SYMBOLS.length],
       symbolSize: tone.pointSize,
       itemStyle: pointStyle(tone, tone.palette[i % tone.palette.length]),
       emphasis: { scale: 1.35 },
@@ -142,6 +167,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       series.push({
         name: tr("drug.chartNoTime"),
         type: "scatter",
+        symbol: SYMBOLS[series.length % SYMBOLS.length],
         symbolSize: tone.pointSize,
         itemStyle: pointStyle(tone, tone.palette[series.length % tone.palette.length]),
         emphasis: { scale: 1.35 },
@@ -196,7 +222,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       },
       series,
     };
-  }, [rows, times, unit, lang, tone]);
+  }, [rows, organShown, timeShown, unit, lang, tone]);
 
   /** 「时间曲线」：每个器官一条线，按 PMID 分段（换文献处断线，不把两篇论文连成一条趋势） */
   const curveOption = useMemo(() => {
@@ -209,10 +235,12 @@ function DrugCurve({ pts }: { pts: Point[] }) {
         if (cur) cur.push(p);
         else byPmid.set(k, [p]);
       }
-      const data: ({ value: [number, number]; pmid: string | null } | null)[] = [];
+      /* 数据项带 sd：散点视图早就显示 "± SD"，曲线视图原先没有 ⇒ 同一份数据两个视图说法不一致
+         （2026-11-05 修）。`null` 是"换文献断线"的占位，不参与 tooltip。 */
+      const data: ({ value: [number, number]; pmid: string | null; sd: number | null } | null)[] = [];
       for (const [, group] of byPmid) {
         for (const p of [...group].sort((a, b) => (a.time_h as number) - (b.time_h as number))) {
-          data.push({ value: [p.time_h as number, p.value_num], pmid: p.doc_pmid });
+          data.push({ value: [p.time_h as number, p.value_num], pmid: p.doc_pmid, sd: p.value_sd });
         }
         data.push(null);
       }
@@ -221,7 +249,8 @@ function DrugCurve({ pts }: { pts: Point[] }) {
         name: organ,
         type: "line" as const,
         symbolSize: tone.lineSymbolSize,
-        symbol: "circle" as const,
+        /* 形状区分器官（不只靠颜色，WCAG 1.4.1） */
+        symbol: SYMBOLS[i % SYMBOLS.length],
         showSymbol: true,
         connectNulls: false,
         smooth: false,
@@ -242,10 +271,16 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       tooltip: {
         ...tooltipStyle(tone),
         trigger: "item" as const,
-        formatter: (q: { seriesName: string; data: { value: [number, number]; pmid: string | null } | null }) => {
+        formatter: (q: {
+          seriesName: string;
+          data: { value: [number, number]; pmid: string | null; sd: number | null } | null;
+        }) => {
           if (!q.data) return "";
           const [t, v] = q.data.value;
-          return `<b>${q.seriesName}</b><br/>${t} h → ${v} ${unit}` + (q.data.pmid ? `<br/>PMID ${q.data.pmid}` : "");
+          const sd = q.data.sd != null ? ` ± ${q.data.sd}` : "";
+          return (
+            `<b>${q.seriesName}</b><br/>${t} h → ${v}${sd} ${unit}` + (q.data.pmid ? `<br/>PMID ${q.data.pmid}` : "")
+          );
         },
       },
       legend: legendStyle(tone),
@@ -325,11 +360,32 @@ function DrugCurve({ pts }: { pts: Point[] }) {
           )}
         </span>
       </div>
-      <Chart option={view === "organ" ? organOption : curveOption} height={340} />
+      <Chart
+        option={view === "organ" ? organOption : curveOption}
+        height={340}
+        ariaLabel={
+          view === "organ"
+            ? tr("drug.chartAriaOrgan", { o: organShown.length, t: times.length, n: plotted, u: unit })
+            : tr("drug.chartAriaCurve", {
+                k: Math.min(curvable.length, 6),
+                n: plottedCurve,
+                u: unit,
+              })
+        }
+      />
       <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-3">
-        {view === "organ"
-          ? tr("drug.chartNoteOrgan", { u: unit })
-          : tr("drug.chartNoteCurve", { n: curvable.length })}
+        {view === "organ" ? (
+          <>
+            {tr("drug.chartNoteOrgan", { u: unit })}
+            {organTop.length > 12 && <> · {tr("drug.chartTruncOrgan", { n: organTop.length })}</>}
+            {times.length > 6 && <> · {tr("drug.chartTruncTime", { n: times.length })}</>}
+          </>
+        ) : (
+          <>
+            {tr("drug.chartNoteCurve", { n: curvable.length })}
+            {curvable.length > 6 && <> · {tr("drug.chartTruncCurve", { n: curvable.length })}</>}
+          </>
+        )}
       </div>
     </div>
   );
@@ -452,9 +508,22 @@ export default function DrugDetail() {
   const did = id ? Number(id) : 0;
   const { data: drugs, error: drugsErr, loading: drugsLoading, reload: reloadDrugs } = useJSON<Drug[]>("drugs.json");
   const { data: pts } = useJSON<Point[]>("biodist.json");
-  const { data: raw } = useJSON<Record<string, string>>("raw.json");
   const [pick, setPick] = useState("");
   const [openId, setOpenId] = useState<number | null>(null);
+  /* ★ 2026-11-05 按需：`raw.json` **1.69 MB**，只在"点开某行看原文"时才用（典型药 p50 只有 3 个点）。
+     原先进页面就整份下载 ⇒ 绝大多数访问白下 1.7 MB。改为首次展开时拉一次并缓存。 */
+  const [raw, setRaw] = useState<Record<string, string> | null>(null);
+  useEffect(() => {
+    if (openId === null || raw) return;
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}data/raw.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string>) => alive && setRaw(m))
+      .catch(() => alive && setRaw({}));
+    return () => {
+      alive = false;
+    };
+  }, [openId, raw]);
   const [zoom, setZoom] = useState<{ src: string; alt?: string; pmc?: string } | null>(null);
   const [tab, setTab] = useState<TabKey>("bio");
   // ★ 结构图来源（884 浙大 / 575 示意图 / 11 肽段 2D / 759 本地 RDKit）：此前一律标成 radiopharm，属错标
@@ -466,22 +535,41 @@ export default function DrugDetail() {
   const [figs, setFigs] = useState<Fig[] | null>(null);
   /** 全库影像规模：用于空态说明「不是坏了，是这药还没命中」 */
   const [figStats, setFigStats] = useState<{ total: number; drugs: number } | null>(null);
+  /** figs 是"哪一次请求的结果"（只在 `tab === "img"` 时才拉 manifest，见下） */
+  const [figsFor, setFigsFor] = useState<number | null>(null);
 
   useEffect(() => {
+    /* ★ 2026-11-05：`figs/manifest.json` **1.22 MB**（2,011 条图注）不该占首屏带宽；
+       但 06 影像 Tab 的角标要用**真实数字**（`figs?.length` 决定"几张/是否禁用"）
+       ⇒ 不能等用户点开才拉（那会显示 0 张并把 Tab 禁用掉）。
+       折中：**空闲预取**（requestIdleCallback，兜底 1.5s）—— 不在 LCP/TBT 路径上，
+       角标照旧准确；真要省流量需在导出层加 `figs_index.json`（drug→张数），属数据批。 */
+    if (figsFor === did) return;
     let alive = true;
-    loadFigManifest()
-      .then((m) => {
-        if (!alive) return;
-        setFigs(m.filter((f) => f.drug_id === did));
-        const s = new Set<number>();
-        for (const f of m) s.add(f.drug_id);
-        setFigStats({ total: m.length, drugs: s.size });
-      })
-      .catch(() => alive && setFigs([]));
+    const run = () => {
+      if (!alive) return;
+      loadFigManifest()
+        .then((m) => {
+          if (!alive) return;
+          setFigs(m.filter((f) => f.drug_id === did));
+          const s = new Set<number>();
+          for (const f of m) s.add(f.drug_id);
+          setFigStats({ total: m.length, drugs: s.size });
+          setFigsFor(did);
+        })
+        .catch(() => alive && setFigs([]));
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const id = w.requestIdleCallback ? w.requestIdleCallback(run, { timeout: 3000 }) : window.setTimeout(run, 1500);
     return () => {
       alive = false;
+      if (w.cancelIdleCallback) w.cancelIdleCallback(id);
+      else clearTimeout(id);
     };
-  }, [did]);
+  }, [did, figsFor]);
 
   useEffect(() => {
     let alive = true;
@@ -569,7 +657,8 @@ export default function DrugDetail() {
       dos: (drug.n_dosim ?? 0) > 0,
       tbr: (drug.has_tbr ?? 0) === 1,
       refs: (drug.n_refs ?? 0) > 0,
-      img: (figs?.length ?? 0) > 0,
+      /* 影像：manifest 未到时（null）当"可能有"，别把用户从 Tab 上弹走 */
+      img: figs === null || figs.length > 0,
     };
     setTab((cur) => (ok[cur] ? cur : TAB_ORDER.find((k) => ok[k]) ?? "bio"));
   }, [drug, mine.length, figs?.length]);
@@ -707,8 +796,10 @@ export default function DrugDetail() {
     {
       key: "img",
       label: tr("drug.tabImg"),
-      // pk295 U1：figs/manifest.json 里该药的图（含 target/unclear/comparator 三类，渲染时分区）
-      ok: (figs?.length ?? 0) > 0,
+      /* pk295 U1：figs/manifest.json 里该药的图（含 target/unclear/comparator 三类，渲染时分区）。
+         ★ 2026-11-05：manifest 改为**空闲预取**（不在首屏路径上）⇒ 未加载完时不能判"没有图"，
+         否则开头一两秒这个 Tab 会被禁用/显示 0 张。`figs === null` = 尚不知道 ⇒ 先当"有"。 */
+      ok: figs === null || figs.length > 0,
       hint: figs && figs.length ? tr("drug.figsN", { n: fmt(figs.length) }) : "",
     },
   ];
@@ -1064,7 +1155,7 @@ export default function DrugDetail() {
                         <td colSpan={6} className="bg-[#fafbfe] px-4 py-3">
                           <div className="text-[12px] leading-relaxed text-ink-2">
                             <span className="font-medium text-ink">{tr("drug.rawSnippet")}</span>
-                            {raw?.[String(p.id)] ?? tr("drug.noRawPlaceholder")}
+                            {raw === null ? tr("common.loading") + "…" : (raw[String(p.id)] ?? tr("drug.noRawPlaceholder"))}
                           </div>
                           <div className="mt-1.5 text-[11.5px] text-ink-3">
                             source_kind = {p.source_kind} · subject_key = {p.subject_key ?? "—"} · row id ={" "}

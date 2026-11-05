@@ -431,12 +431,35 @@ export const STR = {
   "drug.axisLinear": { zh: "线性时间轴", en: "Linear time axis" },
   "drug.axisLog": { zh: "对数时间轴", en: "Log time axis" },
   "drug.chartNoteOrgan": {
-    zh: "每个点 = 一条原始记录，不取均值 · 横轴按最大值排序取前 12 个器官 · 颜色 = 时点 · 悬停看 SD / 物种 / PMID · 单位 {u}",
-    en: "Each point = one source record (no averaging) · x-axis: top 12 organs by maximum · colour = time point · hover for SD / species / PMID · unit {u}",
+    zh: "每个点 = 一条原始记录，不取均值 · 横轴 = 器官（按最大值排序，最多 12 个）· 颜色 = 时点 · 悬停看 SD / 物种 / PMID · 单位 {u}",
+    en: "Each point = one source record (no averaging) · x-axis: organs ranked by maximum (up to 12) · colour = time point · hover for SD / species / PMID · unit {u}",
   },
   "drug.chartNoteCurve": {
     zh: "每条线 = 一个器官（最多 6 个）· 换文献处断线，不把两篇论文连成一条趋势 · 该药有 {n} 个器官满足「≥2 个时点」",
     en: "Each line = one organ (max 6) · lines break between papers, never joining two studies into one trend · {n} organs of this drug have ≥2 time points",
+  },
+  /* 2026-11-05：截断**必须说出来** —— 图上只画前 6 个时点 / 前 12 个器官，不写明就等于让读者
+     以为"这个药只有这么多数据"（实测 drug 2400：15 个时点 / 154 个点，图上只出现 6 个时点、90 个点）。 */
+  "drug.chartTruncOrgan": {
+    zh: "本药共 {n} 个器官，图上只画前 12 个（其余见下方记录表）",
+    en: "This drug has {n} organs; the plot shows the top 12 only (see the table below for the rest)",
+  },
+  "drug.chartTruncTime": {
+    zh: "共 {n} 个时点，图上只画前 6 个（其余见下方记录表）",
+    en: "This drug has {n} time points; the plot shows the first 6 only (see the table below for the rest)",
+  },
+  "drug.chartTruncCurve": {
+    zh: "本药有 {n} 个器官满足「≥2 个时点」，图上只画前 6 个",
+    en: "This drug has {n} organs with ≥2 time points; the plot shows the first 6 only",
+  },
+  /* 图表是 canvas，屏幕阅读器读不到内容 ⇒ 用一句话说明画了什么（明细在本页记录表里） */
+  "drug.chartAriaOrgan": {
+    zh: "器官对比散点图：{o} 个器官、{t} 个时点、{n} 个数据点，单位 {u}；数值明细见本页「生物分布记录」表",
+    en: "Organ comparison scatter: {o} organs, {t} time points, {n} points, unit {u}; see the records table on this page",
+  },
+  "drug.chartAriaCurve": {
+    zh: "时间曲线：{k} 个器官、{n} 个数据点，单位 {u}，纵轴为对数；数值明细见本页记录表",
+    en: "Time course: {k} organs, {n} points, unit {u}, log y-axis; see the records table on this page",
   },
 
   "drug.tbrGoBio": { zh: "去「生物分布」看正常器官对照 →", en: "See normal-organ controls in Biodistribution →" },

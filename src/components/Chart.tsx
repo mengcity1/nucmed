@@ -52,6 +52,11 @@ export const PALETTE_DARK = [
   "#c2cddd",
 ];
 
+/** 系列形状（2026-11-05 加）：时点**不能只靠颜色**区分 —— WCAG 1.4.1 禁止"仅用颜色传达信息"，
+ *  色觉障碍与黑白打印下 6 个色相会糊成一片。形状与颜色正交，顺带也让「深/浅同色相配对」的
+ *  v4 色板（浅成员只有 1.79:1）变得可分辨。ECharts 内置符号名。 */
+export const SYMBOLS = ["circle", "triangle", "diamond", "rect", "roundRect", "pin"] as const;
+
 /** `#rgb` / `#rrggbb` → `rgba()`：点的柔光晕、图例渐隐色都要带透明度 */
 export function withAlpha(hex: string, a: number): string {
   const h = hex.replace("#", "");
@@ -66,8 +71,12 @@ export function withAlpha(hex: string, a: number): string {
 export function Chart({
   option,
   height = 320,
+  ariaLabel,
 }: {
   option: echarts.EChartsCoreOption;
+  /** 图表是 `<canvas>`，屏幕阅读器读到的只有空白 ⇒ 用一句话把"画了什么"写进 aria-label
+   *  （2026-11-05 无障碍）；数值明细仍以下方记录表为准。 */
+  ariaLabel?: string;
   height?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -117,7 +126,7 @@ export function Chart({
     instRef.current?.setOption(option, true);
   }, [option]);
 
-  return <div ref={ref} style={{ height: h }} className="w-full" />;
+  return <div ref={ref} role="img" aria-label={ariaLabel} style={{ height: h }} className="w-full" />;
 }
 
 /** 图表主题令牌（2026-11-05 立 · owner：「深色模式这里的点可视化效果很差，然后实线也过于显眼」）
@@ -172,8 +181,10 @@ const LIGHT_TONE: ChartTone = {
   axisLine: "#cfdaea",
   splitLine: "#dde5f1",
   splitLineType: "dashed",
-  label: "#8fa0b8",
-  axisName: "#94a3b8",
+  /* 浅色轴标签 2026-11-05 由 #8fa0b8(2.46:1) 提到 #5f7089(4.65:1)：刻度是**读数**用的，
+     11px 小字 2.46:1 在投影/强光下读不出（WCAG AA 要 4.5）。 */
+  label: "#5f7089",
+  axisName: "#5f7089",
   legend: "#475569",
   legendInactive: "#c3ccd9",
   tooltipBg: "#ffffff",
