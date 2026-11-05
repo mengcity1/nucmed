@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { EmptyState, ErrorState } from "../components/States";
 import ImageViewer from "../components/ImageViewer";
+import { Caption } from "../components/Caption";
 import { fmt, loadFigManifest, refLink, type Fig } from "../lib/data";
 import { useT, type StrKey } from "../lib/i18n";
 
@@ -36,59 +37,6 @@ function useFigs() {
 const PAGE = 60;
 
 const isAttrib = (v: string): v is Fig["attrib"] => v === "target" || v === "unclear" || v === "comparator";
-
-/** 图注（2026-11-05 改 · owner：「图集下面对应文献的文字没显示全吧」）
- *
- *  旧版是 `-webkit-line-clamp: 3` 且**没有任何展开入口** ⇒ 长图注被硬切断在半句上，
- *  而 `figs/manifest.json` 中位 **400 字**、>300 字的占 1,347/2,011 ⇒ 绝大多数卡片都是断句。
- *  **不做「一上来就全展开」**：400–2,440 字的图注会把图卡撑成一面墙，图集失去可扫读性。
- *  **不用「字数阈值」判按钮显隐**：卡片宽度随断点变（1/2/3 列），同一段字行数不同 ⇒ 用真实测量。
- *  另：导出的图注在 **400 字符**处截断（856/2,011 张正好 400 字），展开后补一句说明，
- *  免得用户以为是前端没显示完（>400 字的那 184 张是完整的，不提示）。 */
-function Caption({ text }: { text: string }) {
-  const tr = useT();
-  const ref = useRef<HTMLParagraphElement>(null);
-  const [over, setOver] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || open) return;
-    const measure = () => setOver(el.scrollHeight - el.clientHeight > 2);
-    measure();
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
-    ro?.observe(el);
-    return () => ro?.disconnect();
-  }, [open, text]);
-
-  return (
-    <>
-      <p
-        ref={ref}
-        className="mt-1.5 text-[11.5px] leading-relaxed text-ink-3"
-        style={
-          open ? undefined : { display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }
-        }
-        title={open ? undefined : text}
-      >
-        {text}
-      </p>
-      {over && (
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="mt-1 rounded text-[11.5px] font-medium text-brand-deep transition hover:underline"
-        >
-          {open ? tr("atlas.captionLess") : tr("atlas.captionMore", { n: fmt(text.length) })}
-        </button>
-      )}
-      {open && text.length === 400 && (
-        <p className="mt-0.5 text-[11px] leading-relaxed text-ink-3">{tr("atlas.truncated")}</p>
-      )}
-    </>
-  );
-}
 
 export default function Atlas() {
   const { data, err, loading, reload } = useFigs();
@@ -335,7 +283,7 @@ export default function Atlas() {
                     </Link>
                     <span className="text-[11.5px] text-ink-3">{f.label}</span>
                   </div>
-                  <Caption text={f.caption} />
+                  <Caption text={f.caption} className="mt-1.5 text-[11.5px] leading-relaxed text-ink-3" />
                   <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-3">
                     {(() => {
                       const L = refLink(f.pmid);
@@ -398,7 +346,7 @@ export default function Atlas() {
                   <span className="text-white/60">{tr("atlas.captionLabel")}</span>
                   {zoom.caption}
                   {zoom.caption.length === 400 && (
-                    <span className="ml-1.5 text-amber-200">{tr("atlas.truncated")}</span>
+                    <span className="ml-1.5 text-amber-200">{tr("common.captionTruncated")}</span>
                   )}
                   {" · "}
                 </>

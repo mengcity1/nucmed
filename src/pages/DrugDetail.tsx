@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
 import { Chart, axisStyle, chartTone, legendStyle, pointStyle, tooltipStyle } from "../components/Chart";
+import { Caption } from "../components/Caption";
 import { useTheme } from "../lib/theme";
 import DosimetryPanel from "../components/DosimetryPanel";
 import { EmptyState, ErrorState, TableSkeleton } from "../components/States";
@@ -1284,7 +1285,7 @@ export default function DrugDetail() {
                             />
                           </button>
                           <figcaption className="p-3 text-[12px] leading-snug text-ink-2">
-                            <div className="max-h-10 overflow-hidden">{f.caption || f.label}</div>
+                            <Caption text={f.caption || f.label} lines={2} />
                             <div className="mt-1.5 text-[11.5px] text-ink-3">
                               PMID {f.pmid} · {f.license}
                             </div>
