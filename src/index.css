@@ -1612,12 +1612,32 @@
   
 }
 
+/* ── v49 tokens：颜色的**唯一字面量处**（2026-11-05 · S1+S2，见 docs/ui_style_consolidation_20261105.md）
+   本块只做两件事，**不改老规则**（S5 再迁）：
+   ① 把"选中标记"这类语义色抽成变量，供 `.chip-badge` / `.tab-on::after` / `.is-selected` 消费；
+   ② 提供**唯一的选中语义** `.is-selected`（今天散在 chip-on / tab-on / bg-brand 三处）。
+   ⚠ 图表内部颜色不在这里 —— 它在 `src/components/Chart.tsx` 的 LIGHT_TONE/DARK_TONE
+     （ECharts 画在 canvas 上，吃不到 CSS 变量），由 `scripts/check_chart_theme.py` 把关。 */
+:root {
+  --ui-marker-bg: #1e5ba8; /* 选中标记（徽标 / 下划线）底色 */
+  --ui-marker-fg: #ffffff; /* 标记上的勾/字 */
+  --ui-selected-weight: 600;
+}
+.app-stage.dark {
+  --ui-marker-bg: #7bb8ff;
+  --ui-marker-fg: #0b1220;
+}
+/* 唯一的"选中"语义：组件只负责加这个 class（可见性由 `.chip-badge` / `::after` 提供） */
+.is-selected {
+  font-weight: var(--ui-selected-weight);
+}
+
 /* ── v47 「选中」用**实心徽标**表达，不跟玻璃底色抢（2026-11-05 · owner：「点了就只有一个 √，
    看不清到底选了没」）────────────────────────────────────────────────────────────
    为什么不像上一版那样改 `.chip-on` 的底色：`.app-stage.light :is(button…)` 那条全站玻璃规则
    带 `!important` 且与本规则同层同量级，浅色下会**把实底洗掉**（实测深色成功、浅色失败）。
    徽标是 chip **内部的一个 `<span>`**，不参与那些 button/chip 规则 ⇒ 两套主题都稳定可见：
-   浅色 = 深蓝底白勾（6.7:1）、深色 = 亮蓝底深字（9.0:1）。选中态同时加粗。 */
+   浅色 = 深蓝底白勾（6.7:1）、深色 = 亮蓝底深字（9.0:1）。颜色走 v49 tokens。 */
 .chip-badge {
   display: inline-grid;
   place-items: center;
@@ -1625,8 +1645,8 @@
   height: 15px;
   flex: none;
   border-radius: 9999px;
-  background: #1e5ba8;
-  color: #fff;
+  background: var(--ui-marker-bg);
+  color: var(--ui-marker-fg);
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
@@ -1636,17 +1656,12 @@
   height: 13px;
   font-size: 9px;
 }
-.app-stage.dark .chip-badge {
-  background: #7bb8ff;
-  color: #0b1220;
-}
 
 /* ── v47 Tab 的选中态补一条下划线（2026-11-05 · 承接"看不出选没选"）────────────────────
    `.tab-on` 原本只是 `rgba(255,255,255,.55)` 叠在浅色玻璃上 —— 实测亮度差 ≈ **2.8/255**，
    导航里 4 个 Tab 并排时几乎看不出当前在哪一页；单药页 5 个 Tab 同理。
    用 `::after` 画一条 2px 品牌色条：伪元素**不被现有 glass 规则命中**（那些规则只选
-   `button` / `.tab` 的背景与 box-shadow）⇒ 不会被 `!important` 洗掉，也不用再加一层 `!important`。
-   浅色 #1e5ba8 对浅底 ≈6.7:1、深色 #7bb8ff 对深底 ≈7:1，都是"一眼可见"级别。 */
+   `button` / `.tab` 的背景与 box-shadow）⇒ 不会被 `!important` 洗掉。颜色走 v49 tokens。 */
 .tab-on::after {
   content: "";
   position: absolute;
@@ -1655,11 +1670,8 @@
   bottom: 2px;
   height: 2px;
   border-radius: 2px;
-  background: #1e5ba8;
+  background: var(--ui-marker-bg);
   pointer-events: none;
-}
-.app-stage.dark .tab-on::after {
-  background: #7bb8ff;
 }
 
 

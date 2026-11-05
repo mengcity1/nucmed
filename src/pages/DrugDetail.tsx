@@ -320,7 +320,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
                 type="button"
                 aria-pressed={unit === u}
                 onClick={() => setUnit(u)}
-                className={`chip-sm ${unit === u ? "chip-on font-semibold" : "chip-off"}`}
+                className={`chip-sm ${unit === u ? "chip-on is-selected" : "chip-off"}`}
               >
                 {unit === u && (
                   <span aria-hidden="true" className="chip-badge">
@@ -337,7 +337,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
             type="button"
             aria-pressed={view === "organ"}
             onClick={() => setView("organ")}
-            className={`chip-sm ${view === "organ" ? "chip-on font-semibold" : "chip-off"}`}
+            className={`chip-sm ${view === "organ" ? "chip-on is-selected" : "chip-off"}`}
           >
             {view === "organ" && (
               <span aria-hidden="true" className="chip-badge">
@@ -352,7 +352,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
             onClick={() => setView("curve")}
             disabled={!curvable.length}
             title={curvable.length ? tr("drug.chartCurveHint") : tr("drug.chartCurveOff")}
-            className={`chip-sm ${view === "curve" ? "chip-on font-semibold" : "chip-off"} ${
+            className={`chip-sm ${view === "curve" ? "chip-on is-selected" : "chip-off"} ${
               curvable.length ? "" : "cursor-not-allowed opacity-45"
             }`}
           >

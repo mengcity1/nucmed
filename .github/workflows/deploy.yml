@@ -43,6 +43,15 @@ jobs:
       - name: Check chart theme — negative test
         run: python3 scripts/check_chart_theme.py --self-test
 
+      # ★ 2026-11-05（批次 A）：选中态可见性 + 样式膨胀棘轮
+      #   见 docs/ui_style_consolidation_20261105.md 第六节。挡的是"选中态只剩淡渐变"、
+      #   "用 bg-brand 表达选中（会被玻璃规则 !important 洗掉）"、以及 !important/规则块继续膨胀。
+      - name: Check UI tokens
+        run: python3 scripts/check_ui_tokens.py
+
+      - name: Check UI tokens — negative test
+        run: python3 scripts/check_ui_tokens.py --self-test
+
       # ★ base 必须与 Pages 路径一致：
       #   - 仓库名 <user>.github.io  → VITE_BASE 留空（默认 "/"）
       #   - 仓库名其它（项目站）      → VITE_BASE=/<仓库名>/

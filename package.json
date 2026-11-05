@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
     "preview": "vite preview --port 4173",
     "check:theme": "python scripts/check_chart_theme.py",
+    "check:ui": "python scripts/check_ui_tokens.py",
     "export": "python ../web/scripts/export_data.py"
   },
   "dependencies": {

@@ -96,7 +96,7 @@ function Chip({
       /* 2026-11-05：`aria-pressed` 让"选没选"对读屏器也成立（原来只有一颗 ✓ 是纯视觉线索） */
       aria-pressed={!!on}
       onClick={onClick}
-      className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"}`}
+      className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on is-selected" : "chip-off"}`}
     >
       {on && (
         <span aria-hidden="true" className="chip-badge">
@@ -667,7 +667,7 @@ export default function Home() {
                    "实心勾徽标 + 加粗"（徽标是 span，不受 button/chip 规则影响）。 */
                 className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11.5px] transition hover:ring-1 hover:ring-brand/30 ${
                   STAGE_TONE[s]
-                } ${on ? "font-semibold" : "hover:-translate-y-px hover:shadow-s1"}`}
+                } ${on ? "is-selected" : "hover:-translate-y-px hover:shadow-s1"}`}
                 title={tr("home.stageClick")}
               >
                 {on && (
