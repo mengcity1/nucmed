@@ -220,7 +220,7 @@ function DrugCurve({ pts }: { pts: Point[] }) {
       return {
         name: organ,
         type: "line" as const,
-        symbolSize: tone.dark ? 7 : 6,
+        symbolSize: tone.lineSymbolSize,
         symbol: "circle" as const,
         showSymbol: true,
         connectNulls: false,

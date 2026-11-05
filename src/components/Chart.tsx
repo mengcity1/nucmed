@@ -120,9 +120,13 @@ export type ChartTone = {
   dark: boolean;
   /** 数据色（按系列顺序取） */
   palette: string[];
-  /** 散点直径 */
+  /** 散点直径（**深浅必须一致**：2026-11-05 曾在深色给到 11px，结果同一批数据
+   *  在深色下显得比浅色"胖"一圈，被判成"误差很大" —— 点径是数据语义的一部分，不能随主题变） */
   pointSize: number;
-  /** 点描边：深色下让亮点从虚线网格里分离，相邻点重叠也分得开 */
+  /** 折线视图上数据点的直径（比散点略小：点在线上要"压得住线"） */
+  lineSymbolSize: number;
+  /** 点描边：深色用**贴着底色的暗边**（同浅色的白边），只当边缘/缝用 ——
+   *  不要用亮边或柔光，否则会增大"看着的直径"（见 `pointSize` 注） */
   pointBorder: string;
   /** 折线宽度 */
   lineWidth: number;
@@ -142,6 +146,7 @@ const LIGHT_TONE: ChartTone = {
   dark: false,
   palette: PALETTE,
   pointSize: 9,
+  lineSymbolSize: 6,
   pointBorder: "#ffffff",
   lineWidth: 2,
   axisLine: "#e6ecf6",
@@ -159,8 +164,11 @@ const LIGHT_TONE: ChartTone = {
 const DARK_TONE: ChartTone = {
   dark: true,
   palette: PALETTE_DARK,
-  pointSize: 11,
-  pointBorder: withAlpha("#e8f1ff", 0.55),
+  pointSize: 9,
+  lineSymbolSize: 6,
+  /* 描边取**贴着底色**的暗色（浅色主题同理用白边）：只当"边缘/缝"用，不增加视觉直径。
+     早前用 55% 白描边，实测像素面积比浅色大 ~30px（9px 点看着像 11px）⇒ 仍被判"深色点更大"。 */
+  pointBorder: withAlpha("#0b1220", 0.5),
   lineWidth: 2,
   axisLine: withAlpha("#ffffff", 0.16),
   splitLine: withAlpha("#ffffff", 0.1),
@@ -188,14 +196,14 @@ export function axisStyle(tone: ChartTone) {
   };
 }
 
-/** 散点样式：亮色 + 细描边 + 柔光晕（深色下光晕把点从网格里"托"起来） */
+/** 散点样式：亮色 + 细描边
+ *  ⚠ 不加柔光晕（`shadowBlur`）：光晕会把 9px 的视觉直径撑到 ~15px，深色下比浅色"胖"一圈，
+ *  被当成误差条（2026-11-05 实测反馈）。可读性靠**配色**解决（`PALETTE_DARK` ≥4.5:1），不靠放大。 */
 export function pointStyle(tone: ChartTone, color: string) {
   return {
     color,
     borderColor: tone.pointBorder,
     borderWidth: 1,
-    shadowBlur: tone.dark ? 12 : 0,
-    shadowColor: withAlpha(color, 0.55),
   };
 }
 
