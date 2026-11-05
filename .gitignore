@@ -1,6 +1,7 @@
 # ── 依赖与构建产物（不进库） ─────────────────────────
 node_modules/
 dist/
+dist-audit/
 *.log
 dev.log
 preview.log
