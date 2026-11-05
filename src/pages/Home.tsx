@@ -39,7 +39,7 @@ const SORTS: { v: string; k: StrKey }[] = [
 ];
 
 const STAGE_TONE: Record<string, string> = {
-  已上市: "bg-[#e6f4f1] text-[#0a7d6f] border-[#c6e8e1]",
+  已上市: "bg-[#e6f4f1] text-[#08695e] border-[#c6e8e1]",
   "4期": "bg-[#e6eefb] text-[#134a86] border-[#cfdff5]",
   "3期": "bg-[#e8f0fa] text-[#164a8a] border-[#d3e2f6]",
   "2/3期": "bg-[#eaf3fc] text-[#245e9c] border-[#d7e6f7]",

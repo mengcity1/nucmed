@@ -33,7 +33,9 @@ SRC = ROOT / "src"
 # ⚠ 说明：先前"S3/S4/S5 把 chip 31→21、button 15→10、!important 107→0"的结论**已撤回** ——
 #   那批验证用了 `?bg=none`，而它会让 GlassApp 不加 light/dark 类 ⇒ 主题规则没被验证。
 #   现已回滚到 `ed855fe` 基线（见 DESIGN v58），下面的数字是回滚后的实测值。
-BASE_IMPORTANT = 111
+# 111 → 112（v58）：`.app-stage.dark .badge-c` 的新增 `color: ... !important` 是**必需**的
+#   —— 上面 1078 行 `:is(..., .badge-c, ...) { color: #d9e3ef !important }` 只能被 `!important` 覆盖。
+BASE_IMPORTANT = 112
 BASE_CHIP = 31
 BASE_TAB = 14
 BASE_BUTTON = 15

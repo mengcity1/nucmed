@@ -1101,6 +1101,13 @@
     border-color: rgba(255, 255, 255, 0.22);
     color: #dbe6f4 !important;
   }
+  /* v58 补漏：`.badge-c` 原来**没有**深色覆盖 ⇒ 浅奶油底(#fdf3e7) + 上面 1078 行强制的浅字
+     = 1.18:1（几乎看不见）。对比度体检 `scripts/ui_contrast_audit.mjs` 找到的。 */
+  .app-stage.dark .badge-c {
+    background: rgba(217, 130, 22, 0.26);
+    border-color: rgba(255, 197, 120, 0.45);
+    color: #ffd9a8 !important;
+  }
   /* ── v24 选项按钮（chip）的液态玻璃 ─────────────────────────────────
      之前 chip 只有"半透明底"，缺**边缘高光/厚度**，所以看着是平的。
      这里补：顶部亮边 + 亮轮廓 + 底部内阴影（厚度）+ 外投影 + 背景模糊 + 三段渐变。 */
