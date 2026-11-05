@@ -33,6 +33,11 @@ const PROPS = [
   "border-left-color",
   "box-shadow",
   "font-weight",
+  /* v60 加：字体族也是"看得见"的 —— 2026-11-05 把正文 CJK 从 Noto Sans SC 换成系统字体，
+     当时这一项没采集 ⇒ 快照报"0 差异"，等于验证不到字体改动。 */
+  "font-family",
+  "font-size",
+  "letter-spacing",
   "opacity",
   "backdrop-filter",
 ];

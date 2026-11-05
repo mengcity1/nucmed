@@ -26,7 +26,17 @@ export default {
         sky: "#e8f1fb",
       },
       fontFamily: {
-        sans: ['Inter', '"Noto Sans SC"', "system-ui", "sans-serif"],
+        /* v60：正文 CJK 不再用 webfont（Noto Sans SC 一档就 828 KB），走系统字体；
+           顺序按"字形质量"排：macOS 苹方 → Windows 微软雅黑 → 装了 Noto 的机器 → 兜底。 */
+        sans: [
+          "Inter",
+          '"PingFang SC"',
+          '"Hiragino Sans GB"',
+          '"Microsoft YaHei"',
+          '"Noto Sans SC"',
+          "system-ui",
+          "sans-serif",
+        ],
         mono: ['"SFMono-Regular"', "Consolas", "monospace"],
       },
       borderRadius: { lg2: "16px", md2: "12px", sm2: "8px", xl2: "20px", xl3: "26px" },

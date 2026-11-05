@@ -7,8 +7,14 @@
     <title>NucMed DB · 核药数据库</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- ★ 2026-11-05 v60 字体瘦身：原来加载 Noto Sans SC 三档（400/500/700）只为正文，
+         实测**一个档就 828 KB**（汉字 unicode-range 分片多），首页字体总计 **2085 KB / 40 请求**。
+         现在正文走系统 CJK（PingFang SC / 微软雅黑，见 tailwind.config 的 fontFamily.sans），
+         只保留 Inter（拉丁）+ **Noto Serif SC 600**（衬线标题的调性）⇒ 字体 **311 KB / 10 请求**。
+         对照数据（首页字体字节）：Sans400;500;700+Serif600;700=2085 · Sans400 单档=1139 ·
+         去 Sans 留 Serif600=311 · 全系统=85。要回滚只需把 family 参数改回来。 -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@600&display=swap"
       rel="stylesheet"
     />
   </head>
