@@ -1,6 +1,7 @@
 import { useJSON, fmt, type Meta, type Stats } from "../lib/data";
 import { useT } from "../lib/i18n";
-import { Chart, PALETTE, AXIS } from "../components/Chart";
+import { Chart, axisStyle, chartTone, tooltipStyle } from "../components/Chart";
+import { useTheme } from "../lib/theme";
 
 const LIC = "CC BY-NC 4.0";
 // ★ 2026-10-28：原为 github.com/<TODO-OWNER> 占位（会显示成一个不存在的地址）。
@@ -22,6 +23,11 @@ export default function About() {
   const { data: m } = useJSON<Meta>("meta.json");
   const { data: st } = useJSON<Stats>("stats.json");
   const tr = useT();
+  /** 图表画在 canvas 上 ⇒ 深浅主题必须由 JS 传进去（2026-11-05 · 与单药画像同一套令牌） */
+  const [theme] = useTheme();
+  const tone = chartTone(theme === "dark");
+  /** 数据色随主题（浅色版对石墨灰底只有 1.6–2.9:1） */
+  const P = tone.palette;
   const base = import.meta.env.BASE_URL;
   /** "(null)" / 空串统一显示为「未标注」（stats.json 里确有这两类键） */
   const lbl = (k: string) => (k === "(null)" || k === "" ? tr("about.na") : k);
@@ -127,18 +133,18 @@ export default function About() {
                 height={300}
                 option={{
                   grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
-                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-                  xAxis: { type: "value", ...AXIS },
+                  tooltip: { ...tooltipStyle(tone), trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...axisStyle(tone) },
                   yAxis: {
                     type: "category",
                     data: top(st.by_organ, 12).map((d) => lbl(d.k)).reverse(),
-                    ...AXIS,
+                    ...axisStyle(tone),
                   },
                   series: [
                     {
                       type: "bar",
                       data: top(st.by_organ, 12).map((d) => d.n).reverse(),
-                      itemStyle: { color: PALETTE[0], borderRadius: [0, 4, 4, 0] },
+                      itemStyle: { color: P[0], borderRadius: [0, 4, 4, 0] },
                       barMaxWidth: 13,
                     },
                   ],
@@ -155,19 +161,19 @@ export default function About() {
                 height={300}
                 option={{
                   grid: { left: 4, right: 8, top: 10, bottom: 4, containLabel: true },
-                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  tooltip: { ...tooltipStyle(tone), trigger: "axis", axisPointer: { type: "shadow" } },
                   xAxis: {
                     type: "category",
                     data: top(st.by_isotope, 12).map((d) => lbl(d.k)),
-                    ...AXIS,
-                    axisLabel: { ...AXIS.axisLabel, rotate: 38, interval: 0, fontSize: 10.5 },
+                    ...axisStyle(tone),
+                    axisLabel: { ...axisStyle(tone).axisLabel, rotate: 38, interval: 0, fontSize: 10.5 },
                   },
-                  yAxis: { type: "value", ...AXIS },
+                  yAxis: { type: "value", ...axisStyle(tone) },
                   series: [
                     {
                       type: "bar",
                       data: top(st.by_isotope, 12).map((d) => d.n),
-                      itemStyle: { color: PALETTE[2], borderRadius: [4, 4, 0, 0] },
+                      itemStyle: { color: P[2], borderRadius: [4, 4, 0, 0] },
                       barMaxWidth: 18,
                     },
                   ],
@@ -184,12 +190,12 @@ export default function About() {
                 height={220}
                 option={{
                   grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
-                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-                  xAxis: { type: "value", ...AXIS },
+                  tooltip: { ...tooltipStyle(tone), trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...axisStyle(tone) },
                   yAxis: {
                     type: "category",
                     data: st.by_species.map((d) => lbl(d.k)).reverse(),
-                    ...AXIS,
+                    ...axisStyle(tone),
                   },
                   series: [
                     {
@@ -197,7 +203,7 @@ export default function About() {
                       data: st.by_species.map((d) => d.n).reverse(),
                       itemStyle: {
                         color: (p: { dataIndex: number }) =>
-                          PALETTE[(p.dataIndex + 2) % PALETTE.length],
+                          P[(p.dataIndex + 2) % P.length],
                         borderRadius: [0, 4, 4, 0],
                       },
                       barMaxWidth: 13,
@@ -216,12 +222,12 @@ export default function About() {
                 height={220}
                 option={{
                   grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
-                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-                  xAxis: { type: "value", ...AXIS },
+                  tooltip: { ...tooltipStyle(tone), trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...axisStyle(tone) },
                   yAxis: {
                     type: "category",
                     data: st.by_grade.map((d) => d.k).reverse(),
-                    ...AXIS,
+                    ...axisStyle(tone),
                   },
                   series: [
                     {
@@ -229,7 +235,7 @@ export default function About() {
                       data: st.by_grade.map((d) => d.n).reverse(),
                       itemStyle: {
                         color: (p: { dataIndex: number }) =>
-                          ["#c9d3e0", PALETTE[4], PALETTE[0]][p.dataIndex] ?? PALETTE[0],
+                          ["#c9d3e0", P[4], P[0]][p.dataIndex] ?? P[0],
                         borderRadius: [0, 4, 4, 0],
                       },
                       barMaxWidth: 20,
@@ -248,12 +254,12 @@ export default function About() {
                 height={200}
                 option={{
                   grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
-                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-                  xAxis: { type: "value", ...AXIS },
+                  tooltip: { ...tooltipStyle(tone), trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...axisStyle(tone) },
                   yAxis: {
                     type: "category",
                     data: st.by_source.map((d) => d.k).reverse(),
-                    ...AXIS,
+                    ...axisStyle(tone),
                   },
                   series: [
                     {
@@ -261,7 +267,7 @@ export default function About() {
                       data: st.by_source.map((d) => d.n).reverse(),
                       itemStyle: {
                         color: (p: { dataIndex: number }) =>
-                          PALETTE[(p.dataIndex + 5) % PALETTE.length],
+                          P[(p.dataIndex + 5) % P.length],
                         borderRadius: [0, 4, 4, 0],
                       },
                       barMaxWidth: 18,
