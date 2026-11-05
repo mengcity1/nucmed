@@ -33,7 +33,7 @@ SRC = ROOT / "src"
 BASE_IMPORTANT = 107
 BASE_CHIP = 21
 BASE_TAB = 12
-BASE_BUTTON = 15
+BASE_BUTTON = 10
 
 SELECTED = ("chip-on", "tab-on", "is-selected")
 OPAQUE_BG = re.compile(r"background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3}\b|#[0-9a-fA-F]{6}\b|rgb\(\s*\d+[,\s]+\d+[,\s]+\d+\s*\)|var\(--ui-marker-bg\))")

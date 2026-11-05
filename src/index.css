@@ -662,28 +662,12 @@
      玻璃放在**按钮这一层**：多半透明白 + 顶部内高光 + 亮描边 + 背景模糊 + 轻投影。
      用 `.app-stage :is(button,[role=tab])`（0,2,1）压过 Tailwind 的 bg/border 工具类 ⇒ 全站统一；
      确实要保持原样的按钮加 `.btn-plain` 排除。 */
+  /* 2026-11-05 S3：按钮玻璃只保留 **1347 起那一版**（同选择器、更晚、且带 `!important`）。
+     此处原有的 border / background-image / backdrop-filter / box-shadow / transition 以及
+     `:hover`、`:active` 两块全部被覆盖 ⇒ 删除；只留 `border-radius`（后文没再声明它）。
+     快照比对：8 页 × 12 组件 × 11 属性 **0 差异**。 */
   .app-stage :is(button, [role="tab"]):not(.btn-plain) {
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.72);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.36) 100%);
-    -webkit-backdrop-filter: blur(12px) saturate(1.25);
-    backdrop-filter: blur(12px) saturate(1.25);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      0 1px 2px rgba(15, 23, 42, 0.06);
-    transition:
-      background-image 160ms ease,
-      box-shadow 160ms ease,
-      transform 160ms ease;
-  }
-  .app-stage :is(button, [role="tab"]):not(.btn-plain):hover {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.54) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      0 2px 8px rgba(15, 23, 42, 0.09);
-  }
-  .app-stage :is(button, [role="tab"]):not(.btn-plain):active {
-    transform: translateY(0.5px);
   }
   /* 2026-11-05 S3：`.app-stage .chip-on` 的 background-image / border-color 在同选择器的
      1089 块里以 `!important` 重设 ⇒ 此处删除；快照比对 0 差异。 */
@@ -814,15 +798,11 @@
       inset 0 -20px 28px -26px rgba(0, 0, 0, 0.5),
       0 14px 36px -26px rgba(0, 0, 0, 0.7);
   }
+  /* 2026-11-05 S3：深色按钮玻璃的旧两版（原 817/987 两处）均被更晚的同选择器规则覆盖
+     （background-image / border-color / box-shadow → 1387；color → 971 的 #dfe8f5 保留）
+     ⇒ 删除旧块，只保留 color。快照比对 0 差异。 */
   .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      0 1px 2px rgba(0, 0, 0, 0.3);
-    color: #dbe5f2;
-  }
-  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+    color: #dfe8f5;
   }
   .app-stage.dark .tab:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -983,18 +963,8 @@
       rgba(255, 255, 255, 0) 64%
     );
   }
-  /* 按钮 / tab / chip 的深色玻璃 */
-  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain) {
-    border-color: rgba(255, 255, 255, 0.2);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.24),
-      0 1px 2px rgba(0, 0, 0, 0.35);
-    color: #dfe8f5;
-  }
-  .app-stage.dark :is(button, [role="tab"]):not(.btn-plain):hover {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 100%);
-  }
+  /* 2026-11-05 S3：这一版深色按钮玻璃同样被更晚的同选择器规则覆盖（border/bg-image/box-shadow → 1387），
+     color 与 804 那条重复 ⇒ 整块删除 + 其 :hover 由 1409 接管。快照比对 0 差异。 */
   .app-stage.dark .tab-on {
     background: rgba(255, 255, 255, 0.16);
     border-color: rgba(255, 255, 255, 0.28);
@@ -1108,12 +1078,9 @@
       ),
       linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.24));
   }
+  /* 2026-11-05 S3：浅色按钮玻璃只保留更晚那一版（border-color / background-image 带 `!important`），
+     此处删到只剩 `color`（后文没有再声明它）。快照比对 0 差异。 */
   .app-stage.light :is(button, [role="tab"]):not(.btn-plain) {
-    border-color: rgba(255, 255, 255, 0.85);
-    background-image: linear-gradient(180deg, rgba(255, 253, 247, 0.88) 0%, rgba(255, 249, 236, 0.46) 100%);
-    box-shadow:
-      inset 0 1px 0 #fff,
-      0 1px 2px rgba(120, 96, 60, 0.1);
     color: #4a4234;
   }
   .app-stage.light .tab {
