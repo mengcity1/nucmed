@@ -16,8 +16,10 @@
 **唯一实现处**：`src/components/Chart.tsx` 的 `LIGHT_TONE` / `DARK_TONE` / `PALETTE*` / `pointStyle()`。
 本脚本只**读**它、不复制颜色 —— 改配色只改那一处，这里自动跟上（与项目「禁止第二份口径」同理）。
 
-**已知欠账走棘轮**：浅色板 `#4ecdc4`(1.79:1) / `#a99cf0`(2.23:1) 是 v4 为「6 个时点」做
-深/浅同色相配对留下的，本门只防它们**再变淡**，不擅自改色（见 `KNOWN_DEBT`，改不改由 owner 定）。
+**已知欠账走"描边兜底"**：v4 色板为「6 个时点」做深/浅同色相配对，浅色成员在亮底上只有
+1.79:1 / 2.23:1。2026-11-05 按 owner 决策**不改色板**，改为给浅色点加 1px 暗边
+（`withAlpha("#0b1220", 0.8)`，实测对底色 **9.68:1**、亮度 63 vs 底 246）⇒ 本门规则：
+**填色 <3:1 时必须有 ≥3:1 的描边兜底**，两者都不到才判红（这样"把暗边改回白边"也会被抓住）。
 
 用法：
     python scripts/check_chart_theme.py              # 门：rc=1 表示有回归
@@ -45,16 +47,6 @@ DARK_BG = (64, 64, 81)
 GRID_MIN, GRID_MAX = 6.0, 28.0
 POINT_MIN = 3.0
 TEXT_MIN = 4.5
-
-# 已知欠账（**棘轮**：只防"变更差"，不强制改既有设计）
-#   v4 色板刻意为 6 个时点做「深/浅同色相」配对，浅色成员在亮底上天然偏淡。
-#   实测（2026-11-05，LIGHT_BG=#f6f6f2）：#4ecdc4 = 1.79:1、#a99cf0 = 2.23:1。
-#   ⇒ 本门放行这两个值，但**再淡**就判红；新出现的低对比色一律判红。
-#   要不要把这两个改深（或改成别的色相）属视觉决策，留给 owner。
-KNOWN_DEBT = {
-    ("浅色", "#4ecdc4"): 1.79,
-    ("浅色", "#a99cf0"): 2.23,
-}
 
 
 # ── 颜色小工具 ────────────────────────────────────────────────────────────
@@ -140,23 +132,25 @@ def run_checks(light: dict, dark: dict, pal_l: list[str], pal_d: list[str], psrc
     glow = "shadowBlur" in psrc
     rows.append((not glow, "pointStyle 无光晕", "出现 shadowBlur" if glow else "未出现 shadowBlur"))
 
-    for label, pal, bg in (("浅色", pal_l, LIGHT_BG), ("深色", pal_d, DARK_BG)):
-        bad, debt = [], []
+    for label, tone, bg, pal in (("浅色", light, LIGHT_BG, pal_l), ("深色", dark, DARK_BG, pal_d)):
+        # 填色不够时，看 1px 描边能不能兜底（浅色主题用暗边、深色主题用暗缝，同一思路）
+        edge = contrast(over(parse_color(tone["pointBorder"]), bg), bg)
+        weak, bad = [], []
         for h in pal:
             r = contrast(hex2rgb(h), bg)
             if r >= POINT_MIN:
                 continue
-            rec = KNOWN_DEBT.get((label, h))
-            if rec is not None and r >= rec - 0.05:
-                debt.append(f"{h}={r:.2f}")
+            if edge >= POINT_MIN:
+                weak.append(f"{h}={r:.2f}")
             else:
                 bad.append(f"{h}={r:.2f}")
         if bad:
-            rows.append((False, f"{label}数据色 ≥{POINT_MIN}", "低于门槛：" + "、".join(bad)))
-        elif debt:
-            rows.append((True, f"{label}数据色 ≥{POINT_MIN}", "已知欠账（未恶化）：" + "、".join(debt)))
+            detail = "低于门槛且无兜底：" + "、".join(bad)
+        elif weak:
+            detail = "靠描边补足：" + "、".join(weak) + f"（描边 {edge:.2f}:1）"
         else:
-            rows.append((True, f"{label}数据色 ≥{POINT_MIN}", f"{len(pal)} 色全部达标"))
+            detail = f"{len(pal)} 色全部达标"
+        rows.append((not bad, f"{label}数据色 ≥{POINT_MIN}", detail))
 
     for label, tone, bg in (("浅色", light, LIGHT_BG), ("深色", dark, DARK_BG)):
         line = over(parse_color(tone["splitLine"]), bg)
@@ -203,6 +197,7 @@ def self_test(src: str) -> int:
         ("深色套用浅色板（v38：1.6:1）", light, dark, pl, pl, psrc),
         ("pointStyle 加回 shadowBlur 12（v38：视觉直径撑大）", light, dark, pl, pd,
          psrc.replace("borderWidth: 1,", "borderWidth: 1, shadowBlur: 12,")),
+        ("浅色描边改回白边（色板浅成员就没人兜底了）", {**light, "pointBorder": '"#ffffff"'}, dark, pl, pd, psrc),
     ]
     caught = 0
     for name, lg, dk, p1, p2, ps in cases:
