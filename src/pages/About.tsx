@@ -1,5 +1,6 @@
 import { useJSON, fmt, type Meta, type Stats } from "../lib/data";
 import { useT } from "../lib/i18n";
+import { Chart, PALETTE, AXIS } from "../components/Chart";
 
 const LIC = "CC BY-NC 4.0";
 // ★ 2026-10-28：原为 github.com/<TODO-OWNER> 占位（会显示成一个不存在的地址）。
@@ -22,6 +23,10 @@ export default function About() {
   const { data: st } = useJSON<Stats>("stats.json");
   const tr = useT();
   const base = import.meta.env.BASE_URL;
+  /** "(null)" / 空串统一显示为「未标注」（stats.json 里确有这两类键） */
+  const lbl = (k: string) => (k === "(null)" || k === "" ? tr("about.na") : k);
+  const top = (d: { k: string; n: number }[], n: number) => d.slice(0, n);
+  const sum = (d: { k: string; n: number }[]) => d.reduce((a, b) => a + b.n, 0);
 
   return (
     <div className="pb-4">
@@ -104,6 +109,170 @@ export default function About() {
           {tr("about.availFullDb", { mb: m ? (m.db_bytes / 1048576).toFixed(1) : "…" })}
         </p>
       </section>
+
+      {/* 2026-11-05：数据分布五图 —— 此前 stats.json 的 by_organ / by_isotope /
+          by_species / by_grade / by_source **没有任何页面渲染**（只在 data.ts 类型里出现）。
+          全部零新数据：直接读 stats.json，随导出层一致刷新；每图副标题给分母。 */}
+      {st ? (
+        <section data-glass="panel" className="card lg-surface mt-5 p-6">
+          <h2 className="text-[16px] font-semibold">{tr("about.distTitle")}</h2>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">{tr("about.distLead")}</p>
+          <div className="mt-5 grid gap-6 lg:grid-cols-2">
+            <figure>
+              <figcaption className="label-caps">{tr("about.organ")}</figcaption>
+              <div className="mt-0.5 text-[11.5px] text-ink-3">
+                {tr("about.organHint", { n: fmt(st.total) })}
+              </div>
+              <Chart
+                height={300}
+                option={{
+                  grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
+                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...AXIS },
+                  yAxis: {
+                    type: "category",
+                    data: top(st.by_organ, 12).map((d) => lbl(d.k)).reverse(),
+                    ...AXIS,
+                  },
+                  series: [
+                    {
+                      type: "bar",
+                      data: top(st.by_organ, 12).map((d) => d.n).reverse(),
+                      itemStyle: { color: PALETTE[0], borderRadius: [0, 4, 4, 0] },
+                      barMaxWidth: 13,
+                    },
+                  ],
+                }}
+              />
+            </figure>
+
+            <figure>
+              <figcaption className="label-caps">{tr("about.isotope")}</figcaption>
+              <div className="mt-0.5 text-[11.5px] text-ink-3">
+                {tr("about.isotopeHint", { n: fmt(st.total), m: st.by_isotope.length })}
+              </div>
+              <Chart
+                height={300}
+                option={{
+                  grid: { left: 4, right: 8, top: 10, bottom: 4, containLabel: true },
+                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: {
+                    type: "category",
+                    data: top(st.by_isotope, 12).map((d) => lbl(d.k)),
+                    ...AXIS,
+                    axisLabel: { ...AXIS.axisLabel, rotate: 38, interval: 0, fontSize: 10.5 },
+                  },
+                  yAxis: { type: "value", ...AXIS },
+                  series: [
+                    {
+                      type: "bar",
+                      data: top(st.by_isotope, 12).map((d) => d.n),
+                      itemStyle: { color: PALETTE[2], borderRadius: [4, 4, 0, 0] },
+                      barMaxWidth: 18,
+                    },
+                  ],
+                }}
+              />
+            </figure>
+
+            <figure>
+              <figcaption className="label-caps">{tr("about.species")}</figcaption>
+              <div className="mt-0.5 text-[11.5px] text-ink-3">
+                {tr("about.speciesHint", { n: fmt(st.total) })}
+              </div>
+              <Chart
+                height={220}
+                option={{
+                  grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
+                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...AXIS },
+                  yAxis: {
+                    type: "category",
+                    data: st.by_species.map((d) => lbl(d.k)).reverse(),
+                    ...AXIS,
+                  },
+                  series: [
+                    {
+                      type: "bar",
+                      data: st.by_species.map((d) => d.n).reverse(),
+                      itemStyle: {
+                        color: (p: { dataIndex: number }) =>
+                          PALETTE[(p.dataIndex + 2) % PALETTE.length],
+                        borderRadius: [0, 4, 4, 0],
+                      },
+                      barMaxWidth: 13,
+                    },
+                  ],
+                }}
+              />
+            </figure>
+
+            <figure>
+              <figcaption className="label-caps">{tr("about.grade")}</figcaption>
+              <div className="mt-0.5 text-[11.5px] text-ink-3">
+                {tr("about.gradeHint", { n: fmt(sum(st.by_grade)) })}
+              </div>
+              <Chart
+                height={220}
+                option={{
+                  grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
+                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...AXIS },
+                  yAxis: {
+                    type: "category",
+                    data: st.by_grade.map((d) => d.k).reverse(),
+                    ...AXIS,
+                  },
+                  series: [
+                    {
+                      type: "bar",
+                      data: st.by_grade.map((d) => d.n).reverse(),
+                      itemStyle: {
+                        color: (p: { dataIndex: number }) =>
+                          ["#c9d3e0", PALETTE[4], PALETTE[0]][p.dataIndex] ?? PALETTE[0],
+                        borderRadius: [0, 4, 4, 0],
+                      },
+                      barMaxWidth: 20,
+                    },
+                  ],
+                }}
+              />
+            </figure>
+
+            <figure className="lg:col-span-2">
+              <figcaption className="label-caps">{tr("about.source")}</figcaption>
+              <div className="mt-0.5 text-[11.5px] text-ink-3">
+                {tr("about.gradeHint", { n: fmt(sum(st.by_source)) })}
+              </div>
+              <Chart
+                height={200}
+                option={{
+                  grid: { left: 4, right: 22, top: 6, bottom: 4, containLabel: true },
+                  tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                  xAxis: { type: "value", ...AXIS },
+                  yAxis: {
+                    type: "category",
+                    data: st.by_source.map((d) => d.k).reverse(),
+                    ...AXIS,
+                  },
+                  series: [
+                    {
+                      type: "bar",
+                      data: st.by_source.map((d) => d.n).reverse(),
+                      itemStyle: {
+                        color: (p: { dataIndex: number }) =>
+                          PALETTE[(p.dataIndex + 5) % PALETTE.length],
+                        borderRadius: [0, 4, 4, 0],
+                      },
+                      barMaxWidth: 18,
+                    },
+                  ],
+                }}
+              />
+            </figure>
+          </div>
+        </section>
+      ) : null}
 
       {/* 第二组：引用 / 数据字典 / 联系（3 个面片）—— 拆两个舞台是为了把单块 canvas 面积压下去
           （显存按面积算；一块覆盖整页的 stage 在长页面上既不划算也更容易触发帧缓冲失败） */}
