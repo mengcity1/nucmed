@@ -407,9 +407,23 @@ export default function Home() {
         <Chip on={hideBad} onClick={() => setHideBad((v) => !v)}>
           {tr("home.hideBad", { n: 175 })}
         </Chip>
-        <Chip onClick={() => setKw("PSMA")}>{tr("home.psma")}</Chip>
-        <Chip onClick={() => setNucs(["镥-177"])}>{tr("home.lu177")}</Chip>
-        <Chip onClick={() => setNucs(["镓-68"])}>{tr("home.ga68")}</Chip>
+        {/* 2026-11-05：这三枚快捷筛选原先只是"设值动作"，点完**没有任何选中反馈**（与 owner
+            说的"看不出选没选"是同一类问题）⇒ 改为有状态的开关：再点一次取消。 */}
+        <Chip on={kw.trim().toUpperCase() === "PSMA"} onClick={() => setKw(kw.trim().toUpperCase() === "PSMA" ? "" : "PSMA")}>
+          {tr("home.psma")}
+        </Chip>
+        <Chip
+          on={nucs.length === 1 && nucs[0] === "镥-177"}
+          onClick={() => setNucs(nucs.length === 1 && nucs[0] === "镥-177" ? [] : ["镥-177"])}
+        >
+          {tr("home.lu177")}
+        </Chip>
+        <Chip
+          on={nucs.length === 1 && nucs[0] === "镓-68"}
+          onClick={() => setNucs(nucs.length === 1 && nucs[0] === "镓-68" ? [] : ["镓-68"])}
+        >
+          {tr("home.ga68")}
+        </Chip>
       </div>
 
       {/* 筛选卡（2026-11-04 重做）：默认折叠 · 展开后四列紧凑 · 靶点/适应症改为 chip 多选
