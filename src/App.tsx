@@ -11,7 +11,10 @@ import Overview from "./pages/Home";
 const DrugDetail = lazy(() => import("./pages/DrugDetail"));
 /** 临时：背景结构对照页（选完删除） */
 const GlassBgLab = lazy(() => import("./pages/GlassBgLab"));
-import About from "./pages/About";
+/** ★ 2026-11-05：About 也改路由级 lazy —— 它 `import Chart`，而 Chart 依赖 echarts
+ *  （573 KB / gzip 195 KB）⇒ 静态引入会把 echarts 拉进 **entry 依赖图**，`dist/index.html`
+ *  因此对全站（含总览/图集）`modulepreload` 了它在。改 lazy 后 echarts 只在进 /about 时才下载。 */
+const About = lazy(() => import("./pages/About"));
 import Atlas from "./pages/Atlas";
 /** 临时：液态玻璃选型对照页（选完删除） */
 

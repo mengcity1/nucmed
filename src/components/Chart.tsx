@@ -71,6 +71,8 @@ export function Chart({
   height?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  /** ECharts 实例：跨 `option` 变更复用，只有卸载才 dispose（见下方 init effect 的注释） */
+  const instRef = useRef<ReturnType<typeof echarts.init> | null>(null);
   /** 小屏（<640px）高度按 0.72 缩放：320 → 230，避免手机上一屏放不下（2026-11-01 小屏适配） */
   const [h, setH] = useState(height);
   useEffect(() => {
@@ -88,8 +90,11 @@ export function Chart({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    /* ★ 2026-11-05：实例**只建一次**。旧写法把 init/dispose 放在 `[option, h]` 上 ⇒
+       切主题、切「器官对比/时间曲线」、改筛选都会 dispose 再 init：canvas 重建、
+       600ms 入场动画重放、hover/选中状态丢失（观感就是"闪一下"）。 */
     const inst = echarts.init(el);
-    inst.setOption(option);
+    instRef.current = inst;
     const onResize = () => inst.resize();
     // ResizeObserver 优于 window.resize：容器因布局/断点变化而变宽时也会重绘
     let ro: ResizeObserver | undefined;
@@ -103,8 +108,15 @@ export function Chart({
       if (ro) ro.disconnect();
       else window.removeEventListener("resize", onResize);
       inst.dispose();
+      instRef.current = null;
     };
-  }, [option, h]);
+  }, []);
+
+  /* 选项变化只**更新**，不重建：`notMerge = true` 保证系列/坐标轴整体替换（切换视图时类型会变） */
+  useEffect(() => {
+    instRef.current?.setOption(option, true);
+  }, [option]);
+
   return <div ref={ref} style={{ height: h }} className="w-full" />;
 }
 
