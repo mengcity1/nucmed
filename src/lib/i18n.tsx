@@ -302,6 +302,8 @@ export const STR = {
   "atlas.reset": { zh: "重置", en: "Reset" },
   "atlas.close": { zh: "关闭 ✕", en: "Close ✕" },
   "atlas.captionLabel": { zh: "原文图注：", en: "Caption: " },
+  "atlas.captionMore": { zh: "展开全文（{n} 字）", en: "Show full caption ({n} chars)" },
+  "atlas.captionLess": { zh: "收起", en: "Collapse" },
   "atlas.truncated": {
     zh: "图注已在 400 字符处截断，完整内容请看 PMC 原图页",
     en: "Caption truncated at 400 characters — see the PMC figure page for the full text",
