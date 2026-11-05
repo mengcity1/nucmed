@@ -34,6 +34,7 @@ BASE_IMPORTANT = 107
 BASE_CHIP = 21
 BASE_TAB = 12
 BASE_BUTTON = 10
+BASE_LG = 27
 
 SELECTED = ("chip-on", "tab-on", "is-selected")
 OPAQUE_BG = re.compile(r"background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3}\b|#[0-9a-fA-F]{6}\b|rgb\(\s*\d+[,\s]+\d+[,\s]+\d+\s*\)|var\(--ui-marker-bg\))")
@@ -99,10 +100,11 @@ def check_counts(css: str) -> tuple[bool, str]:
     chip = sum(1 for s, _ in rs if ".chip" in s)
     tab = sum(1 for s, _ in rs if re.search(r"\.tab(?:-on)?(?![a-z-])", s))
     btn = sum(1 for s, _ in rs if ":is(button" in s)
-    ok = imp <= BASE_IMPORTANT and chip <= BASE_CHIP and tab <= BASE_TAB and btn <= BASE_BUTTON
+    lg = sum(1 for s, _ in rs if ".lg-surface" in s)
+    ok = imp <= BASE_IMPORTANT and chip <= BASE_CHIP and tab <= BASE_TAB and btn <= BASE_BUTTON and lg <= BASE_LG
     return (
         ok,
-        f"!important {imp}/{BASE_IMPORTANT} · chip {chip}/{BASE_CHIP} · tab {tab}/{BASE_TAB} · button {btn}/{BASE_BUTTON}",
+        f"!important {imp}/{BASE_IMPORTANT} · chip {chip}/{BASE_CHIP} · tab {tab}/{BASE_TAB} · button {btn}/{BASE_BUTTON} · lg-surface {lg}/{BASE_LG}",
     )
 
 
