@@ -82,8 +82,18 @@ function Chip({
   sm?: boolean;
 }) {
   return (
-    <button onClick={onClick} className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"}`}>
-      {on && <span className="text-[10.5px] leading-none">✓</span>}
+    <button
+      type="button"
+      /* 2026-11-05：`aria-pressed` 让"选没选"对读屏器也成立（原来只有一颗 ✓ 是纯视觉线索） */
+      aria-pressed={!!on}
+      onClick={onClick}
+      className={`${sm ? "chip-sm" : "chip"} ${on ? "chip-on" : "chip-off"}`}
+    >
+      {on && (
+        <span aria-hidden="true" className="chip-badge">
+          ✓
+        </span>
+      )}
       {children}
     </button>
   );

@@ -318,11 +318,15 @@ function DrugCurve({ pts }: { pts: Point[] }) {
               <button
                 key={u}
                 type="button"
+                aria-pressed={unit === u}
                 onClick={() => setUnit(u)}
-                className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
-                  unit === u ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-                }`}
+                className={`chip-sm ${unit === u ? "chip-on font-semibold" : "chip-off"}`}
               >
+                {unit === u && (
+                  <span aria-hidden="true" className="chip-badge">
+                    ✓
+                  </span>
+                )}
                 {u} · {n}
               </button>
             ))}
@@ -331,30 +335,36 @@ function DrugCurve({ pts }: { pts: Point[] }) {
         <span className="ml-auto flex flex-wrap items-center gap-1">
           <button
             type="button"
+            aria-pressed={view === "organ"}
             onClick={() => setView("organ")}
-            className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
-              view === "organ" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-            }`}
+            className={`chip-sm ${view === "organ" ? "chip-on font-semibold" : "chip-off"}`}
           >
+            {view === "organ" && (
+              <span aria-hidden="true" className="chip-badge">
+                ✓
+              </span>
+            )}
             {tr("drug.chartOrgan")}
           </button>
           <button
             type="button"
+            aria-pressed={view === "curve"}
             onClick={() => setView("curve")}
             disabled={!curvable.length}
             title={curvable.length ? tr("drug.chartCurveHint") : tr("drug.chartCurveOff")}
-            className={`rounded-full border px-2.5 py-0.5 text-[11.5px] transition ${
-              view === "curve" ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-            } ${curvable.length ? "" : "cursor-not-allowed opacity-45 hover:border-line"}`}
+            className={`chip-sm ${view === "curve" ? "chip-on font-semibold" : "chip-off"} ${
+              curvable.length ? "" : "cursor-not-allowed opacity-45"
+            }`}
           >
+            {view === "curve" && (
+              <span aria-hidden="true" className="chip-badge">
+                ✓
+              </span>
+            )}
             {tr("drug.chartCurve")}{curvable.length ? "" : tr("drug.unavailable")}
           </button>
           {view === "curve" && (
-            <button
-              type="button"
-              onClick={() => setLogX((v) => !v)}
-              className="rounded-full border border-line bg-white px-2.5 py-0.5 text-[11.5px] text-ink-2 transition hover:border-[#b9d0e9]"
-            >
+            <button type="button" onClick={() => setLogX((v) => !v)} className="chip-sm chip-off">
               {logX ? tr("drug.axisLinear") : tr("drug.axisLog")}
             </button>
           )}

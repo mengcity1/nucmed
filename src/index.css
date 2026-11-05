@@ -1609,5 +1609,31 @@
       inset 0 -10px 14px -12px rgba(0, 0, 0, 0.55),
       0 1px 2px rgba(0, 0, 0, 0.4),
       0 8px 18px -12px rgba(0, 0, 0, 0.7);
-  }
+  
+}
+
+/* ── v47 「选中」用**实心徽标**表达，不跟玻璃底色抢（2026-11-05 · owner：「点了就只有一个 √，
+   看不清到底选了没」）────────────────────────────────────────────────────────────
+   为什么不像上一版那样改 `.chip-on` 的底色：`.app-stage.light :is(button…)` 那条全站玻璃规则
+   带 `!important` 且与本规则同层同量级，浅色下会**把实底洗掉**（实测深色成功、浅色失败）。
+   徽标是 chip **内部的一个 `<span>`**，不参与那些 button/chip 规则 ⇒ 两套主题都稳定可见：
+   浅色 = 深蓝底白勾（6.7:1）、深色 = 亮蓝底深字（9.0:1）。选中态同时加粗。 */
+.chip-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 9999px;
+  background: #1e5ba8;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.app-stage.dark .chip-badge {
+  background: #7bb8ff;
+  color: #0b1220;
+}
+
 }

@@ -135,12 +135,18 @@ export default function Atlas() {
           <button
             key={k}
             type="button"
+            aria-pressed={attrib === k}
             onClick={() => setFilter({ attrib: k })}
             title={k === "all" ? tr("atlas.all") : tr(ATTRIB[k].whyKey)}
-            className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
-              attrib === k ? "border-brand bg-brand-soft text-brand-deep" : "border-line bg-white text-ink-2 hover:border-[#b9d0e9]"
-            }`}
+            /* 2026-11-05：选中态 = **实心勾徽标 + 加粗**（`.chip-badge` 是 chip 内部的 span，
+               不会被玻璃规则洗掉；见 index.css v47）。原来的"选中 = bg-brand-soft"深色下几乎看不出。 */
+            className={`chip-sm ${attrib === k ? "chip-on font-semibold" : "chip-off"}`}
           >
+            {attrib === k && (
+              <span aria-hidden="true" className="chip-badge">
+                ✓
+              </span>
+            )}
             {k === "all" ? tr("atlas.all") : tr(ATTRIB[k].key)}
             <span className="num ml-1 text-[11px] opacity-70">{data ? fmt(counts[k]) : "…"}</span>
           </button>
