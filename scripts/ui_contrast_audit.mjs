@@ -18,10 +18,16 @@ const arg = (k, d) => {
 };
 const BASE = arg("--base", "http://127.0.0.1:4175");
 
+/* 覆盖面（v61）：不只首页 —— 药页按**分期徽标**各挑一个（Phase 2 / Phase 1 /  preclinical 点数最多的），
+   图集换两个药。这些页的徽标色族不同（badge-a/b/c），最容易出现"深色漏覆盖"那类问题。 */
 const PAGES = [
   ["home", "/?contrast=1"],
-  ["drug", "/drug/1145?contrast=1"],
-  ["atlas", "/atlas?drug=3&contrast=1"],
+  ["drug-a", "/drug/1145?contrast=1"],
+  ["drug-phase2", "/drug/278?contrast=1"],
+  ["drug-phase1", "/drug/2448?contrast=1"],
+  ["drug-preclin", "/drug/2400?contrast=1"],
+  ["atlas-3", "/atlas?drug=3&contrast=1"],
+  ["atlas-2400", "/atlas?drug=2400&contrast=1"],
   ["about", "/about?contrast=1"],
 ];
 const THEMES = ["light", "dark"];

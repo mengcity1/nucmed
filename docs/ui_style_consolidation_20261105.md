@@ -180,7 +180,26 @@ L4 pages       页面层不出现 bg-white / 色号；选中一律用 .is-select
 4. 页面内 `?contrast=1` 的报告**不可信**（它在主题类落地前就采样，会给出 `#164a8a on 深底` 的假阳性）——
    要在主题就绪后**自己算**。
 
-### 新增的回归能力（这是 S3 的前置）
+## 十一、下一批（v61 已量好数字，待做）：**数据分片**
+
+首屏重量实测（`scripts/ui_perf_probe.mjs`，线上，传输字节 / gzip 后）：
+
+| 页 | 总传输 | 最大项 |
+|---|---|---|
+| home | **410 KB**（字体瘦身后；瘦身前 2317 KB） | drugs.json 133 KB · app.js 107 KB |
+| drug | ≈350 KB | echarts 192 KB · **biodist.json 101 KB** · drug_refs 35 KB |
+| atlas | ≈390 KB | **figs/manifest.json 258 KB** · 图 317 KB |
+
+**做法（不改数据机！在 build 期派生，产物不进库）**：`prebuild` 读 `public/data/*.json` 生成本页真正需要的分片：
+
+1. `biodist.json`（1.41 MB）→ 按 `drug_id` 拆成 `data/points/<id>.json`；药页只取自己那份（典型药 p50 约 3 个点）。
+2. `drugs.json`（1.65 MB）→ `data/drugs_index.json`（只留列表/搜索/排序用的字段：`drug_id/name_en/name_zh/status/n_points/…`）。
+3. `figs/manifest.json`（258 KB）→ 按药拆 `figs/by-drug/<id>.json`。
+
+**预期**：drug 350 → ≈120 KB，atlas 390 → ≈180 KB，home 410 → ≈290 KB。
+
+**风险清单（动手前先写测试）**：深链 `?tab=` / `?drug=`、目录分页与排序、图集按药取图、5,162 个文件的 artifact 体积、CI 时间（+30 s 左右）、以及"分片与源文件不同步"（用一条闸门断言 `Σ 分片 == 源 JSON`）。
+
 
 `scripts/ui_style_snapshot.mjs`（Playwright）：
 
