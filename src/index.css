@@ -884,9 +884,6 @@
   .app-stage.dark [class*="bg-[#fef3c7]"] {
     background-color: rgba(251, 191, 36, 0.16) !important;
   }
-  .app-stage.dark [class*="bg-[#dcfce7]"] {
-    background-color: rgba(52, 211, 153, 0.16) !important;
-  }
   .app-stage.dark [class*="bg-[#fee2e2]"],
   .app-stage.dark [class*="bg-[#fdf2f2]"] {
     background-color: rgba(248, 113, 113, 0.16) !important;
@@ -962,19 +959,6 @@
   }
   .app-stage.dark .text-brand-deep {
     color: #a9d0ff !important;
-  }
-  /* KPI 的四个彩色数字（Tailwind 任意值类）—— 用属性选择器统一提亮 */
-  .app-stage.dark [class*="#12457f"] {
-    color: #9dc2ff;
-  }
-  .app-stage.dark [class*="#0a6f66"] {
-    color: #7fe2d6;
-  }
-  .app-stage.dark [class*="#4b3ea3"] {
-    color: #b9b0ff;
-  }
-  .app-stage.dark [class*="#8a5a12"] {
-    color: #f0c07a;
   }
   /* 卡片 / 表格 */
   .app-stage.dark .card {
@@ -1080,15 +1064,6 @@
   }
   .app-stage.dark :is(.eyebrow, .chip-on) {
     color: #a9d0ff !important;
-  }
-  .app-stage.dark [class*="#12457f"] {
-    color: #a8c8ff !important;
-  }
-  .app-stage.dark [class*="#0a6f66"] {
-    color: #8fe7db !important;
-  }
-  .app-stage.dark [class*="#4b3ea3"] {
-    color: #c3baff !important;
   }
   /* 徽标（A/B/C 级）：浅色底是写在 `.badge-*` 类里的（不是元素上的 bg 工具类），兜底规则抓不到 ⇒ 单独处理 */
   .app-stage.dark .badge-a {

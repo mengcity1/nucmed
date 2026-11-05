@@ -29,8 +29,8 @@ ROOT = Path(__file__).resolve().parent.parent
 CSS = ROOT / "src" / "index.css"
 SRC = ROOT / "src"
 
-# 棘轮基线（2026-11-05 实测；**只允许往下调**，调低时同步改这里）
-BASE_IMPORTANT = 114
+# 棘轮基线（**只允许往下调**；2026-11-05 批次 B 删掉 8 个重复/死规则后实测值）
+BASE_IMPORTANT = 110
 BASE_CHIP = 30
 BASE_TAB = 13
 BASE_BUTTON = 15
