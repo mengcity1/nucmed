@@ -29,10 +29,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CSS = ROOT / "src" / "index.css"
 SRC = ROOT / "src"
 
-# 棘轮基线（**只允许往下调**；2026-11-05 批次 B 删掉 8 个重复/死规则后实测值）
-BASE_IMPORTANT = 110
-BASE_CHIP = 30
-BASE_TAB = 13
+# 棘轮基线（**只允许往下调**；2026-11-05 批次 B 逐族删死规则后实测值）
+BASE_IMPORTANT = 107
+BASE_CHIP = 21
+BASE_TAB = 12
 BASE_BUTTON = 15
 
 SELECTED = ("chip-on", "tab-on", "is-selected")
@@ -93,7 +93,9 @@ def check_bg_only(css_tsx: dict) -> tuple[bool, str]:
 
 def check_counts(css: str) -> tuple[bool, str]:
     rs = rules_of(css)
-    imp = css.count("!important")
+    code = uncommented(css)  # ★ 2026-11-05：必须**先剥注释**再数 !important
+    # （否则注释里提到 "!important" 会被计入 —— 第一次跑就被自己写的注释坑了）
+    imp = code.count("!important")
     chip = sum(1 for s, _ in rs if ".chip" in s)
     tab = sum(1 for s, _ in rs if re.search(r"\.tab(?:-on)?(?![a-z-])", s))
     btn = sum(1 for s, _ in rs if ":is(button" in s)

@@ -507,19 +507,9 @@
     border-width: 1px;
     border-style: solid;
   }
-  .app-stage .chip-off {
-    border-color: rgba(15, 23, 42, 0.1);
-  }
-  .app-stage .chip-on {
-    border-color: rgba(30, 91, 168, 0.25);
-  }
-  /* v20.1：chip 同样是"玻璃板上的高光层"，不各开一层折射 */
-  .app-stage .chip-off {
-    background: rgba(255, 255, 255, 0.4);
-  }
-  .app-stage .chip-on {
-    background: rgba(30, 91, 168, 0.13);
-  }
+  /* 2026-11-05 S3：此处原有 `.app-stage .chip-off/.chip-on` 的 border-color / background
+     （rgba(15,23,42,.1) / rgba(30,91,168,.25/.13)），均被后文同选择器的 667/671/703/1144/1099
+     以及 `.app-stage.light` / `.dark` 的 chip 规则覆盖 ⇒ 删除；快照比对 0 差异。 */
   .glass-bar .lg-surface {
     border-radius: 0;
     border: 0;
@@ -664,14 +654,10 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
       0 1px 3px rgba(15, 23, 42, 0.07);
   }
-  .app-stage .chip-off {
-    background: rgba(255, 255, 255, 0.45);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-  .app-stage .chip-on {
-    background: rgba(30, 91, 168, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  }
+  /* 2026-11-05 S3：此处原有 `.app-stage .chip-off/.chip-on` 的
+     `background` + `box-shadow`（.45/.16 + inset 高光），均被后文
+     `.app-stage :is(.chip,.chip-sm)`（1058）/ `.app-stage .chip-on`（1089）/
+     `.app-stage.light .chip-on` 覆盖 ⇒ 删除；快照比对 0 差异。 */
   /* ── v20.6 全站按钮 = 液态玻璃（owner：只要是按钮都得是）────────────────
      玻璃放在**按钮这一层**：多半透明白 + 顶部内高光 + 亮描边 + 背景模糊 + 轻投影。
      用 `.app-stage :is(button,[role=tab])`（0,2,1）压过 Tailwind 的 bg/border 工具类 ⇒ 全站统一；
@@ -699,11 +685,8 @@
   .app-stage :is(button, [role="tab"]):not(.btn-plain):active {
     transform: translateY(0.5px);
   }
-  /* 选中态按钮（chip）保留品牌色，只在玻璃上叠一层淡色 */
-  .app-stage .chip-on {
-    background-image: linear-gradient(180deg, rgba(30, 91, 168, 0.2) 0%, rgba(30, 91, 168, 0.12) 100%);
-    border-color: rgba(30, 91, 168, 0.35);
-  }
+  /* 2026-11-05 S3：`.app-stage .chip-on` 的 background-image / border-color 在同选择器的
+     1089 块里以 `!important` 重设 ⇒ 此处删除；快照比对 0 差异。 */
   /* 面板的玻璃厚度：顶沿亮边 + 亮轮廓 + 底部内阴影 + 淡外投影（CSS 层，弥补 WebGL 只在边缘可见） */
   .app-stage.webgl-ready .lg-surface {
     box-shadow:
@@ -845,21 +828,9 @@
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.14);
   }
-  .app-stage.dark .tab-on {
-    background: rgba(255, 255, 255, 0.11);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #eef4ff;
-  }
-  .app-stage.dark .chip-off {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.14);
-    color: #d5e0ef;
-  }
-  .app-stage.dark .chip-on {
-    background: rgba(120, 170, 255, 0.16);
-    border-color: rgba(140, 185, 255, 0.32);
-    color: #eaf2ff;
-  }
+  /* 2026-11-05 S3：此处原有 `.tab-on` / `.chip-off` / `.chip-on` 三块深色规则，
+     均被后文**同选择器**的规则整块覆盖（`.tab-on` 1027、`.chip-off` 1032、`.chip-on` 1037/1236）
+     ⇒ 已删除；计算样式快照比对 0 差异（见 DESIGN v52）。 */
   .app-stage.dark.webgl-ready .lg-surface {
     background-image: radial-gradient(
       520px circle at var(--mx, 50%) var(--my, -20%),
