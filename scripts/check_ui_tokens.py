@@ -29,8 +29,9 @@ ROOT = Path(__file__).resolve().parent.parent
 CSS = ROOT / "src" / "index.css"
 SRC = ROOT / "src"
 
-# 棘轮基线（**只允许往下调**；2026-11-05 批次 B 逐族删死规则后实测值）
-BASE_IMPORTANT = 107
+# 棘轮基线（**只允许往下调**；2026-11-05 S4：全部 !important 已移除并证明等价 ⇒ 锁 0）
+# ⚠ 要把 `!important` 加回来，必须同时改这个基线，并在规则上方写明"对抗哪条 vendor 规则"。
+BASE_IMPORTANT = 0
 BASE_CHIP = 21
 BASE_TAB = 12
 BASE_BUTTON = 10

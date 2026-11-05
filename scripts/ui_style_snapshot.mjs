@@ -37,8 +37,12 @@ const PROPS = [
   "backdrop-filter",
 ];
 
-/** 每页每主题都拍的组件（取前 n 个实例） */
+/** 每页每主题都拍的组件（取前 n 个实例）
+ *  ⚠ 2026-11-05：**采集面必须覆盖"被 !important 覆盖的那类元素"**，否则会得出假的"0 差异"。
+ *  第一次做 S4 时只采了 12 个控件，得出"去掉 107 个 !important 无变化"的错误结论 ——
+ *  因为多数 !important 是**文字色**（.text-ink / text-[#…] / KPI / 徽标 / 表格），根本没采到。 */
 const TARGETS = [
+  // 控件
   { sel: ".tab", n: 3 },
   { sel: ".tab-on", n: 2, pseudo: "::after" },
   { sel: ".chip", n: 2 },
@@ -47,10 +51,35 @@ const TARGETS = [
   { sel: ".chip-off", n: 2 },
   { sel: ".chip-badge", n: 2 },
   { sel: ".is-selected", n: 2 },
-  { sel: "button", n: 3 },
+  { sel: "button", n: 4 },
+  // 面板
   { sel: ".card", n: 2 },
   { sel: ".card-solid", n: 2 },
   { sel: ".lg-surface", n: 2 },
+  // 文字 / 表格（!important 集中的地方）
+  { sel: ".text-ink", n: 3 },
+  { sel: ".text-ink-2", n: 3 },
+  { sel: ".text-ink-3", n: 3 },
+  { sel: ".text-brand", n: 2 },
+  { sel: ".text-brand-deep", n: 2 },
+  { sel: ".text-bad", n: 2 },
+  { sel: ".text-good", n: 2 },
+  { sel: ".text-ok", n: 2 },
+  { sel: ".kpi-val", n: 3 },
+  { sel: ".badge", n: 3 },
+  { sel: ".label-caps", n: 2 },
+  { sel: ".sec-no", n: 2 },
+  { sel: ".num", n: 3 },
+  { sel: "h1", n: 1 },
+  { sel: "h2", n: 2 },
+  { sel: "p", n: 3 },
+  { sel: "a", n: 3 },
+  { sel: "th", n: 3 },
+  { sel: "td", n: 5 },
+  { sel: ".table-booktabs tbody tr", n: 2 },
+  { sel: ".prose-serif", n: 2 },
+  { sel: "input", n: 2 },
+  { sel: "select", n: 1 },
 ];
 
 const PAGES = [
@@ -91,6 +120,23 @@ async function snap() {
             }
           });
         }
+        /* ★ 全页指纹：把**每一个元素**的 11 个关键属性压成一个 FNV-1a 哈希。
+           采样点只能证明"采到的没变"，全页指纹能证明"整页没有一处样式漂移"。
+           （2026-11-05：第一次做 S4 时只靠 12 个采样点，差点得出"去掉 107 个 !important 无变化"的假结论。） */
+        let h = 2166136261 >>> 0;
+        const push = (s) => {
+          for (let i = 0; i < s.length; i++) {
+            h ^= s.charCodeAt(i);
+            h = Math.imul(h, 16777619) >>> 0;
+          }
+        };
+        const all = document.querySelectorAll("*");
+        for (const el of Array.from(all)) {
+          push(el.tagName);
+          const cs = getComputedStyle(el);
+          for (const p of props) push(cs.getPropertyValue(p));
+        }
+        out.__full = { elements: String(all.length), hash: h.toString(16) };
         return out;
       },
       { targets: TARGETS, props: PROPS },
@@ -112,6 +158,14 @@ function diff(a, b) {
     for (const k of keys) {
       if (!ea[k] || !eb[k]) {
         rows.push(`${pg} ${k}: 元素只在${ea[k] ? "前" : "后"}存在`);
+        continue;
+      }
+      if (k === "__full") {
+        if (ea[k].hash !== eb[k].hash || ea[k].elements !== eb[k].elements) {
+          rows.push(
+            `${pg} 全页指纹不同：${ea[k].elements} 元素 / ${ea[k].hash} → ${eb[k].elements} 元素 / ${eb[k].hash}`,
+          );
+        }
         continue;
       }
       for (const p of PROPS) {
