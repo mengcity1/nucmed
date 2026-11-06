@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useJSON, fmt, loadFigManifest, refLink, type Drug, type Fig, type Point } from "../lib/data";
 import { enSafe, nuclideEn, stageLabel, useLang, useT } from "../lib/i18n";
@@ -658,13 +658,21 @@ export default function DrugDetail() {
   );
   /** 文献列表：优先药物级参考文献（drug_refs + refs_all）；未加载完时先按 biodist 来源占位 */
   const refList = useMemo<Ref[]>(() => {
-    const ids = drugRefs ?? pmids;
+    /* ★ 2026-11-06：`drug_refs` 为空（不是 null）时也要退回 biodist 来源 PMID ——
+       实测 5 个药 `n_refs>0` 但 `drug_refs` 无条目，旧写法 `drugRefs ?? pmids` 只兜 null，
+       这些药会被显示成「暂无关联文献」。 */
+    const ids = drugRefs && drugRefs.length ? drugRefs : pmids;
     return ids.map((p) => refMeta?.[p] ?? { pmid: p, title: null, journal: null, year: null });
   }, [drugRefs, refMeta, pmids]);
 
   /** 分两组：① 该药生物分布数值的出处 ② 其余相关文献（背景/方法/临床） */
   const srcRefs = useMemo(() => refList.filter((r) => pmids.includes(r.pmid)), [refList, pmids]);
   const otherRefs = useMemo(() => refList.filter((r) => !pmids.includes(r.pmid)), [refList, pmids]);
+  /** 文献条数（唯一口径 · 2026-11-06）：药物级 `drug_refs` 优先，为空时退回「该药生物分布来源 PMID」数。
+   *  ★ 为什么要有这一处：Tab 角标原先取 `drugRefs`、而「落 Tab」守卫取 `drug.n_refs`
+   *  （= biodist 来源 PMID 数）⇒ 两套口径。实测 2,183 个药 `n_refs=0` 但 `drug_refs` 有条目
+   *  ⇒ 角标写「2 篇」却仍被判「无文献」，点进去被守卫弹回生物分布（owner 2026-11-06 报的闪回）。 */
+  const refCount = drugRefs && drugRefs.length ? drugRefs.length : Math.max(drug?.n_refs ?? 0, pmids.length);
   const hits = useMemo(() => {
     const k = pick.trim().toLowerCase();
     return (drugs ?? [])
@@ -672,20 +680,27 @@ export default function DrugDetail() {
       .slice(0, 24);
   }, [drugs, pick]);
 
-  /* 切药时把 Tab 落到「有数据的第一个」，否则停在上一个药的 Tab 上会看到空面板 */
+  /* 切药时把 Tab 落到「有数据的第一个」，否则停在上一个药的 Tab 上会看到空面板。
+     ★ 2026-11-06 修「点『文献』闪一下又弹回生物分布」（owner 实测 · Playwright 复现）：
+     ① **只在换药时纠正** —— 旧写法依赖里带 `tab`，用户每点一次 Tab 都会触发一次纠正，
+        于是「灰态 Tab 可点、点进去看『该药暂无 + 覆盖说明』」这个设计被守卫自己抹掉，表现就是闪回；
+     ② 判据与 Tab 角标**同源**（`refCount`）—— 旧写法用 `drug.n_refs`，2,183 个药被误判「无文献」；
+     ③ 文献索引未到（`drugRefs === null`）时不下判断，等它到再看，避免把用户从文献 Tab 上误弹走；
+        影像同理（`figs === null` 当「可能有」，见 tabs 定义处注释）。 */
+  const tabGuard = useRef<number | null>(null);
   useEffect(() => {
-    if (!drug) return;
+    if (!drug || drugRefs === null) return;
+    if (tabGuard.current === drug.drug_id) return;
+    tabGuard.current = drug.drug_id;
     const ok: Record<TabKey, boolean> = {
       bio: (drug.n_points ?? mine.length) > 0,
       dos: (drug.n_dosim ?? 0) > 0,
       tbr: (drug.has_tbr ?? 0) === 1,
-      refs: (drug.n_refs ?? 0) > 0,
-      /* 影像：manifest 未到时（null）当"可能有"，别把用户从 Tab 上弹走 */
+      refs: refCount > 0,
       img: figs === null || figs.length > 0,
     };
-    /* 2026-11-05：`tab` 现在来自 URL ⇒ 这里只负责"落到有数据的第一个"，并写回 URL（依赖里带 tab，落定后不再触发） */
     if (!ok[tab]) setTab(TAB_ORDER.find((k) => ok[k]) ?? "bio");
-  }, [drug, mine.length, figs?.length, tab, setTab]);
+  }, [drug, mine.length, drugRefs, refCount, figs, tab, setTab]);
 
   /* 无 id ⇒ 选择器（导航「单药画像」直接进来时） */
   if (!did) {
@@ -814,8 +829,9 @@ export default function DrugDetail() {
       label: tr("drug.tabRefs"),
       // ★ 用「药物级参考文献」的真实条数（drug_refs），而不是 biodist 来源数；
       //   无文献时不显示「该药暂无」（用户要求），只显示「文献」两个字。
-      ok: (drugRefs?.length ?? drug.n_refs ?? 0) > 0,
-      hint: drugRefs && drugRefs.length ? tr("drug.articles", { n: fmt(drugRefs.length) }) : "",
+      //   2026-11-06：条数取唯一口径 `refCount`（与「落 Tab」守卫同源），避免角标与判据两套口径。
+      ok: refCount > 0,
+      hint: refCount > 0 ? tr("drug.articles", { n: fmt(refCount) }) : "",
     },
     {
       key: "img",
@@ -876,7 +892,7 @@ export default function DrugDetail() {
               {tr("drug.thOrgan")} <b className="num text-ink-2">{fmt(organCount)}</b>
             </span>
             <span>
-              {tr("drug.tabRefs")} <b className="num text-ink-2">{fmt(drugRefs?.length ?? drug.n_refs ?? 0)}</b>
+              {tr("drug.tabRefs")} <b className="num text-ink-2">{fmt(refCount)}</b>
             </span>
             <span>
               {tr("drug.tabDos")} <b className="num text-ink-2">{fmt(drug.n_dosim ?? 0)}</b>
