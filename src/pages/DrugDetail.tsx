@@ -21,7 +21,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return (
     <div>
       <div className="text-[11.5px] font-medium text-ink-3">{label}</div>
-      <div className="mt-0.5 text-[13.5px] text-ink">{children}</div>
+      {/* ★ 2026-11-06：靶点 / 适应症等字段同样会出现超长英文名，缺断行会顶出卡片（同五段卡） */}
+      <div className="mt-0.5 break-words text-[13.5px] text-ink">{children}</div>
     </div>
   );
 }
@@ -872,7 +873,7 @@ export default function DrugDetail() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-2.5">
-            <h1 className="font-sans text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
+            <h1 className="break-words font-sans text-[22px] font-bold tracking-tight sm:text-[26px]">{drug.name_en}</h1>
             <span className="rounded-full border border-[#dfe6f0] bg-tint px-2.5 py-0.5 text-[12px] text-[#516078]">
               # {drug.drug_id}
             </span>
@@ -932,13 +933,18 @@ export default function DrugDetail() {
           ].map((p) => (
             <div
               key={p.key}
-              className={`rounded-[10px] border p-3 ${
+              className={`min-w-0 rounded-[10px] border p-3 ${
                 p.v ? "border-line bg-tint-soft" : "border-dashed border-[#e8edf5] bg-white"
               }`}
             >
               <div className="text-[11.5px] font-medium tracking-wide text-ink-3">{p.k}</div>
+              {/* ★ 2026-11-06（owner 报「Safari 里载体名溢出卡片」· Playwright 双引擎实测）：
+                  五段值里会出现 91 字符的 IUPAC 名（drug 101 `177Lu-ST2210` 的载体），
+                  `overflow-wrap` 默认 normal ⇒ 长词不换行；而 ≥1024px 时五段卡被压到 146–192px
+                  ⇒ 溢出 127–129px（Chromium 与 WebKit 同样溢出，不是 Safari 独有）。
+                  加 `break-words`（overflow-wrap:break-word，Safari 各版本都支持）让他断行。 */}
               <div
-                className={`mt-1.5 text-[15px] font-semibold leading-snug ${
+                className={`mt-1.5 break-words text-[15px] font-semibold leading-snug ${
                   p.v ? "text-ink" : "text-ink-3"
                 }`}
               >
