@@ -231,6 +231,14 @@ def main() -> int:
                 "model": r["model"],
                 "grade": r["evidence_grade"],
                 "src": r["source_field"],
+                # ★ pk322 P4（2026-11-06）：来源派生列，只在导出层算，库与 schema 一律不动
+                #   （dosimetry 表无 note 列 ⇒ 只能派生）。判据与 SQL 等价：
+                #   source_field LIKE 'fda_label:%' ⇒ label（FDA 说明书原文抽取值）；
+                #   其余 ⇒ literature（文献 / 试验报告来源，含 pk321 W1 的 89 行）。
+                #   现算分母：534 = label 366 + literature 168（logs/pk322_adv/w0_check.json）。
+                "dose_provenance": (
+                    "label" if (r["source_field"] or "").startswith("fda_label:") else "literature"
+                ),
                 "raw": (r["raw_text"] or "")[:600],
             })
         sizes["dosimetry.json"] = dump("dosimetry.json", dos_out)
