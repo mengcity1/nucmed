@@ -84,14 +84,21 @@ export const STR = {
   "home.searchDiseases": { zh: "搜索适应症（共 {n} 个）", en: "Search indications ({n})" },
   "home.kpiResult": { zh: "结果药物", en: "Matching drugs" },
   "home.kpiResultHint": { zh: "有数据 {a} / 目录 {b}", en: "{a} with data / {b} in catalogue" },
+  /* ★ 2026-11-06：有筛选时这张卡的提示语也要换口径 —— 否则「结果药物 353」旁边写
+     「有数据 834」会被读成"353 里有 834 个有数据"。 */
+  "home.kpiResultHintFiltered": { zh: "本筛选 {n} 个药有数据", en: "{n} filtered drugs with data" },
   "home.kpiApproved": { zh: "已上市", en: "Approved" },
   "home.kpiApprovedHint": { zh: "最高阶段 = Approval", en: "highest stage = Approval" },
   "home.kpiStruct": { zh: "结构图覆盖", en: "Structure coverage" },
   "home.kpiStructHint": { zh: "{p}% · 有背证结构", en: "{p}% with curated structure" },
   "home.kpiDosim": { zh: "剂量学记录", en: "Dosimetry rows" },
   "home.kpiDosimHint": { zh: "{a} 个药 · {b} 器官", en: "{a} drugs · {b} organs" },
+  /* ★ 2026-11-06：两张卡改为随筛选变化（口径 = 当前结果集）；有筛选时器官/表数无免费来源
+     （biodist.json 1.48 MB 不为一句话再下载）⇒ 只报"本筛选 N 个药"，不混用全库器官数。 */
+  "home.kpiDosimFiltered": { zh: "本筛选 {n} 个药有剂量学", en: "{n} filtered drugs with dosimetry" },
   "home.kpiPts": { zh: "生物分布点", en: "Biodistribution points" },
   "home.kpiPtsHint": { zh: "{a} 张表 · {b} 个器官", en: "{a} tables · {b} organs" },
+  "home.kpiPtsFiltered": { zh: "本筛选 {n} 个药有生物分布", en: "{n} filtered drugs with biodistribution" },
   "home.none": { zh: "暂无", en: "none" },
   "home.stage": { zh: "研发阶段：", en: "Stage:" },
   "home.sort": { zh: "排序", en: "Sort" },

@@ -365,6 +365,19 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [view, structSrc]
   );
+
+  /** ★ 2026-11-06：`剂量学记录` / `生物分布点` 两张卡改为**随筛选变化**。
+   *  原来直接取 `stats.json` 的全库值 ⇒ 筛选到 Lu-177 时仍显示全库 393 / 4,933，
+   *  读起来像"Lu-177 有 393 条剂量学"（实际 1 条）⇒ 属口径误导，连带这两个数字也不会动。
+   *  取值 = 当前结果集内 Σ`n_dosim` / Σ`n_points`（都已在 drugs.json 里，零额外下载）；
+   *  无筛选时**恒等于** stats 全库值（现算：Σn_points 4,933 == `stats.total`、Σn_dosim 393 ==
+   *  `stats.dosimetry.total`，探针 `logs/probe_kpi_filter.mjs` 断言）。 */
+  const sumDosim = useMemo(() => view.reduce((s, d) => s + (d.n_dosim ?? 0), 0), [view]);
+  const sumPts = useMemo(() => view.reduce((s, d) => s + (d.n_points ?? 0), 0), [view]);
+  const drugsWithDosim = useMemo(() => view.filter((d) => (d.n_dosim ?? 0) > 0).length, [view]);
+  const drugsWithPts = useMemo(() => view.filter((d) => (d.n_points ?? 0) > 0).length, [view]);
+  /** 「有筛选」判定与 URL 同步用的同一组状态：nSel 为五类 facet 选中数，另加关键词 */
+  const filtered = nSel > 0 || kw.trim() !== "";
   const pages = Math.max(1, Math.ceil(view.length / PAGE));
   const cur = Math.min(page, pages - 1);
   const rows = view.slice(cur * PAGE, cur * PAGE + PAGE);
@@ -605,10 +618,14 @@ export default function Home() {
               tone="brand"
               label={tr("home.kpiResult")}
               value={view.length}
-              hint={tr("home.kpiResultHint", {
-                a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
-                b: st ? fmt(st.drugs) : "…",
-              })}
+              hint={
+                filtered
+                  ? tr("home.kpiResultHintFiltered", { n: fmt(drugsWithPts) })
+                  : tr("home.kpiResultHint", {
+                      a: st?.coverage ? fmt(st.coverage.drugs_with_biodist) : "…",
+                      b: st ? fmt(st.drugs) : "…",
+                    })
+              }
             />
             <Metric
               tone="accent"
@@ -627,21 +644,29 @@ export default function Home() {
             <Metric
               tone="sand"
               label={tr("home.kpiDosim")}
-              value={st?.dosimetry?.total ?? 0}
+              value={sumDosim}
               hint={
-                st?.dosimetry
+                filtered
+                  ? tr("home.kpiDosimFiltered", { n: fmt(drugsWithDosim) })
+                  : st?.dosimetry
                   ? tr("home.kpiDosimHint", { a: fmt(st.dosimetry.drugs), b: st.dosimetry.organs })
                   : tr("home.none")
               }
             />
-            {/* 2026-11-05：第 5 张 —— 生物分布点总量（全库口径，不是筛选值）。
-                数据源 = stats.json 的 total / tables / organs（与 About 页同源）；
+            {/* 2026-11-05：第 5 张 —— 生物分布点总量。
+                2026-11-06：改为**当前结果集**口径（Σn_points），无筛选时等于 stats.total（4,933）；
                 移动端 5 项排 2 列会剩 1 格 ⇒ 本卡跨 2 列，占满最后一整行。 */}
             <Metric
               tone="ink"
               label={tr("home.kpiPts")}
-              value={st?.total ?? 0}
-              hint={st ? tr("home.kpiPtsHint", { a: fmt(st.tables), b: st.organs }) : tr("home.none")}
+              value={sumPts}
+              hint={
+                filtered
+                  ? tr("home.kpiPtsFiltered", { n: fmt(drugsWithPts) })
+                  : st
+                  ? tr("home.kpiPtsHint", { a: fmt(st.tables), b: st.organs })
+                  : tr("home.none")
+              }
               className="max-sm:col-span-2"
             />
           </section>
