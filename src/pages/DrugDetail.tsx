@@ -623,8 +623,10 @@ export default function DrugDetail() {
       alive = false;
     };
   }, []);
-  const [composeFmt, setComposeFmt] = useState<"svg" | "webp">("svg");
-  useEffect(() => setComposeFmt("svg"), [did]);
+  const [composeFmt, setComposeFmt] = useState<"zju" | "svg" | "webp">("zju");
+  useEffect(() => setComposeFmt("zju"), [did]);
+  const composeUrl = (f: string, id: number) =>
+    `${import.meta.env.BASE_URL}compose/${f === "zju" ? `zju/${id}` : id}.${f === "zju" ? "webp" : f}`;
 
   const [composeSrc, setComposeSrc] = useState<string | null>(null);
   useEffect(() => {
@@ -1035,7 +1037,11 @@ export default function DrugDetail() {
                 {lang === "en" ? "Whole-drug composition schematic" : "整药组成示意"}
               </span>
               <span className="text-[11.5px] text-ink-3">
-                {composeFmt === "svg"
+                {composeFmt === "zju"
+                  ? lang === "en"
+                    ? "source: ZJU radiopharm DB (schematic, not exact structure)"
+                    : "来源：浙大核药库示意图（非精确结构）"
+                  : composeFmt === "svg"
                   ? lang === "en"
                     ? "composition schematic · assembled in-house (not exact structure)"
                     : "整药组成示意 · 本库组装（非精确结构）"
@@ -1054,7 +1060,7 @@ export default function DrugDetail() {
                   type="button"
                   onClick={() =>
                     setZoom({
-                      src: `${import.meta.env.BASE_URL}compose/${drug.drug_id}.${composeFmt}`,
+                      src: composeUrl(composeFmt, drug.drug_id),
                       alt: tr("drug.structAlt", { d: drug.name_en }),
                     })
                   }
@@ -1062,12 +1068,13 @@ export default function DrugDetail() {
                   title={tr("drug.clickZoom")}
                 >
                   <img
-                    src={`${import.meta.env.BASE_URL}compose/${drug.drug_id}.${composeFmt}`}
+                    src={composeUrl(composeFmt, drug.drug_id)}
                     alt={drug.name_en}
                     loading="lazy"
                     className="max-h-[420px] w-auto max-w-full rounded-lg border border-line bg-white p-3"
                     onError={() => {
-                      if (composeFmt === "svg") setComposeFmt("webp");
+                      if (composeFmt === "zju") setComposeFmt("svg");
+                      else if (composeFmt === "svg") setComposeFmt("webp");
                       else setImgErr((s) => ({ ...s, compose: true }));
                     }}
                   />
