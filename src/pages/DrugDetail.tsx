@@ -1037,8 +1037,8 @@ export default function DrugDetail() {
               <span className="text-[11.5px] text-ink-3">
                 {composeFmt === "svg"
                   ? lang === "en"
-                    ? "source: ZJU radiopharm DB · schematic (not exact structure)"
-                    : "来源：浙大核药库示意图 · 非精确结构"
+                    ? "composition schematic · assembled in-house (not exact structure)"
+                    : "整药组成示意 · 本库组装（非精确结构）"
                   : lang === "en"
                   ? "four components assembled · not an exact structure"
                   : "四部件拼装 · 非精确结构"}
