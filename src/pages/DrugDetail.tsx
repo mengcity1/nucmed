@@ -606,6 +606,22 @@ export default function DrugDetail() {
     };
   }, [did]);
 
+  /* ★ 2026-11-08（owner 报「底部大图是螯合剂」）：底部改为「整药组成示意」——
+     来源 parts4（四部件组成图）> schematic（抗体/多肽卡通）。
+     载体结构图改到 ④ 载体 名下（parts/<id>_vector.png），见下方 part 渲染。 */
+  const [composeSrc, setComposeSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    setComposeSrc(null);
+    fetch(`${import.meta.env.BASE_URL}compose/manifest.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string>) => alive && setComposeSrc(m[String(did)] ?? null))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [did]);
+
   /* 药 → pmids：进页面就取，供 Tab 显示真实文献数（不再显示「该药暂无」） */
   useEffect(() => {
     let alive = true;
@@ -992,7 +1008,53 @@ export default function DrugDetail() {
           ))}
         </div>
 
-        {hasRealStruct && (
+        {composeSrc && (
+          <div className="mt-5 border-t border-line pt-4">
+            <div className="mb-3 flex items-baseline justify-between">
+              <span className="text-[13px] font-medium text-ink">
+                {lang === "en" ? "Whole-drug composition schematic" : "整药组成示意"}
+              </span>
+              <span className="text-[11.5px] text-ink-3">
+                {composeSrc === "parts4"
+                  ? lang === "en"
+                    ? "four components assembled · not an exact structure"
+                    : "四部件拼装 · 非精确结构"
+                  : lang === "en"
+                  ? "antibody/peptide schematic · drawn here (not exact)"
+                  : "抗体/多肽示意图 · 本库绘制（非精确结构）"}
+              </span>
+            </div>
+            <div className="flex justify-center">
+              {imgErr.compose ? (
+                <div className="w-full rounded-lg border border-dashed border-line bg-paper-2 px-4 py-8 text-center text-[12.5px] text-ink-3">
+                  {tr("drug.structLoadFail")}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setZoom({
+                      src: `${import.meta.env.BASE_URL}compose/${drug.drug_id}.webp`,
+                      alt: tr("drug.structAlt", { d: drug.name_en }),
+                    })
+                  }
+                  className="cursor-zoom-in rounded-lg transition duration-200 ease-out hover:scale-[1.015] hover:shadow-s2"
+                  title={tr("drug.clickZoom")}
+                >
+                  <img
+                    src={`${import.meta.env.BASE_URL}compose/${drug.drug_id}.webp`}
+                    alt={drug.name_en}
+                    loading="lazy"
+                    className="max-h-[420px] w-auto max-w-full rounded-lg border border-line bg-white p-3"
+                    onError={() => setImgErr((s) => ({ ...s, compose: true }))}
+                  />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {hasRealStruct && !composeSrc && (
           <div className="mt-5 border-t border-line pt-4">
             <div className="mb-3 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-ink">
