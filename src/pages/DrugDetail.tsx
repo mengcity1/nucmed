@@ -609,6 +609,23 @@ export default function DrugDetail() {
   /* ★ 2026-11-08（owner 报「底部大图是螯合剂」）：底部改为「整药组成示意」——
      来源 parts4（四部件组成图）> schematic（抗体/多肽卡通）。
      载体结构图改到 ④ 载体 名下（parts/<id>_vector.png），见下方 part 渲染。 */
+  /* ★ 2026-11-08（owner「不要自己画的海报式示意图，要浙大原图」）：
+     - 底部整药示意改用浙大原图 SVG（3,317 个药），缺失时回退 parts4 的 webp
+     - ④ 载体 卡片只显示"真结构"（ligand/peptide2d），抗体类不再显示自绘海报 */
+  const [realVec, setRealVec] = useState<Record<string, string> | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}parts/vector_real_manifest.json`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((m: Record<string, string>) => alive && setRealVec(m))
+      .catch(() => alive && setRealVec({}));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const [composeFmt, setComposeFmt] = useState<"svg" | "webp">("svg");
+  useEffect(() => setComposeFmt("svg"), [did]);
+
   const [composeSrc, setComposeSrc] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
@@ -989,7 +1006,10 @@ export default function DrugDetail() {
                     .join(" · ")}
                 </div>
               )}
-              {p.part && !imgErr[`part:${p.part}`] && (
+              {p.part &&
+                (p.part !== "vector" ||
+                  (realVec && realVec[String(drug.drug_id)])) &&
+                !imgErr[`part:${p.part}`] && (
                 <img
                   src={`${import.meta.env.BASE_URL}parts/${drug.drug_id}_${p.part}.png`}
                   alt={tr("drug.partAlt", { k: p.k })}
@@ -1015,13 +1035,13 @@ export default function DrugDetail() {
                 {lang === "en" ? "Whole-drug composition schematic" : "整药组成示意"}
               </span>
               <span className="text-[11.5px] text-ink-3">
-                {composeSrc === "parts4"
+                {composeFmt === "svg"
                   ? lang === "en"
-                    ? "four components assembled · not an exact structure"
-                    : "四部件拼装 · 非精确结构"
+                    ? "source: ZJU radiopharm DB · schematic (not exact structure)"
+                    : "来源：浙大核药库示意图 · 非精确结构"
                   : lang === "en"
-                  ? "antibody/peptide schematic · drawn here (not exact)"
-                  : "抗体/多肽示意图 · 本库绘制（非精确结构）"}
+                  ? "four components assembled · not an exact structure"
+                  : "四部件拼装 · 非精确结构"}
               </span>
             </div>
             <div className="flex justify-center">
@@ -1034,7 +1054,7 @@ export default function DrugDetail() {
                   type="button"
                   onClick={() =>
                     setZoom({
-                      src: `${import.meta.env.BASE_URL}compose/${drug.drug_id}.webp`,
+                      src: `${import.meta.env.BASE_URL}compose/${drug.drug_id}.${composeFmt}`,
                       alt: tr("drug.structAlt", { d: drug.name_en }),
                     })
                   }
@@ -1042,11 +1062,14 @@ export default function DrugDetail() {
                   title={tr("drug.clickZoom")}
                 >
                   <img
-                    src={`${import.meta.env.BASE_URL}compose/${drug.drug_id}.webp`}
+                    src={`${import.meta.env.BASE_URL}compose/${drug.drug_id}.${composeFmt}`}
                     alt={drug.name_en}
                     loading="lazy"
                     className="max-h-[420px] w-auto max-w-full rounded-lg border border-line bg-white p-3"
-                    onError={() => setImgErr((s) => ({ ...s, compose: true }))}
+                    onError={() => {
+                      if (composeFmt === "svg") setComposeFmt("webp");
+                      else setImgErr((s) => ({ ...s, compose: true }));
+                    }}
                   />
                 </button>
               )}

@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1216" height="472" viewBox="0 0 1216 472"><defs><marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#8c959f"/></marker></defs><rect width="1216" height="472" fill="#ffffff"/><text x="608.0" y="34" text-anchor="middle" font-size="19" font-weight="700">[89Zr]Zr-3,2-HOPO-MSLN-mAb</text><text x="608.0" y="56" text-anchor="middle" font-size="12" fill="#57606a">Antibody-based RP · RPALTZFTL9 · 真实结构 1/4（连接位点未定）</text><rect x="20" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="132" y="96" text-anchor="middle" font-size="13" fill="#8c959f">核素</text><text x="132" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">Zr-89</text><path d="M246 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="258" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="370" y="96" text-anchor="middle" font-size="13" fill="#8c959f">螯合物</text><text x="370" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">DFO-like</text><path d="M484 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="496" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="608" y="96" text-anchor="middle" font-size="13" fill="#8c959f">连接子</text><g transform="translate(504,108) scale(0.6500)"><?xml version='1.0' encoding='iso-8859-1'?>
+<svg version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width='320px' height='260px' viewBox='0 0 320 260'>
+<!-- END OF HEADER -->
+<path class='bond-0 atom-0 atom-1' d='M 182.3,110.9 L 138.5,148.9' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-1 atom-1 atom-2' d='M 138.5,148.9 L 83.6,129.9' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 88.4,131.5 L 83.7,107.0' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 83.7,107.0 L 79.0,82.5' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 79.8,133.2 L 75.1,108.7' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 75.1,108.7 L 70.4,84.2' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-3 atom-2 atom-4' d='M 83.6,129.9 L 66.4,144.8' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-3 atom-2 atom-4' d='M 66.4,144.8 L 49.2,159.7' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-4 atom-0 atom-5' d='M 182.3,110.9 L 237.2,129.9' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-5 atom-6' d='M 232.4,128.2 L 237.2,152.8' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-5 atom-6' d='M 237.2,152.8 L 241.9,177.5' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-5 atom-6' d='M 241.0,126.6 L 245.7,151.2' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-5 atom-5 atom-6' d='M 245.7,151.2 L 250.4,175.8' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-6 atom-5 atom-7' d='M 237.2,129.9 L 254.4,115.0' style='fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-6 atom-5 atom-7' d='M 254.4,115.0 L 271.6,100.1' style='fill:none;fill-rule:evenodd;stroke:#FF0000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path d='M 180.1,112.8 L 182.3,110.9 L 185.1,111.8' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 140.7,147.0 L 138.5,148.9 L 135.7,147.9' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 86.4,130.8 L 83.6,129.9 L 82.8,130.6' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path d='M 234.4,128.9 L 237.2,129.9 L 238.0,129.1' style='fill:none;stroke:#000000;stroke-width:2.0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;' />
+<path class='atom-3' d='M 65.1 72.9
+Q 65.1 69.0, 67.1 66.8
+Q 69.0 64.6, 72.7 64.6
+Q 76.3 64.6, 78.3 66.8
+Q 80.2 69.0, 80.2 72.9
+Q 80.2 76.9, 78.2 79.2
+Q 76.3 81.5, 72.7 81.5
+Q 69.1 81.5, 67.1 79.2
+Q 65.1 77.0, 65.1 72.9
+M 72.7 79.6
+Q 75.2 79.6, 76.5 77.9
+Q 77.9 76.2, 77.9 72.9
+Q 77.9 69.7, 76.5 68.1
+Q 75.2 66.4, 72.7 66.4
+Q 70.2 66.4, 68.8 68.1
+Q 67.5 69.7, 67.5 72.9
+Q 67.5 76.3, 68.8 77.9
+Q 70.2 79.6, 72.7 79.6
+' fill='#FF0000'/>
+<path class='atom-4' d='M 16.0 159.7
+L 18.2 159.7
+L 18.2 166.7
+L 26.6 166.7
+L 26.6 159.7
+L 28.9 159.7
+L 28.9 176.2
+L 26.6 176.2
+L 26.6 168.6
+L 18.2 168.6
+L 18.2 176.2
+L 16.0 176.2
+L 16.0 159.7
+' fill='#FF0000'/>
+<path class='atom-4' d='M 32.2 167.9
+Q 32.2 164.0, 34.2 161.8
+Q 36.1 159.6, 39.8 159.6
+Q 43.4 159.6, 45.4 161.8
+Q 47.3 164.0, 47.3 167.9
+Q 47.3 171.9, 45.3 174.2
+Q 43.4 176.4, 39.8 176.4
+Q 36.2 176.4, 34.2 174.2
+Q 32.2 171.9, 32.2 167.9
+M 39.8 174.6
+Q 42.3 174.6, 43.6 172.9
+Q 45.0 171.2, 45.0 167.9
+Q 45.0 164.7, 43.6 163.1
+Q 42.3 161.4, 39.8 161.4
+Q 37.3 161.4, 35.9 163.0
+Q 34.6 164.7, 34.6 167.9
+Q 34.6 171.2, 35.9 172.9
+Q 37.3 174.6, 39.8 174.6
+' fill='#FF0000'/>
+<path class='atom-6' d='M 240.6 186.9
+Q 240.6 183.0, 242.5 180.8
+Q 244.5 178.5, 248.1 178.5
+Q 251.8 178.5, 253.7 180.8
+Q 255.7 183.0, 255.7 186.9
+Q 255.7 190.9, 253.7 193.2
+Q 251.7 195.4, 248.1 195.4
+Q 244.5 195.4, 242.5 193.2
+Q 240.6 190.9, 240.6 186.9
+M 248.1 193.6
+Q 250.6 193.6, 252.0 191.9
+Q 253.4 190.2, 253.4 186.9
+Q 253.4 183.7, 252.0 182.1
+Q 250.6 180.4, 248.1 180.4
+Q 245.6 180.4, 244.3 182.0
+Q 242.9 183.7, 242.9 186.9
+Q 242.9 190.2, 244.3 191.9
+Q 245.6 193.6, 248.1 193.6
+' fill='#FF0000'/>
+<path class='atom-7' d='M 273.5 91.9
+Q 273.5 88.0, 275.4 85.8
+Q 277.4 83.6, 281.0 83.6
+Q 284.7 83.6, 286.6 85.8
+Q 288.6 88.0, 288.6 91.9
+Q 288.6 95.9, 286.6 98.2
+Q 284.6 100.4, 281.0 100.4
+Q 277.4 100.4, 275.4 98.2
+Q 273.5 95.9, 273.5 91.9
+M 281.0 98.6
+Q 283.5 98.6, 284.9 96.9
+Q 286.3 95.2, 286.3 91.9
+Q 286.3 88.7, 284.9 87.1
+Q 283.5 85.4, 281.0 85.4
+Q 278.5 85.4, 277.2 87.1
+Q 275.8 88.7, 275.8 91.9
+Q 275.8 95.2, 277.2 96.9
+Q 278.5 98.6, 281.0 98.6
+' fill='#FF0000'/>
+<path class='atom-7' d='M 291.1 83.8
+L 293.4 83.8
+L 293.4 90.7
+L 301.8 90.7
+L 301.8 83.8
+L 304.0 83.8
+L 304.0 100.2
+L 301.8 100.2
+L 301.8 92.6
+L 293.4 92.6
+L 293.4 100.2
+L 291.1 100.2
+L 291.1 83.8
+' fill='#FF0000'/>
+</svg>
+</g><text x="608" y="299" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">Succinic acid</text><path d="M722 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="734" y="74" width="224" height="344" rx="10" fill="#fff8c5" stroke="#9a6700" stroke-width="2" stroke-dasharray="5,4"/><text x="846" y="96" text-anchor="middle" font-size="13" fill="#8c959f">载体</text><text x="846" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#9a6700">有（未归类）</text><path d="M960 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="972" y="74" width="224" height="344" rx="10" fill="#f6f8fa" stroke="#8c959f" stroke-width="2"/><text x="1084" y="96" text-anchor="middle" font-size="13" fill="#8c959f">本体结构</text><text x="1084" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#8c959f">无结构数据</text></svg>

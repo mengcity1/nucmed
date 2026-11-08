@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1216" height="472" viewBox="0 0 1216 472"><defs><marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#8c959f"/></marker></defs><rect width="1216" height="472" fill="#ffffff"/><text x="608.0" y="34" text-anchor="middle" font-size="19" font-weight="700">[15O]H2O</text><text x="608.0" y="56" text-anchor="middle" font-size="12" fill="#57606a">Element-based RP · RPQ8IHJAGO · 真实结构 1/4（连接位点未定）</text><rect x="20" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="132" y="96" text-anchor="middle" font-size="13" fill="#8c959f">核素</text><text x="132" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">O-15</text><path d="M246 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="258" y="74" width="224" height="344" rx="10" fill="#f6f8fa" stroke="#8c959f" stroke-width="2"/><text x="370" y="96" text-anchor="middle" font-size="13" fill="#8c959f">螯合物</text><text x="370" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#8c959f">无</text><path d="M484 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="496" y="74" width="224" height="344" rx="10" fill="#f6f8fa" stroke="#8c959f" stroke-width="2"/><text x="608" y="96" text-anchor="middle" font-size="13" fill="#8c959f">连接子</text><text x="608" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#8c959f">无</text><path d="M722 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="734" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="846" y="96" text-anchor="middle" font-size="13" fill="#8c959f">载体</text><text x="846" y="198" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">BloodFlow</text><path d="M960 246.0 l10 0" stroke="#8c959f" stroke-width="2" marker-end="url(#ar)"/><rect x="972" y="74" width="224" height="344" rx="10" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/><text x="1084" y="96" text-anchor="middle" font-size="13" fill="#8c959f">本体结构</text><g transform="translate(980,108) scale(0.6500)"><?xml version='1.0' encoding='iso-8859-1'?>
+<svg version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width='320px' height='260px' viewBox='0 0 320 260'>
+<!-- END OF HEADER -->
+<path class='atom-0' d='M 117.6 111.1
+L 121.5 111.1
+L 121.5 123.1
+L 136.0 123.1
+L 136.0 111.1
+L 139.8 111.1
+L 139.8 139.4
+L 136.0 139.4
+L 136.0 126.3
+L 121.5 126.3
+L 121.5 139.4
+L 117.6 139.4
+L 117.6 111.1
+' fill='#FF0000'/>
+<path class='atom-0' d='M 145.3 138.4
+Q 146.0 136.6, 147.6 135.7
+Q 149.3 134.7, 151.6 134.7
+Q 154.4 134.7, 156.0 136.2
+Q 157.5 137.7, 157.5 140.4
+Q 157.5 143.2, 155.5 145.8
+Q 153.5 148.4, 149.2 151.4
+L 157.9 151.4
+L 157.9 153.6
+L 145.3 153.6
+L 145.3 151.8
+Q 148.8 149.3, 150.8 147.5
+Q 152.9 145.6, 153.9 143.9
+Q 154.9 142.3, 154.9 140.6
+Q 154.9 138.8, 154.0 137.8
+Q 153.1 136.8, 151.6 136.8
+Q 150.0 136.8, 149.0 137.4
+Q 148.0 138.0, 147.3 139.3
+L 145.3 138.4
+' fill='#FF0000'/>
+<path class='atom-0' d='M 147.0 123.1
+L 151.0 123.1
+L 151.0 109.2
+L 146.5 110.6
+L 145.9 109.0
+L 151.7 106.4
+L 153.5 106.8
+L 153.5 123.1
+L 157.2 123.1
+L 157.2 125.2
+L 147.0 125.2
+L 147.0 123.1
+' fill='#FF0000'/>
+<path class='atom-0' d='M 167.2 113.5
+Q 168.8 113.5, 170.1 114.3
+Q 171.5 114.9, 172.3 116.3
+Q 173.0 117.6, 173.0 119.3
+Q 173.0 121.3, 172.1 122.7
+Q 171.2 124.0, 169.6 124.7
+Q 168.1 125.4, 166.3 125.4
+Q 164.6 125.4, 163.0 124.8
+Q 161.5 124.2, 160.4 123.0
+L 162.0 121.3
+Q 162.8 122.3, 164.0 122.8
+Q 165.2 123.3, 166.4 123.3
+Q 168.1 123.3, 169.2 122.3
+Q 170.4 121.3, 170.4 119.4
+Q 170.4 117.4, 169.2 116.5
+Q 168.1 115.5, 166.3 115.5
+Q 164.6 115.5, 162.8 116.2
+L 161.4 115.5
+L 162.3 106.5
+L 171.9 106.5
+L 171.6 108.7
+L 164.4 108.7
+L 163.9 114.2
+Q 165.5 113.5, 167.2 113.5
+' fill='#FF0000'/>
+<path class='atom-0' d='M 176.4 125.2
+Q 176.4 118.4, 179.7 114.6
+Q 183.1 110.8, 189.4 110.8
+Q 195.6 110.8, 199.0 114.6
+Q 202.4 118.4, 202.4 125.2
+Q 202.4 132.0, 199.0 136.0
+Q 195.6 139.8, 189.4 139.8
+Q 183.1 139.8, 179.7 136.0
+Q 176.4 132.1, 176.4 125.2
+M 189.4 136.6
+Q 193.7 136.6, 196.0 133.8
+Q 198.4 130.8, 198.4 125.2
+Q 198.4 119.6, 196.0 116.8
+Q 193.7 114.0, 189.4 114.0
+Q 185.0 114.0, 182.7 116.8
+Q 180.4 119.6, 180.4 125.2
+Q 180.4 130.9, 182.7 133.8
+Q 185.0 136.6, 189.4 136.6
+' fill='#FF0000'/>
+</svg>
+</g><text x="1084" y="299" text-anchor="middle" font-size="13" font-weight="600" fill="#1a7f37">有（全分子）</text></svg>
