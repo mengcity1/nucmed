@@ -198,8 +198,9 @@ def main() -> int:
 
         tabs = rows_to_dicts(
             con,
-            "SELECT id, drug_id, doc_pmid FROM biodist_table ORDER BY id",
-            ["id", "drug_id", "doc_pmid"],
+            # ★ pk340 P3（2026-11-10）：表级 species 出口（库不动，导出层加列）
+            "SELECT id, drug_id, doc_pmid, species FROM biodist_table ORDER BY id",
+            ["id", "drug_id", "doc_pmid", "species"],
         )
         sizes["tables.json"] = dump("tables.json", tabs)
 
