@@ -35,6 +35,23 @@ POINT_COLS = [
     "source_kind", "subject_key", "species",
 ]
 
+# ★ pk347（§8.2 第 1 件）：publishable 的**唯一来源** = 三桶归属（logs/pk343_adv/n3_records.jsonl）。
+#   禁止用 evidence_grade 推断：grade 是「抽取质量」，不是「归属唯一性」（pk347 契约 §0.1）。
+PUB_SOURCE = ROOT / "logs" / "pk343_adv" / "n3_records.jsonl"
+
+# ★ pk347（§8.2 第 4 件）：/v1 三端点用静态 JSON 实现（静态站架构，不引入 serverless）
+V1 = ROOT / "web" / "public" / "v1"
+DATA_LICENSE = "CC BY-NC 4.0"
+CODE_LICENSE = "MIT"
+CITATION = (
+    "@article{nucmeddb2026,\n"
+    "  title   = {NucMed DB: a traceable radiopharmaceutical\n"
+    "             biodistribution resource with a reproducible benchmark},\n"
+    "  journal = {Manuscript in preparation},\n"
+    "  year    = {2026}\n"
+    "}"
+)
+
 
 def sha256_of(path: Path) -> str:
     h = hashlib.sha256()
@@ -57,6 +74,107 @@ def rows_to_dicts(con, sql: str, cols: list) -> list:
     return [dict(zip(cols, r)) for r in cur.fetchall()]
 
 
+def load_publishable() -> dict:
+    """db_id(biodist_point.id) -> bool。源缺失 ⇒ 空 dict（本列全写 null 并打印 WARN，不静默装真）。"""
+    if not PUB_SOURCE.exists():
+        print(f"WARN publishable 源缺失：{PUB_SOURCE} ⇒ 本列全部写 null（判据未施加）")
+        return {}
+    out = {}
+    skipped = 0
+    with open(PUB_SOURCE, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                skipped += 1
+                continue
+            r = json.loads(line)
+            db_id = r.get("db_id")
+            if db_id is None:
+                skipped += 1
+                continue
+            out[int(db_id)] = (r.get("bucket") == "attributed")
+    print(f"  publishable 源：{PUB_SOURCE.name} → {len(out):,} 行映射（跳过 {skipped}）")
+    return out
+
+
+def build_v1(meta: dict, pts: list, sizes: dict) -> dict:
+    """写 web/public/v1/{meta,records,downloads}.json（只读输入，纯静态）。"""
+    V1.mkdir(parents=True, exist_ok=True)
+    n_pub = sum(1 for p in pts if p.get("publishable") is True)
+    n_unpub = sum(1 for p in pts if p.get("publishable") is False)
+    n_unknown = len(pts) - n_pub - n_unpub
+    fields_note = {
+        "publishable": (
+            "true = 该点在三桶归属里为 attributed（唯一药 ∧ 非类别级 ∧ 非 DF 键）；"
+            "false = 归属不唯一（多药 / 无论文记录 / 类别级 / DF 键），仅供浏览，不得用于定量引用；"
+            "null = 本机缺归属源，判据未施加"
+        ),
+        "source": "logs/pk343_adv/n3_records.jsonl 的 bucket（按 db_id = biodist_point.id 映射）",
+        "not_evidence_grade": "publishable 由归属唯一性判定，与 evidence_grade（抽取质量）无关",
+        "filter": "已排除 backfill_queue.reason='comparative_context' 且未解决的污染行（导出层口径）",
+        "value_unit": "原样照抄库内单位，未折算",
+    }
+    v1_meta = {
+        "api": "v1",
+        "version": meta["version"],
+        "db_sha16": meta["db_sha16"],
+        "db_bytes": meta["db_bytes"],
+        "generated_at": meta["generated_at"],
+        "counts": {
+            "records": len(pts),
+            "publishable": n_pub,
+            "not_publishable": n_unpub,
+            "drugs": meta["counts"]["drugs"],
+            "tables": meta["counts"]["tables"],
+        },
+        "license": {"data": DATA_LICENSE, "code": CODE_LICENSE},
+        "citation": CITATION,
+        "endpoints": {
+            "meta": "/v1/meta.json",
+            "records": "/v1/records.json",
+            "downloads": "/v1/downloads.json",
+        },
+    }
+    rec = {
+        "api": "v1",
+        "version": meta["version"],
+        "db_sha16": meta["db_sha16"],
+        "generated_at": meta["generated_at"],
+        "fields_note": fields_note,
+        "n_records": len(pts),
+        "n_publishable": n_pub,
+        "n_not_publishable": n_unpub,
+        "n_unknown": n_unknown,
+        "records": pts,
+    }
+    files = [
+        {
+            "name": name,
+            "bytes": size,
+            "sha256": sha256_of(OUT / name),
+            "url": "/data/" + name,
+        }
+        for name, size in sorted(sizes.items())
+    ]
+    dl = {
+        "api": "v1",
+        "version": meta["version"],
+        "db_sha16": meta["db_sha16"],
+        "generated_at": meta["generated_at"],
+        "license": {"data": DATA_LICENSE, "code": CODE_LICENSE},
+        "n_files": len(files),
+        "total_bytes": sum(f["bytes"] for f in files),
+        "files": files,
+    }
+    out = {}
+    for name, obj in (("meta.json", v1_meta), ("records.json", rec), ("downloads.json", dl)):
+        path = V1 / name
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
+        out[name] = path.stat().st_size
+    return out
+
+
 def main() -> int:
     if not DB.exists():
         print(f"FAIL 库不存在：{DB}")
@@ -66,6 +184,7 @@ def main() -> int:
     con.execute("PRAGMA query_only=1")
     try:
         sizes = {}
+        v1_sizes = {}
 
         # ★ 2026-10-28 pk263：排除「多药比较句」污染行
         #   backfill_queue 里 reason='comparative_context' 的 484 行（全部 C 级、全部 site_text），
@@ -109,9 +228,21 @@ def main() -> int:
 
         # ★ pk263：给每行标 has_raw，前端据此显示「原文片段」或「仅文献级追溯（PMID）」
         #   487 条无原文（14.4%），它们仍有 doc_pmid，可追到文献但不是原句。
+        # ★ pk347：每行加 publishable（真源 = 三桶归属，不是 evidence_grade）
+        pub = load_publishable()
+        n_pub = n_unpub = n_none = 0
         for p in pts:
             p["has_raw"] = 1 if str(p["id"]) in raw else 0
+            v = pub.get(p["id"])
+            p["publishable"] = v
+            if v is True:
+                n_pub += 1
+            elif v is False:
+                n_unpub += 1
+            else:
+                n_none += 1
         sizes["biodist.json"] = dump("biodist.json", pts)
+        print(f"  publishable: true={n_pub:,} false={n_unpub:,} null={n_none:,}")
 
         # 药物列表取自 v_drug_overview（原 app.py 总览页用的就是这个视图）
         struct_dir = ROOT / "docs" / "assets" / "structures"
@@ -397,6 +528,13 @@ def main() -> int:
             "by_status": dist("SELECT COALESCE(status,'(未标注)'),COUNT(*) FROM v_drug_overview GROUP BY 1 ORDER BY 2 DESC"),
             "by_drug_type": dist("SELECT COALESCE(drug_type,'(未分类)'),COUNT(*) FROM v_drug_overview GROUP BY 1 ORDER BY 2 DESC"),
         }
+        stats["publishable"] = {
+            "source": "logs/pk343_adv/n3_records.jsonl",
+            "rule": "bucket=='attributed'",
+            "true": n_pub,
+            "false": n_unpub,
+            "null": n_none,
+        }
         # ★ pk263：原始总量（未过滤）留档，供审计与论文方法学部分引用
         stats["raw_total_unfiltered"] = con.execute(
             "SELECT COUNT(*) FROM biodist_point").fetchone()[0]
@@ -470,10 +608,13 @@ def main() -> int:
             "db_sha16": sha[:16],
             "db_bytes": DB.stat().st_size,
             "generated_at": datetime.now(tz=UTC).astimezone().isoformat(timespec="seconds"),
-            "counts": {"biodist": total, "drugs": stats["drugs"], "tables": stats["tables"], "refs": len(refs)},
+            "counts": {"biodist": total, "drugs": stats["drugs"], "tables": stats["tables"],
+                       "refs": len(refs), "publishable": n_pub},
             "files": {k: v for k, v in sorted(sizes.items())},
+            "publishable_source": ("logs/pk343_adv/n3_records.jsonl" if PUB_SOURCE.exists() else None),
         }
         dump("meta.json", meta)
+        v1_sizes = build_v1(meta, pts, sizes)
     finally:
         con.close()
 
@@ -483,6 +624,8 @@ def main() -> int:
         total_bytes += size
         print(f"  {name:<15} {size:>10,} B  ({size / 1024:.0f} KB)")
     print(f"  {'合计':<14} {total_bytes:>10,} B  ({total_bytes / 1024 / 1024:.2f} MB)")
+    for name, size in sorted(v1_sizes.items()):
+        print(f"  v1/{name:<12} {size:>10,} B  → {V1}")
     print(f"  库 sha16 = {sha[:16]}  ·  输出目录 {OUT}")
     return 0
 

@@ -510,6 +510,15 @@ export const STR = {
   },
   "drug.onlyLit": { zh: "仅文献", en: "PMID only" },
   "drug.traceOnly": { zh: "仅文献级追溯", en: "Literature-level only" },
+  "drug.notPublishable": { zh: "证据不足", en: "Not publishable" },
+  "drug.notPublishableTitle": {
+    zh: "该点药物归属不唯一（同一篇论文有多个候选药 / 类别级 / 仅 DF 键）⇒ 仅供浏览，不用于定量引用",
+    en: "Drug attribution is not unique for this record (multiple candidate drugs in the paper / class-level / DF-key only) — browse only, not for quantitative use",
+  },
+  "drug.notPublishableCount": {
+    zh: "{n} 条归属不唯一（证据不足，不用于定量）",
+    en: "{n} rows with non-unique attribution (not for quantitative use)",
+  },
   "drug.rawSnippet": { zh: "原文片段：", en: "Source snippet: " },
   "drug.noRawPlaceholder": { zh: "（该行无原文片段）", en: "(no source snippet for this row)" },
   "drug.bioEmptyTitle": { zh: "该药在库内暂无生物分布记录", en: "No biodistribution records for this drug" },

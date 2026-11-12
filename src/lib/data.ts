@@ -19,6 +19,9 @@ export type Point = {
   drug_en?: string | null;
   /** 1 = 有原文片段；0 = 只有 PMID 可追溯（487 条，pk263 新增） */
   has_raw?: number;
+  /** ★ pk347：true = 可发布（三桶归属 attributed）；false = 归属不唯一，可浏览但不得用于定量引用；
+   *  null = 本机缺归属源（判据未施加）。来源 = logs/pk343_adv/n3_records.jsonl 的 bucket。 */
+  publishable?: boolean | null;
 };
 
 export type Drug = {

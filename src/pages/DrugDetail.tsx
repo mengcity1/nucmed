@@ -688,6 +688,9 @@ export default function DrugDetail() {
   /** `has_raw = 0` ⇒ 只有 PMID、没有原文片段（487/3,391，pk263）。
    *  这类行不展开、不留空白框，直接在表格里标明「仅文献级追溯」。 */
   const noRawCount = useMemo(() => mine.filter((p) => p.has_raw === 0).length, [mine]);
+  /** ★ pk347：`publishable === false` ⇒ 归属不唯一（多药 / 类别级 / DF 键）——
+   *  数据照常可见，但明确标注「证据不足，不用于定量」。 */
+  const notPubCount = useMemo(() => mine.filter((p) => p.publishable === false).length, [mine]);
   const pmids = useMemo(
     () => [...new Set(mine.map((p) => p.doc_pmid).filter(Boolean) as string[])],
     [mine]
@@ -1207,6 +1210,17 @@ export default function DrugDetail() {
             ) : (
               <> · {tr("drug.bioClickRow")}</>
             )}
+            {notPubCount > 0 ? (
+              <>
+                {" · "}
+                <span
+                  className="rounded border border-dashed border-[#cbd5e1] px-1.5 py-0.5 text-[10.5px] font-medium"
+                  title={tr("drug.notPublishableTitle")}
+                >
+                  {tr("drug.notPublishableCount", { n: fmt(notPubCount) })}
+                </span>
+              </>
+            ) : null}
           </span>
         </div>
 
@@ -1245,6 +1259,14 @@ export default function DrugDetail() {
                         {p.organ_norm}
                         {p.has_raw === 0 && (
                           <span className="ml-1.5 text-[10.5px] font-normal text-ink-3 sm:hidden">{tr("drug.onlyLit")}</span>
+                        )}
+                        {p.publishable === false && (
+                          <span
+                            className="ml-1.5 rounded border border-dashed border-[#cbd5e1] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-3"
+                            title={tr("drug.notPublishableTitle")}
+                          >
+                            {tr("drug.notPublishable")}
+                          </span>
                         )}
                       </td>
                       <td className="num px-4 py-2">{p.time_h ?? "—"}</td>
